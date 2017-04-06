@@ -1,24 +1,63 @@
 var fs = require("fs"),
 	querystring = require("querystring"),
 	util = require("util"),
-	formidable = require("formidable"),
-	mongoClient = require('mongodb').MongoClient,
-	ObjectID = require('mongodb').ObjectID,
-	mongoOp = require("../models/mongo"),
+//	formidable = require("formidable"),
+//	mongoClient = require('mongodb').MongoClient,
+//	ObjectID = require('mongodb').ObjectID,
+//	mongoOp = require("../models/mongo"),
 	url = require("url");
 
 var appRouter = function(app) {
+	
+	/**
+	 * @swagger
+	 * definition:
+	 *   twitter-accounts:
+	 *     properties:
+	 *       id:
+	 *         type: string
+	 *       info:
+	 *         type: string
+	 *       description:
+	 *         type: string
+	 *   urls:
+	 *     properties:
+	 *       hash:
+	 *         type: string
+	 *       dest:
+	 *         type: string
+	 */
 
+	
+	////////////////////////////////////////////////////////
+	
 	//registro
 	app.post("/login/signup", function(request, response) {
-
 
 	});
 
 	//login
+	/**
+	 * @swagger
+	 * login/signup:
+	 *   post:
+	 *     tags:
+	 *       - Login
+	 *     description: Log in the system
+	 *     produces:
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: Login OK 
+	 *       401:
+	 *         description: Unable to log in
+	 */
 	app.post("/login/signin", function(request, response) {
 
-
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("prueba ok");
+	
+		response.end();
 	});
 
 	//recordar passwd
@@ -29,11 +68,14 @@ var appRouter = function(app) {
 
 	//todas las cuentas
 	app.get("/twitter-accounts", function(request, response) {
-
+		response.writeHead(200, {"Content-Type": "text/html"});
+		response.write("prueba ok");
+	
+		response.end();
 
 	});
 
-	//obtienee una cuenta
+	//obtiene una cuenta
 	app.get("/twitter-accounts/:id", function(request, response) {
 
 
