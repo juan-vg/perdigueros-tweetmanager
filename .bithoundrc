@@ -1,0 +1,9 @@
+"ignore": [
+    "**/api-docs/**"
+]
+
+"critics": {
+  "wc": { "limit": 800 }
+}
+
+"packageJsonLocation": "backend/package.json"
