@@ -55,7 +55,7 @@ var appRouter = function(app) {
 	app.post("/login/signin", function(request, response) {
 
 		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("prueba ok");
+		response.write("prueba ok signin");
 	
 		response.end();
 	});
@@ -69,10 +69,9 @@ var appRouter = function(app) {
 	//todas las cuentas
 	app.get("/twitter-accounts", function(request, response) {
 		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("prueba ok");
+		response.write("prueba ok twitter-accounts");
 	
 		response.end();
-
 	});
 
 	//obtiene una cuenta
@@ -238,6 +237,6 @@ var appRouter = function(app) {
 
 
 	});
-}
+};
 
 module.exports = appRouter;
