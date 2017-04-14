@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head;
+    any other head content must come *after* these tags -->
+    <title>Bootstrap template</title>
+
+    <!-- Integrar Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Integrar otros estilos -->
+    <link href="css/perdiguero.css" rel="stylesheet">
+    <!---->
+    <link href="css/footer.css" rel="stylesheet">
+
+    <!-- Font Awesome library -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+</head>
+<body>
+
+<!-- Static top navbar -->
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- Navbar brand-->
+            <a class="navbar-brand" href="#">Perdigueros Tweet Manager</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <!-- Right list with user information and logout button-->
+            <ul class="nav navbar-nav navbar-right">
+                <!-- User drodown -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Usuario<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Mi perfil</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+<!-- Content of home logged user view-->
+
+<div class="container">
+    <div class="row">
+        <!-- Account panel -->
+        <div class="col-xs-12 col-sm-5 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                    Cuentas
+                    <div class="pull-left">
+                        <button class="icon-button"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <img src="img/img1.png" class="img-circle">
+                        </div>
+                        <div class="col-xs-8">
+                            Nombre usuario <br>
+                            @cuentaTwitter <br>
+                            Descripcion
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tweet navigation toolbar -->
+        <div class="col-xs-12 col-sm-7 col-md-8">
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <ul class="nav nav-pills center-block">
+                        <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Información de tweets</a></li>
+                        <li><a href="#"><i class="fa fa-twitch" aria-hidden="true"></i>&nbsp;Publicar tweet</a></li>
+
+                    <!-- User drodown -->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Más herramientas
+                            <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Acortador de URL's</a></li>
+                                <li><a href="#">Estadísticas</a></li>
+                                <li><a href="#">Seguimiento de <br>hashtags
+                                    o de usuarios</a></li>
+                            </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel-body">
+                holi
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+           El footer
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+
+
+
+
+    <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- Bootstrap js library required -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
