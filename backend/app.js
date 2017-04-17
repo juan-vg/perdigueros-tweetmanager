@@ -69,16 +69,60 @@ var appRouter = function(app) {
 	});
 
 	//todas las cuentas
+	/**
+	 * @swagger
+	 * twitter-accounts/:
+	 *   get:
+	 *     tags:
+	 *       - GET accounts
+	 *     description: Get information of all accounts
+	 *     produces:
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: Accounts have been successfully obtained 
+	 *       500:
+	 *         description: Error getting the accounts
+	 */
 	app.get("/twitter-accounts", function(request, response) {
-		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("prueba ok twitter-accounts");
-	
-		response.end();
+		console.log("APP-GET-ALL-ACCOUNTS");
+		twitter-accounts.getAll( request.headers.userToken, function (err, data){
+				if(!err){
+					console.log("APP-GET-ALL-ACCOUNTS: Accounts founded" + data);
+					
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write(data);
+					
+				} else {
+					console.log("APP-GET-ALL-ACCOUNTS: Error while performing query");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Error getting the accounts");
+				}
+				response.end();
+			}
+		);
 	});
 
 	//obtiene una cuenta
 	app.get("/twitter-accounts/:id", function(request, response) {
-
+		console.log("APP-GET-ACCOUNTS-ID");
+		twitter-accounts.getAccount(request.params.id, function (err, data){
+				if(!err){
+					console.log("APP-GET-ACCOUNTS-ID: Account founded" + data);
+					
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write(data);
+					response.end();
+					
+				} else {
+					console.log("APP-GET-ACCOUNTS-ID: Error while performing query");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("There is no task with id=" + id);
+					response.end();
+				}
+				response.end();
+			}
+		);
 
 	});
 	
@@ -89,8 +133,48 @@ var appRouter = function(app) {
 	});
 	
 	//borra una cuenta
+	/**
+	 * @swagger
+	 * twitter-accounts/{id}:
+	 *   delete:
+	 *     tags:
+	 *       - DELETE account
+	 *     description: 
+	 *     parameters:
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The ID account
+	 *         type: string
+	 *     produces:
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The account has been successfully removed 
+	 *       404:
+	 *         description: Unable to find the requested {id}
+	 */
 	app.delete("/twitter-accounts/:id", function(request, response) {
-
+		console.log("APP-DEL-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
+		twitter-accounts.deleteAccount(request.params.id, request.headers.token,
+			function (err){
+				if(err == null){
+					console.log("APP-DEL-ACCOUNTS-ID: Delete ok");
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Deleted account");
+					
+				} else if(err == 'forbidden'){
+					console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID is forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("The user does not own this account!");
+				} else {
+					console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID not found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Account ID not found!");
+				}
+				response.end();
+			}
+		);
 
 	});
 	
