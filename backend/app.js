@@ -6,6 +6,8 @@ var fs = require("fs"),
 //	ObjectID = require('mongodb').ObjectID,
 //	mongoOp = require("../models/mongo"),
 	url = require("url");
+	
+var urlShortener = require('./url-shortener.js');
 
 var appRouter = function(app) {
 	
@@ -22,9 +24,9 @@ var appRouter = function(app) {
 	 *         type: string
 	 *   urls:
 	 *     properties:
-	 *       hash:
+	 *       URL-ID:
 	 *         type: string
-	 *       dest:
+	 *       URL:
 	 *         type: string
 	 */
 
@@ -39,7 +41,7 @@ var appRouter = function(app) {
 	//login
 	/**
 	 * @swagger
-	 * login/signup:
+	 * login/signin:
 	 *   post:
 	 *     tags:
 	 *       - Login
@@ -217,14 +219,84 @@ var appRouter = function(app) {
 	});
 	
 	//ACORTAR URL
+	
+	/**
+	 * @swagger
+	 * urls/{id}:
+	 *   get:
+	 *     tags:
+	 *       - GET short url
+	 *     description: Request the real URL associated with the provided {id}
+	 *     parameters:
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The short URL-ID
+	 *         type: string
+	 *     produces:
+	 *       - text/html
+	 *     responses:
+	 *       307:
+	 *         description: Redirect to the real URL (provided as Location header)
+	 *       404:
+	 *         description: Unable to find the requested {id}
+	 */
 	app.get("/urls/:id", function(request, response) {
-
-
+		console.log("APP-GET-URLS-ID: Requested URL-ID is: " + request.params.id);
+		urlShortener.get(request.params.id,
+			function (err, url){
+				if(!err){
+					console.log("APP-GET-URLS-ID: Requested URL is: " + url);
+					response.writeHead(307, {"Content-Type": "text/html", Location: url});
+					response.write("Redirecting to " + url);
+				} else {
+					console.log("APP-GET-URLS-ID: Requested URL-ID not found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("URL not found!");
+				}
+				response.end();
+			}
+		);
 	});
 	
+	/**
+	 * @swagger
+	 * urls:
+	 *   post:
+	 *     tags:
+	 *       - POST short url
+	 *     description: Creates a new short URL associated with the provided {url}
+	 *     parameters:
+	 *       - name: url
+	 *         in: body
+	 *         required: true
+	 *         description: The URL string
+	 *         type: string
+	 *     produces:
+	 *       - text/html
+	 *     responses:
+	 *       201:
+	 *         description: The short URL was created successfully
+	 *       500:
+	 *         description: DB insert error
+	 */
 	app.post("/urls", function(request, response) {
-
-
+		
+		console.log("APP-POST-URLS: Posted URL is: " + request.body.url);
+		urlShortener.post(request.body.url,
+			function (err, urlId){
+				if(!err){
+					console.log("APP-POST-URLS: Short URL saved!");
+					response.writeHead(201, {"Content-Type": "text/html"});
+					response.write("Short URL saved!");
+				} else {
+					console.log("APP-POST-URLS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+				response.end();
+			}
+		);
 	});
 	
 	//SUBIR IMAGEN
