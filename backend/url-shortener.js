@@ -4,6 +4,10 @@ var objectID = require('mongodb').ObjectID;
 // MongoDB - URLs DB - connection
 var connection = 'mongodb://localhost:27017/urls';
 
+
+//TODO: prefijos en logs
+//TODO: mongoose
+
 exports.post = function (urlStr, callback){
 	
 	var error;
