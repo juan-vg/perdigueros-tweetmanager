@@ -23,11 +23,11 @@ exports.post = function (urlStr, callback){
 				if (!err) {
 					console.log("Inserted URL Id: ", result.insertedIds[0]);
 					var error = false;
-					callback(err, result.insertedIds[0]);
+					callback(error, result.insertedIds[0]);
 				} else {
 					console.log("ERROR: while inserting on DB");
 					var error = true;
-					callback(err, null);
+					callback(error, null);
 				}
 			});
 			db.close();
@@ -35,7 +35,7 @@ exports.post = function (urlStr, callback){
 		} else {
 			console.log("ERROR: while connecting to DB");
 			var error = true;
-			callback(err, null);
+			callback(error, null);
 		}
 	});
 };
@@ -44,12 +44,13 @@ exports.get = function (urlId, callback){
 	
 	// If the urlId is NOT valid
 	var checkId = new RegExp("^[0-9a-fA-F]{24}$");
-	if !(typeof urlId == 'string' && (urlId.length == 12 || urlId.length == 24) && checkId.test(urlId)){
+	if ( !(typeof urlId == 'string' && (urlId.length == 12 || urlId.length == 24) && checkId.test(urlId) ) ){
 		var error = true;
-		callback(err, null);
-	} 
-	// If the urlId is VALID
-	else {
+		callback(error, null);
+		
+	} else {
+		// If the urlId is VALID
+		
 		mongo.connect(connection, function(err, db) {
 		
 			if(!err){
@@ -65,11 +66,11 @@ exports.get = function (urlId, callback){
 					if(!err && docs.length > 0){
 						console.log("URL: ", docs[0]);
 						var error = false;
-						callback(err, docs[0].urlStr);
+						callback(error, docs[0].urlStr);
 					} else {
 						console.log("No URL with id=", urlId);
 						var error = true;
-						callback(err, null);
+						callback(error, null);
 					}
 				});
 				db.close();
@@ -77,7 +78,7 @@ exports.get = function (urlId, callback){
 			} else {
 				console.log("ERROR: while connecting to DB");
 				var error = true;
-				callback(err, null);
+				callback(error, null);
 			}
 		});
 	}
