@@ -13,21 +13,19 @@ var appRouter = function(app) {
 	
 	/**
 	 * @swagger
-	 * definition:
-	 *   twitter-accounts:
+	 * definitions:
+	 *   Twitter-accounts:
 	 *     properties:
-	 *       id:
-	 *         type: string
 	 *       info:
 	 *         type: string
 	 *       description:
 	 *         type: string
-	 *   urls:
+	 *   Urls:
+	 *     type: "object"
 	 *     properties:
-	 *       URL-ID:
+	 *       url:
 	 *         type: string
-	 *       URL:
-	 *         type: string
+	 *         description: "The URL string"
 	 */
 
 	
@@ -41,7 +39,7 @@ var appRouter = function(app) {
 	//login
 	/**
 	 * @swagger
-	 * login/signin:
+	 * /login/signin:
 	 *   post:
 	 *     tags:
 	 *       - Login
@@ -219,10 +217,9 @@ var appRouter = function(app) {
 	});
 	
 	//ACORTAR URL
-	
 	/**
 	 * @swagger
-	 * urls/{id}:
+	 * /urls/{id}:
 	 *   get:
 	 *     tags:
 	 *       - GET short url
@@ -261,19 +258,22 @@ var appRouter = function(app) {
 	
 	/**
 	 * @swagger
-	 * urls:
+	 * /urls:
 	 *   post:
 	 *     tags:
 	 *       - POST short url
 	 *     description: Creates a new short URL associated with the provided {url}
+	 *     consumes:
+	 *       - application/json
 	 *     parameters:
 	 *       - name: url
 	 *         in: body
 	 *         required: true
 	 *         description: The URL string
-	 *         type: string
+	 *         schema:
+	 *           $ref: "#/definitions/Urls"
 	 *     produces:
-	 *       - text/html
+	 *       - application/json
 	 *     responses:
 	 *       201:
 	 *         description: The short URL was created successfully
@@ -288,7 +288,7 @@ var appRouter = function(app) {
 				if(!err){
 					console.log("APP-POST-URLS: Short URL saved!");
 					response.writeHead(201, {"Content-Type": "text/html"});
-					response.write("Short URL saved!");
+					response.write("Short URL saved! (ID="+urlId+")");
 				} else {
 					console.log("APP-POST-URLS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
