@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- The above 3 meta tags *must* come first in the head;
+    any other head content must come *after* these tags -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>PTM</title>
+
+    <!-- Bootstrap Framework load -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/footer.css" rel="stylesheet">
+    <link href="css/login.css" rel="stylesheet">
+
+    <!-- Font Awesome library load -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+</head>
+
+
+<body>
+<!-- Static top navbar -->
+<nav id="indexNavbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <!-- Navbar brand-->
+            <a class="navbar-brand" href="#">Perdigueros Tweet Manager</a>
+        </div>
+
+
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+
+<!-- Index body content, component jumbotron with welcome message -->
+<div class="jumbotron">
+    <div class="container">
+    <h1>¡Bienvenido a <br> Perdigueros Tweet Manager!</h1>
+        <h3>¿Aún no estás registrado? <a class="btn btn-success btn-lg" href="#" role="button">Regístrate</a></h3>
+    </div>
+</div>
+<!-- Login form -->
+<div class="container-fluid">
+    <!-- Login module -->
+    <div class="container omb_login">
+        <h3 class="omb_authTitle">Inicia sesión o <a href="#">regístrate</a></h3>
+        <div class="row omb_row-sm-offset-3 omb_socialButtons">
+            <div class="col-xs-4 col-sm-2">
+                <a href="#" class="btn btn-lg btn-block omb_btn-facebook">
+                    <!--Responsive method -->
+                    <i class="fa fa-facebook visible-xs"></i>
+                    <span class="hidden-xs">Facebook</span>
+                </a>
+            </div>
+            <div class="col-xs-4 col-sm-2">
+                <a href="#" class="btn btn-lg btn-block omb_btn-openid">
+                    <!--Responsive method -->
+                    <i class="fa fa-openid visible-xs"></i>
+                    <span class="hidden-xs">OpenID</span>
+                </a>
+            </div>
+            <div class="col-xs-4 col-sm-2">
+                <a href="#" class="btn btn-lg btn-block omb_btn-google">
+                    <!--Responsive method -->
+                    <i class="fa fa-google-plus visible-xs"></i>
+                    <span class="hidden-xs">Google+</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="row omb_row-sm-offset-3 omb_loginOr">
+            <div class="col-xs-12 col-sm-6">
+                <hr class="omb_hrOr">
+                <span class="omb_spanOr">o</span>
+            </div>
+        </div>
+
+        <div class="row omb_row-sm-offset-3">
+            <div class="col-xs-12 col-sm-6">
+                <form class="omb_loginForm" action="" autocomplete="off" method="POST">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <input type="text" class="form-control" name="username" placeholder="E-mail">
+                    </div>
+                    <span class="help-block"></span>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                        <input  type="password" class="form-control" name="password" placeholder="Contraseña">
+                    </div>
+                    <span class="help-block">Error en contraseña</span>
+
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Inicia sesión</button>
+                </form>
+            </div>
+        </div>
+        <div class="row omb_row-sm-offset-3">
+            <div class="col-xs-12 col-sm-3">
+                <label class="checkbox omb_rememberMe">
+                    <input type="checkbox" value="remember-me">Recuérdame
+                </label>
+            </div>
+            <div class="col-xs-12 col-sm-3">
+                <p class="omb_forgotPwd">
+                    <a href="#">¿Olvidaste la contraseña?</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<footer class="footer">
+    <div class="container-fluid">
+        <p class=text-muted">Footer</p>
+    </div>
+</footer>
+
+
+
+
+    <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- Bootstrap js library required -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
