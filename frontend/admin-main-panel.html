@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head;
+    any other head content must come *after* these tags -->
+    <title>Perdigueros Tweet Manager</title>
+
+    <!-- Bootstrap Framework load -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Perdigueros Css styles load -->
+    <link href="css/perdiguero.css" rel="stylesheet">
+    <!-- Footer styles -->
+    <link href="css/footer.css" rel="stylesheet">
+    <!-- Font Awesome library -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+</head>
+<body>
+
+<!-- Static top navbar -->
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- Navbar brand-->
+            <a class="navbar-brand" href="#">Perdigueros Tweet Manager. Admin Control</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+            	<!-- Stadistics link -->
+            	<li><a href="admin-door-panel.html"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Estadisticas</a></li>
+                <!-- Right list with logout button-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+
+
+<!-- Content of list of users view-->
+
+<div class="container">
+    <div class="row">
+        <!-- List with users -->
+        <div class="col-xs-12 col-sm-7 col-md-8">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Usuario</th>
+						<th>Ultima Entrada</th>
+						<th>Fecha de Registro</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>User1</td>
+						<td>10/04/1999</td>
+						<td>05/01/1998</td>
+					</tr>
+				</tbody>
+			</table>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+           El footer
+        </div>
+    </div>
+</footer>
+    <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- Bootstrap js library required -->
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
