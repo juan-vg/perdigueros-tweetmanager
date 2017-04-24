@@ -12,6 +12,7 @@
     <!-- Bootstrap Framework load -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/footer.css" rel="stylesheet">
+    <link href="css/common-styles.css" rel="stylesheet">
     <link href="css/login.css" rel="stylesheet">
 
     <!-- Font Awesome library load -->
@@ -21,30 +22,28 @@
 
 <body>
 <!-- Static top navbar -->
-<nav id="indexNavbar" class="navbar navbar-default navbar-fixed-top">
+<nav id="indexNavbar" class="hidden-xs navbar navbar-default navbar-fixed-top">
     <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
             <!-- Navbar brand-->
             <a class="navbar-brand" href="#">Perdigueros Tweet Manager</a>
         </div>
-
-
-    </div><!-- /.container-fluid -->
+    </div><!-- /.container-->
 </nav>
 
 
 
 <!-- Index body content, component jumbotron with welcome message -->
-<div class="jumbotron">
-    <div class="container">
-    <h1>¡Bienvenido a <br> Perdigueros Tweet Manager!</h1>
-        <h3>¿Aún no estás registrado? <a class="btn btn-success btn-lg" href="#" role="button">Regístrate</a></h3>
+<div id="welcomeHeader" class="jumbotron">
+    <div class="container text-center">
+    <h2 class="hidden-xs">Bienvenido a </h2>
+        <h1>Perdigueros Tweet Manager</h1>
     </div>
 </div>
 <!-- Login form -->
 <div class="container-fluid">
-    <!-- Login module -->
+    <!-- Social networks login module -->
     <div class="container omb_login">
         <h3 class="omb_authTitle">Inicia sesión o <a href="#">regístrate</a></h3>
         <div class="row omb_row-sm-offset-3 omb_socialButtons">
@@ -71,6 +70,7 @@
             </div>
         </div>
 
+        <!-- or login with system credentials -->
         <div class="row omb_row-sm-offset-3 omb_loginOr">
             <div class="col-xs-12 col-sm-6">
                 <hr class="omb_hrOr">

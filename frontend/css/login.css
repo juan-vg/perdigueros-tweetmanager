@@ -13,7 +13,7 @@
     text-align: center;
     line-height: 300%;
 }
-
+/*Styles for social buttons(facebook,openid,google)*/
 .omb_login .omb_socialButtons a {
     font-size: 16px;
     text-align: center;
@@ -28,7 +28,7 @@
 .omb_login .omb_socialButtons .omb_btn-openid {background: #f7931e;}
 .omb_login .omb_socialButtons .omb_btn-google {background: #c32f10;}
 
-
+/*Styles for login selector(social networks or system credentials)*/
 .omb_login .omb_loginOr {
     position: relative;
     font-size: 1.5em;
@@ -55,9 +55,11 @@
     text-align: center;
 }
 
+/*Styles for login form inputs*/
 .omb_login .omb_loginForm .input-group.i {
     width: 2em;
 }
+/*Stles for login form help-block */
 .omb_login .omb_loginForm  .help-block {
     color: red;
 }
@@ -87,5 +89,18 @@
         margin-top:10px;
     }
 }
+
+
+/*Styles for sign-up bottom into welcome header jumbotron*/
+#welcomeHeader .btn {
+    color:white;
+
+}
+
+
+
+
+
+
 
 
