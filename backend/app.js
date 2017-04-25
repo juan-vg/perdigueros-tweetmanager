@@ -8,6 +8,7 @@ var fs = require("fs"),
 	url = require("url");
 	
 var urlShortener = require('./url-shortener.js');
+var hashtags = require('./hashtags.js');
 
 var appRouter = function(app) {
 	
@@ -117,8 +118,62 @@ var appRouter = function(app) {
 	});
 	
 	//HASHTAGS
+	
+	/**
+	 * @swagger
+	 * /hashtags:
+	 *   get:
+	 *     tags:
+	 *       - GET all hashtags
+	 *     description: Gets all hashtags for the provided {twitter-account-id}
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: twitter-account-id
+	 *         in: header
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *     produces:
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: The hashtag list
+	 *       403:
+	 *         description: Given token does not have permission to the provided {twitter-account-id}
+	 *       500:
+	 *         description: DB error
+	 */
 	app.get("/hashtags", function(request, response) {
-
+		
+		var accountID = {
+			"token": request.headers.token,
+			"twitter-account-id": request.headers.twitter-account-id
+		}
+		
+		console.log("APP-GET-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter-account-id + ")");
+		
+		hashtags.get(accountID,	function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-HASHTAGS: Requested URL is: " + url);
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write("Redirecting to " + url);
+				
+			} else {
+				if(data === "FORBIDDEN"){
+					console.log("APP-GET-HASHTAGS: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "application/json"});
+					response.write("Forbidden");
+				} else {
+					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "application/json"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 
 	});
 	

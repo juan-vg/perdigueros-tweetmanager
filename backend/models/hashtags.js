@@ -1,15 +1,12 @@
 var mongoose = require("mongoose");
-
-mongoose.connect('mongodb://localhost:27017/hashtags');
-
-//create instance of Schema
+mongoose.connect('mongodb://localhost:27017/ptm');
 var mongoSchema = mongoose.Schema;
 
-//create schema
-var hashtagSchema = {
+
+var hashtagSchema = new mongoSchema {
 	"idTwitterAcount" : String,
 	"hashtag" : String
 };
 
-//create model if not exists.
-module.exports = mongoose.model('hashtags',hashtagSchema);
+var dbHashtags = mongoose.model('hashtags',hashtagSchema);
+module.exports = dbHashtags;
