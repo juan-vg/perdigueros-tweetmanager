@@ -60,20 +60,22 @@
 <div class="container">
     <div class="row">
         <!-- List with users -->
-        <div class="col-xs-12">
+        <div class="col-xs-12"  ng-app="UsersData" ng-controller="UserController">
 			<table class="table table-bordered">
 				<thead>
 					<tr>
 						<th class="text-center">Usuario</th>
 						<th class="text-center">Ultima Entrada</th>
 						<th class="text-center">Fecha de Registro</th>
+                        <th class="text-center col-md-1"">¿Eliminar?</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody ng-repeat="i in users">
 					<tr>
-						<td class="text-center">User1</td>
-						<td class="text-center">10/04/1999</td>
-						<td class="text-center">05/01/1998</td>
+						<td class="text-center">{{i.name}}</td>
+						<td class="text-center">{{i.last}}</td>
+						<td class="text-center">{{i.first}}</td>
+                        <td><button class="btn btn-danger center-block" ng-click="removeUser(i.name)"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
 					</tr>
 				</tbody>
 			</table>
@@ -92,5 +94,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <!-- Bootstrap js library required -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- Angular js library required -->
+    <script src="js/angular.min.js"></script>
+    <!-- Angular js Functions -->
+    <script src="angular.js"></script>
 </body>
 </html>

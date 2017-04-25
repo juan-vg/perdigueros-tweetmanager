@@ -44,14 +44,14 @@
 <div class="container">
     <div class="row">
         <!-- Form with password -->
-        <div class="col-xs-4 col-xs-offset-4">
-			<form>
-  				<div class="form-group">
-    				<label for="pwd">Contraseña:</label>
-    				<input type="password" class="form-control" id="pwd">
-  				</div>
-  				<button type="submit" class="btn btn-primary btn-lg center-block"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Entrar</button>
-			</form>
+        <div class="col-xs-4 col-xs-offset-4" ng-app="PwdCheck">
+			   <form name="myForm">
+       				<label for="password">Contraseña</label>
+       				<input type="password" id="password" name="password" ng-model="formData.password" ng-minlength="8" ng-maxlength="20" required  />
+   					<span ng-show="!myForm.password.$error.required && (myForm.password.$error.minlength || myForm.password.$error.maxlength) && myForm.password.$dirty"><br />Contraseña minimo 8 caracteres y maximo de 20</span>
+       				<br />
+   					<button type="submit"  class="btn btn-primary btn-lg center-block" ng-disabled="!myForm.$valid"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Entrar</button>
+				</form>
         </div>
     </div>
 </div>
@@ -67,5 +67,9 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <!-- Bootstrap js library required -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- Angular js library required -->
+    <script src="js/angular.min.js"></script>
+    <!-- Angular js Functions -->
+    <script src="angular.js"></script>
 </body>
 </html>
