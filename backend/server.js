@@ -14,8 +14,8 @@ var swaggerDefinition = {
 	version: '1.0.0',
 	description: 'Descripción del API del servicio de usuarios'
 	},
-	host: 'localhost:8888',
-	basePath: '/',
+	host: 'zaratech-ptm.ddns.net:8888',
+	basePath: '',
 	};
 
 // options for the swagger docs
