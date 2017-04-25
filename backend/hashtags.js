@@ -7,8 +7,6 @@ var objectID = require('mongodb').ObjectID;
 
 //accountID {token, idTwitterAcount}
 
-// TODO: verificar la db de usuarios token -> email
-
 function getUserEmail(token, callback){
 	
 	var error, data;
@@ -16,7 +14,7 @@ function getUserEmail(token, callback){
 	urlsModel.find({"token" : token }, function(err, dbData) {
 		if(!err && data.length > 0){
 			error = false;
-			data = dbData[0].email
+			data = dbData[0].email;
 		} else {
 			error = true;
 			data = null;

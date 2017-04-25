@@ -150,7 +150,7 @@ var appRouter = function(app) {
 		var accountID = {
 			"token": request.headers.token,
 			"twitter-account-id": request.headers.twitter-account-id
-		}
+		};
 		
 		console.log("APP-GET-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter-account-id + ")");
 		
