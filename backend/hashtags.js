@@ -1,4 +1,4 @@
-var usersModel = require("./models/users");
+var usersModel = require("./models/user-accounts");
 var twiAccModel = require("./models/twitter-accounts");
 var hashtagsModel = require("./models/hashtags");
 
@@ -11,11 +11,13 @@ function getUserEmail(token, callback){
 	
 	var error, data;
 	
-	urlsModel.find({"token" : token }, function(err, dbData) {
-		if(!err && data.length > 0){
+	usersModel.find({"token" : token }, function(err, dbData) {
+		if(!err && dbData.length > 0){
+			console.log("HASHTAGS-GET-USER-EMAIL: token: " + token + " -> email: " + dbData[0].email);
 			error = false;
 			data = dbData[0].email;
 		} else {
+			console.log("HASHTAGS-GET-USER-EMAIL: NOT FOUND!!!");
 			error = true;
 			data = null;
 		}
@@ -27,27 +29,31 @@ function verifyUser(accountID, callback){
 	
 	var success;
 	
-	getUserEmail(accountID.token,
-		function(error, email){
+	getUserEmail(accountID.token, function(error, email){
 			
 			if(!error){
-				dbTwitterAccounts.find({"email" : email, "idTwitterAcount" : accountID.idTwitterAcount},
+				twiAccModel.find({"email" : email, "_id" : accountID.twitterAccountId},
 					
 					function(err,dbData){
 						
 						if(!err && dbData.length > 0){
+							console.log("HASHTAGS-VERIFY-USER: email: " + email + " owns TwitterAccount: " + accountID.twitterAccountId);
 							success = true;
 						} else {
+							console.log("HASHTAGS-VERIFY-USER: email: " + email + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
 							success = false;
 						}
+						
+						callback(success);
 					}
 				);
 				
 			} else {
+				console.log("HASHTAGS-VERIFY-USER: DB ERROR!!!");
 				success = false;
+				
+				callback(success);
 			}
-			
-			callback(success);
 		}
 	);
 }
@@ -59,30 +65,65 @@ exports.getAll = function (accountID, callback){
 	verifyUser(accountID, function(success){
 		
 		if(success){
-			dbHashtags.find({},function(err,dbData){
+			hashtagsModel.find({},function(err,dbData){
 				
 				if(!err){
 					error = false;
-					data = dbData;
+					
+					if(dbData.length > 0){
+						data = dbData;
+					} else {
+						data = '{[]}';
+					}
 				} else {
 					error = true;
 					data = "DB ERROR";
 				}
+				
+				callback(error, data);
 			});
 			
 		} else {
 			error = true;
 			data = "FORBIDDEN";
+			
+			callback(error, data);
 		}
-		
-		callback(error, data);
 	});
 };
 
 exports.get = function (accountID, hashtag, callback){
 	
-	var error;
+	var error, data;
 	
+	verifyUser(accountID, function(success){
+		
+		if(success){
+			hashtagsModel.find({'hashtag': hashtag},function(err,dbData){
+				
+				if(!err){
+					error = false;
+					
+					if(dbData.length > 0){
+						data = dbData;
+					} else {
+						data = '{[]}';
+					}
+				} else {
+					error = true;
+					data = "DB ERROR";
+				}
+				
+				callback(error, data);
+			});
+			
+		} else {
+			error = true;
+			data = "FORBIDDEN";
+			
+			callback(error, data);
+		}
+	});	
 	
 };
 

@@ -131,7 +131,7 @@ var appRouter = function(app) {
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
-	 *       - name: twitter-account-id
+	 *       - name: twitter_account_id
 	 *         in: header
 	 *         required: true
 	 *         description: The twitter account ID that owns the hashtag list
@@ -148,27 +148,27 @@ var appRouter = function(app) {
 	app.get("/hashtags", function(request, response) {
 		
 		var accountID = {
-			"token": request.headers.token,
-			"twitter-account-id": request.headers.twitter-account-id
+			'token': request.headers.token,
+			'twitterAccountId': request.headers.twitter_account_id
 		};
 		
-		console.log("APP-GET-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter-account-id + ")");
+		console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
 		
-		hashtags.get(accountID,	function (err, data){
+		hashtags.getAll(accountID,	function (err, data){
 			
 			if(!err){
-				console.log("APP-GET-HASHTAGS: Requested URL is: " + url);
+				console.log("APP-GET-ALL-HASHTAGS: OK");
 				response.writeHead(200, {"Content-Type": "application/json"});
-				response.write("Redirecting to " + url);
+				response.write(data);
 				
 			} else {
-				if(data === "FORBIDDEN"){
-					console.log("APP-GET-HASHTAGS: Forbidden!!!");
-					response.writeHead(403, {"Content-Type": "application/json"});
+				if(data == "FORBIDDEN"){
+					console.log("APP-GET-ALL-HASHTAGS: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
 				} else {
-					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
-					response.writeHead(500, {"Content-Type": "application/json"});
+					console.log("APP-GET-ALL-HASHTAGS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
 					response.write("Sorry, DB Error!");
 				}
 			}
@@ -177,9 +177,65 @@ var appRouter = function(app) {
 
 	});
 	
-	app.get("/hashtags/:id", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /hashtags/{hashtag}:
+	 *   get:
+	 *     tags:
+	 *       - GET hashtag info
+	 *     description: Gets the hashtag info for the provided ({twitter-account-id}, {hashtag})
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: twitter_account_id
+	 *         in: header
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *       - name: hashtag
+	 *         in: path
+	 *         required: true
+	 *         description: The hashtag string to look for
+	 *     produces:
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: The hashtag info
+	 *       403:
+	 *         description: Given token does not have permission to the provided {twitter-account-id}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.get("/hashtags/:hashtag", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.headers.twitter_account_id
+		};
+		
+		console.log("APP-GET-HASHTAGS: Retrieving a hashtag for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
+		
+		hashtags.get(accountID, request.param.hashtag, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-HASHTAGS: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(data);
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-GET-HASHTAGS: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+				} else {
+					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 
 	app.post("/hashtags", function(request, response) {
