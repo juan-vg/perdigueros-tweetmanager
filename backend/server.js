@@ -45,6 +45,10 @@ app.get('/swagger.json', function(req, res) {
 // hace publica la carpeta "public"
 app.use(express.static('./public'));
 
+//database connection
+var mongoose = require("mongoose");
+mongoose.connect('mongodb://localhost:27017/ptm');
+
 var server = app.listen(8888, function () {
     console.log("Servidor escuchando peticiones en el puerto %s...", server.address().port);
 });

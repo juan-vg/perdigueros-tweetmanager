@@ -1,18 +1,22 @@
 var mongoose = require("mongoose");
 
-mongoose.connect('mongodb://localhost:27017/twitter-accounts');
-
 //create instance of Schema
-var mongoSchema =   mongoose.Schema;
+var mongoSchema =  mongoose.Schema;
 
 //create schema
-var accountsSchema  = {
-		"idTwitterAccount" : String,
+var twitterAccountsSchema  = new mongoSchema({
 		"email" : String,
+		"idTwitterAccount" : {
+			"consumerKey" : String,
+			"consumerSecret" : String,
+			"accessToken" : String,
+			"accessTokenSecret" : String
+		},
 		"information" : String,
 		"description" : String,
-		"activated" : String
-};
+		"activated" : Boolean
+});
 
 //create model if not exists.
-module.exports = mongoose.model('twitter-accounts',accountsSchema);
+var dbAccounts = mongoose.model('twitteraccounts',twitterAccountsSchema);
+module.exports = dbAccounts;

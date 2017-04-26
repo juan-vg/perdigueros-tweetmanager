@@ -13,6 +13,7 @@
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "mongodb": "^2.2.25",
+	"mongoose": "^4.9.5",
     "swagger-jsdoc": "^1.9.2"
   }
 }

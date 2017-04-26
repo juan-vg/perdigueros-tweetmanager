@@ -6,8 +6,8 @@ var fs = require("fs"),
 //	ObjectID = require('mongodb').ObjectID,
 //	mongoOp = require("../models/mongo"),
 	url = require("url");
-	
 var urlShortener = require('./url-shortener.js');
+var twitterAccounts = require('./twitter-accounts.js');
 
 var appRouter = function(app) {
 	
@@ -86,12 +86,20 @@ var appRouter = function(app) {
 	 */
 	app.get("/twitter-accounts", function(request, response) {
 		console.log("APP-GET-ALL-ACCOUNTS");
-		twitter-accounts.getAll( request.headers.userToken, function (err, data){
-				if(!err){
-					console.log("APP-GET-ALL-ACCOUNTS: Accounts founded" + data);
-					
-					response.writeHead(200, {"Content-Type": "text/html"});
-					response.write(data);
+		
+		twitterAccounts.getAll( request.headers.usertoken, function (err, data){
+				if(!err){	
+					if (data != null) {
+						console.log("APP-GET-ALL-ACCOUNTS: Accounts founded OK");
+						
+						response.writeHead(200, {"Content-Type": "text/html"});
+						response.write("Accounts founded: " + data.length);
+					} else {
+						console.log("APP-GET-ALL-ACCOUNTS: No accounts founded");
+						
+						response.writeHead(200, {"Content-Type": "text/html"});
+						response.write("No accounts founded.");
+					}
 					
 				} else {
 					console.log("APP-GET-ALL-ACCOUNTS: Error while performing query");
@@ -106,7 +114,8 @@ var appRouter = function(app) {
 	//obtiene una cuenta
 	app.get("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-GET-ACCOUNTS-ID");
-		twitter-accounts.getAccount(request.params.id, function (err, data){
+		
+		twitterAccounts.getAccount(request.params.id, function (err, data){
 				if(!err){
 					console.log("APP-GET-ACCOUNTS-ID: Account founded" + data);
 					
@@ -116,8 +125,9 @@ var appRouter = function(app) {
 					
 				} else {
 					console.log("APP-GET-ACCOUNTS-ID: Error while performing query");
+					
 					response.writeHead(500, {"Content-Type": "text/html"});
-					response.write("There is no task with id=" + id);
+					response.write("There is no account with id=" + request.params.id);
 					response.end();
 				}
 				response.end();
@@ -156,7 +166,7 @@ var appRouter = function(app) {
 	 */
 	app.delete("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-DEL-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
-		twitter-accounts.deleteAccount(request.params.id, request.headers.token,
+		twitterAccounts.deleteAccount(request.params.id, request.headers.token,
 			function (err){
 				if(err == null){
 					console.log("APP-DEL-ACCOUNTS-ID: Delete ok");
