@@ -27,6 +27,12 @@ var appRouter = function(app) {
 	 *       url:
 	 *         type: string
 	 *         description: "The URL string"
+	 *   Hashtags:
+	 *     type: "object"
+	 *     properties:
+	 *       hashtag:
+	 *         type: string
+	 *         description: "The Hashtag string"
 	 */
 
 	
@@ -121,18 +127,18 @@ var appRouter = function(app) {
 	
 	/**
 	 * @swagger
-	 * /hashtags:
+	 * /twitter-accounts/{id}/hashtags:
 	 *   get:
 	 *     tags:
 	 *       - GET all hashtags
-	 *     description: Gets all hashtags for the provided {twitter-account-id}
+	 *     description: Gets all hashtags for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
-	 *       - name: twitter_account_id
-	 *         in: header
+	 *       - name: id
+	 *         in: path
 	 *         required: true
 	 *         description: The twitter account ID that owns the hashtag list
 	 *     produces:
@@ -141,15 +147,15 @@ var appRouter = function(app) {
 	 *       200:
 	 *         description: The hashtag list
 	 *       403:
-	 *         description: Given token does not have permission to the provided {twitter-account-id}
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
 	 *       500:
 	 *         description: DB error
 	 */
-	app.get("/hashtags", function(request, response) {
+	app.get("/twitter-accounts/:id/hashtags", function(request, response) {
 		
 		var accountID = {
 			'token': request.headers.token,
-			'twitterAccountId': request.headers.twitter_account_id
+			'twitterAccountId': request.params.id
 		};
 		
 		console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
@@ -179,18 +185,18 @@ var appRouter = function(app) {
 	
 	/**
 	 * @swagger
-	 * /hashtags/{hashtag}:
+	 * /twitter-accounts/{id}/hashtags/{hashtag}:
 	 *   get:
 	 *     tags:
 	 *       - GET hashtag info
-	 *     description: Gets the hashtag info for the provided ({twitter-account-id}, {hashtag})
+	 *     description: Gets the hashtag info for the provided (twitter-account's {id}, {hashtag})
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
-	 *       - name: twitter_account_id
-	 *         in: header
+	 *       - name: id
+	 *         in: path
 	 *         required: true
 	 *         description: The twitter account ID that owns the hashtag list
 	 *       - name: hashtag
@@ -203,22 +209,22 @@ var appRouter = function(app) {
 	 *       200:
 	 *         description: The hashtag info
 	 *       403:
-	 *         description: Given token does not own the provided {twitter-account-id}
+	 *         description: Given token does not own the provided twitter-account's {id}
 	 *       404:
 	 *         description: {hashtag} not found
 	 *       500:
 	 *         description: DB error
 	 */
-	app.get("/hashtags/:hashtag", function(request, response) {
+	app.get("/twitter-accounts/:id/hashtags/:hashtag", function(request, response) {
 		
 		var accountID = {
 			'token': request.headers.token,
-			'twitterAccountId': request.headers.twitter_account_id
+			'twitterAccountId': request.params.id
 		};
 		
 		console.log("APP-GET-HASHTAGS: Retrieving a hashtag for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
 		
-		hashtags.get(accountID, request.param.hashtag, function (err, data){
+		hashtags.get(accountID, request.params.hashtag, function (err, data){
 			
 			if(!err){
 				console.log("APP-GET-HASHTAGS: OK");
@@ -246,40 +252,42 @@ var appRouter = function(app) {
 
 	/**
 	 * @swagger
-	 * /hashtags:
+	 * /twitter-accounts/{id}/hashtags:
 	 *   post:
 	 *     tags:
 	 *       - POST hashtag
-	 *     description: Creates a new hashtag for the provided {twitter-account-id}
+	 *     description: Creates a new hashtag for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
-	 *       - name: twitter_account_id
-	 *         in: header
+	 *       - name: id
+	 *         in: path
 	 *         required: true
 	 *         description: The twitter account ID that owns the hashtag list
 	 *       - name: hashtag
 	 *         in: body
 	 *         required: true
 	 *         description: The hashtag string to create
+	 *         schema:
+	 *           $ref: "#/definitions/Hashtags"
 	 *     produces:
 	 *       - application/json
 	 *     responses:
 	 *       201:
 	 *         description: Hashtag created
 	 *       403:
-	 *         description: Given token does not own the provided {twitter-account-id}
+	 *         description: Given token does not own the provided twitter-account's {id}
 	 *       409:
-	 *         description: Conflict. The {hashtag} already exists for the provided {twitter-account-id}
+	 *         description: Conflict. The {hashtag} already exists for the provided twitter-account's {id}
 	 *       500:
 	 *         description: DB error
 	 */
-	app.post("/hashtags", function(request, response) {
+	app.post("/twitter-accounts/:id/hashtags", function(request, response) {
 		var accountID = {
 			'token': request.headers.token,
-			'twitterAccountId': request.headers.twitter_account_id
+			'twitterAccountId': request.params.id
 		};
 		
 		console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
