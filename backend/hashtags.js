@@ -182,7 +182,7 @@ exports.post = function (accountID, hashtag, callback){
                                     data = "DB ERROR";
                                     callback(error, data);
                                 }
-                            }
+                            });
                         }
                         
                     } else {

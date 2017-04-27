@@ -211,7 +211,7 @@ var appRouter = function(app) {
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
 	 *       404:
-	 *         description: {hashtag} not found
+	 *         description: Not found {hashtag}
 	 *       500:
 	 *         description: DB error
 	 */
