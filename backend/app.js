@@ -272,13 +272,42 @@ var appRouter = function(app) {
 	 *       403:
 	 *         description: Given token does not own the provided {twitter-account-id}
 	 *       409:
-	 *         description: Conflict. The {hashtag} already exists
+	 *         description: Conflict. The {hashtag} already exists for the provided {twitter-account-id}
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/hashtags", function(request, response) {
-
-
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.headers.twitter_account_id
+		};
+		
+		console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
+		
+		hashtags.post(accountID, request.body.hashtag, function (err, data){
+			
+			if(!err){
+				console.log("APP-POST-HASHTAG: OK");
+				response.writeHead(201, {"Content-Type": "text/html"});
+				response.write("Created");
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-POST-HASHTAG: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+				} else if(data == "ALREADY EXISTS"){
+					console.log("APP-POST-HASHTAG: Conflict. Already exists!!!");
+					response.writeHead(409, {"Content-Type": "text/html"});
+					response.write("Hashtag already exists for the provided twitter account");				
+				} else {
+					console.log("APP-POST-HASHTAG: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	app.put("/hashtags/:id", function(request, response) {

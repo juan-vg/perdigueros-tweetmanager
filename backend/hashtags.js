@@ -11,6 +11,7 @@ function getUserEmail(token, callback){
     
     var error, data;
     
+    // get user from token
     usersModel.find({"token" : token }, function(err, dbData) {
         if(!err && dbData.length > 0){
             console.log("HASHTAGS-GET-USER-EMAIL: token: " + token + " -> email: " + dbData[0].email);
@@ -29,9 +30,12 @@ function verifyUser(accountID, callback){
     
     var success;
     
+    // get user email from token
     getUserEmail(accountID.token, function(error, email){
             
             if(!error){
+                
+                // check if the email matchs the twitterAccountId
                 twiAccModel.find({"email" : email, "_id" : accountID.twitterAccountId},
                     
                     function(err,dbData){
@@ -62,10 +66,12 @@ exports.getAll = function (accountID, callback){
 
     var error, data;
     
+    // check if the token has access to twitterAccountId
     verifyUser(accountID, function(success){
         
         if(success){
             
+            // get all hashtags that twitterAccountId owns
             hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId},
             
                 function(err,dbData){
@@ -76,6 +82,7 @@ exports.getAll = function (accountID, callback){
                         if(dbData.length > 0){
                             data = dbData;
                         } else {
+                            //no results
                             data = '{[]}';
                         }
                     } else {
@@ -100,10 +107,12 @@ exports.get = function (accountID, hashtag, callback){
     
     var error, data;
     
+    // check if the token has access to twitterAccountId
     verifyUser(accountID, function(success){
         
         if(success){
             
+            // get the specified hashtag if twitterAccountId owns it
             hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'hashtag': hashtag},
             
                 function(err,dbData){
@@ -140,28 +149,47 @@ exports.post = function (accountID, hashtag, callback){
     
     var error, data;
     
+    // check if the token has access to twitterAccountId
     verifyUser(accountID, function(success){
         
         if(success){
             
+            // check if the specified hashtag already exists
             hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'hashtag': hashtag},
                 
                 function(err,dbData){
                     
                     if(!err){
-                        error = false;
                         
                         if(dbData.length > 0){
-                            // 409
+                            // already exists
+                            error = true;
+                            data = "ALREADY EXISTS";
+                            callback(error, data);
                         } else {
-                            //db save
+                            
+                            var dbHashtags = new hashtagsModel();
+                            dbHashtags.twitterAccountId = accountID.twitterAccountId;
+                            dbHashtags.hashtag = hashtag;
+                            
+                            dbHashtags.save(function(err, result) {
+                                if(!err){
+                                    error = false;
+                                    data = null;
+                                    callback(error, data);
+                                } else {
+                                    error = true;
+                                    data = "DB ERROR";
+                                    callback(error, data);
+                                }
+                            }
                         }
+                        
                     } else {
                         error = true;
                         data = "DB ERROR";
+                        callback(error, data);
                     }
-                    
-                    callback(error, data);
                 }
             );
             
