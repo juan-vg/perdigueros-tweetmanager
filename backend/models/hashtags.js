@@ -3,7 +3,7 @@ var mongoSchema = mongoose.Schema;
 
 
 var hashtagSchema = new mongoSchema({
-	"idTwitterAcount" : String,
+	"twitterAccountId" : String,
 	"hashtag" : String
 });
 

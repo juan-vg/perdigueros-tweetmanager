@@ -65,23 +65,27 @@ exports.getAll = function (accountID, callback){
 	verifyUser(accountID, function(success){
 		
 		if(success){
-			hashtagsModel.find({},function(err,dbData){
-				
-				if(!err){
-					error = false;
+			
+			hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId},
+			
+				function(err,dbData){
 					
-					if(dbData.length > 0){
-						data = dbData;
+					if(!err){
+						error = false;
+						
+						if(dbData.length > 0){
+							data = dbData;
+						} else {
+							data = '{[]}';
+						}
 					} else {
-						data = '{[]}';
+						error = true;
+						data = "DB ERROR";
 					}
-				} else {
-					error = true;
-					data = "DB ERROR";
+					
+					callback(error, data);
 				}
-				
-				callback(error, data);
-			});
+			);
 			
 		} else {
 			error = true;
@@ -99,23 +103,28 @@ exports.get = function (accountID, hashtag, callback){
 	verifyUser(accountID, function(success){
 		
 		if(success){
-			hashtagsModel.find({'hashtag': hashtag},function(err,dbData){
-				
-				if(!err){
-					error = false;
+			
+			hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'hashtag': hashtag},
+			
+				function(err,dbData){
 					
-					if(dbData.length > 0){
-						data = dbData;
+					if(!err){
+						
+						if(dbData.length > 0){
+							error = false;
+							data = dbData;
+						} else {
+							error = true;
+							data = "NOT FOUND";
+						}
 					} else {
-						data = '{[]}';
+						error = true;
+						data = "DB ERROR";
 					}
-				} else {
-					error = true;
-					data = "DB ERROR";
+					
+					callback(error, data);
 				}
-				
-				callback(error, data);
-			});
+			);
 			
 		} else {
 			error = true;
@@ -129,8 +138,40 @@ exports.get = function (accountID, hashtag, callback){
 
 exports.post = function (accountID, hashtag, callback){
 	
-	var error;
+	var error, data;
 	
+	verifyUser(accountID, function(success){
+		
+		if(success){
+			
+			hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'hashtag': hashtag},
+				
+				function(err,dbData){
+					
+					if(!err){
+						error = false;
+						
+						if(dbData.length > 0){
+							// 409
+						} else {
+							//db save
+						}
+					} else {
+						error = true;
+						data = "DB ERROR";
+					}
+					
+					callback(error, data);
+				}
+			);
+			
+		} else {
+			error = true;
+			data = "FORBIDDEN";
+			
+			callback(error, data);
+		}
+	});		
 	
 };
 

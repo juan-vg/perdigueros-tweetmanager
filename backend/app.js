@@ -203,7 +203,9 @@ var appRouter = function(app) {
 	 *       200:
 	 *         description: The hashtag info
 	 *       403:
-	 *         description: Given token does not have permission to the provided {twitter-account-id}
+	 *         description: Given token does not own the provided {twitter-account-id}
+	 *       404:
+	 *         description: {hashtag} not found
 	 *       500:
 	 *         description: DB error
 	 */
@@ -228,6 +230,10 @@ var appRouter = function(app) {
 					console.log("APP-GET-HASHTAGS: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+				} else if(data == "NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Not found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Not Found");				
 				} else {
 					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -238,6 +244,38 @@ var appRouter = function(app) {
 		});
 	});
 
+	/**
+	 * @swagger
+	 * /hashtags:
+	 *   post:
+	 *     tags:
+	 *       - POST hashtag
+	 *     description: Creates a new hashtag for the provided {twitter-account-id}
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: twitter_account_id
+	 *         in: header
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *       - name: hashtag
+	 *         in: body
+	 *         required: true
+	 *         description: The hashtag string to create
+	 *     produces:
+	 *       - application/json
+	 *     responses:
+	 *       201:
+	 *         description: Hashtag created
+	 *       403:
+	 *         description: Given token does not own the provided {twitter-account-id}
+	 *       409:
+	 *         description: Conflict. The {hashtag} already exists
+	 *       500:
+	 *         description: DB error
+	 */
 	app.post("/hashtags", function(request, response) {
 
 
