@@ -17,10 +17,14 @@ function getUserEmail(token, callback){
             console.log("HASHTAGS-GET-USER-EMAIL: token: " + token + " -> email: " + dbData[0].email);
             error = false;
             data = dbData[0].email;
-        } else {
-            console.log("HASHTAGS-GET-USER-EMAIL: NOT FOUND!!!");
+        } else if(!err){
+			console.log("HASHTAGS-GET-USER-EMAIL: TOKEN NOT FOUND!");
             error = true;
-            data = null;
+            data = "NOT FOUND";
+		} else {
+            console.log("HASHTAGS-GET-USER-EMAIL: DB ERROR!!!");
+            error = true;
+            data = "DB ERROR";
         }
         callback(error, data);
     });
@@ -31,20 +35,20 @@ function verifyUser(accountID, callback){
     var success;
     
     // get user email from token
-    getUserEmail(accountID.token, function(error, email){
+    getUserEmail(accountID.token, function(error, data){
             
             if(!error){
                 
                 // check if the email matchs the twitterAccountId
-                twiAccModel.find({"email" : email, "_id" : accountID.twitterAccountId},
+                twiAccModel.find({"email" : data, "_id" : accountID.twitterAccountId},
                     
                     function(err,dbData){
                         
                         if(!err && dbData.length > 0){
-                            console.log("HASHTAGS-VERIFY-USER: email: " + email + " owns TwitterAccount: " + accountID.twitterAccountId);
+                            console.log("HASHTAGS-VERIFY-USER: email: " + data + " owns TwitterAccount: " + accountID.twitterAccountId);
                             success = true;
                         } else {
-                            console.log("HASHTAGS-VERIFY-USER: email: " + email + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
+                            console.log("HASHTAGS-VERIFY-USER: email: " + data + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
                             success = false;
                         }
                         
@@ -53,7 +57,13 @@ function verifyUser(accountID, callback){
                 );
                 
             } else {
-                console.log("HASHTAGS-VERIFY-USER: DB ERROR!!!");
+                
+                if(data == "NOT FOUND"){
+					console.log("HASHTAGS-VERIFY-USER: CAN NOT VERIFY USER!");
+				} else {
+					console.log("HASHTAGS-VERIFY-USER: DB ERROR!!!");
+				}
+                
                 success = false;
                 
                 callback(success);
@@ -83,7 +93,7 @@ exports.getAll = function (accountID, callback){
                             data = dbData;
                         } else {
                             //no results
-                            data = '{[]}';
+                            data = [];
                         }
                     } else {
                         error = true;

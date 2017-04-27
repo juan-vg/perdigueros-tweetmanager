@@ -158,14 +158,14 @@ var appRouter = function(app) {
 			'twitterAccountId': request.params.id
 		};
 		
-		console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
+		console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 		
 		hashtags.getAll(accountID,	function (err, data){
 			
 			if(!err){
 				console.log("APP-GET-ALL-HASHTAGS: OK");
 				response.writeHead(200, {"Content-Type": "application/json"});
-				response.write(data);
+				response.write(JSON.stringify(data));
 				
 			} else {
 				if(data == "FORBIDDEN"){
@@ -222,14 +222,14 @@ var appRouter = function(app) {
 			'twitterAccountId': request.params.id
 		};
 		
-		console.log("APP-GET-HASHTAGS: Retrieving a hashtag for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
+		console.log("APP-GET-HASHTAGS: Retrieving a hashtag for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 		
 		hashtags.get(accountID, request.params.hashtag, function (err, data){
 			
 			if(!err){
 				console.log("APP-GET-HASHTAGS: OK");
 				response.writeHead(200, {"Content-Type": "application/json"});
-				response.write(data);
+				response.write(JSON.stringify(data));
 				
 			} else {
 				if(data == "FORBIDDEN"){
@@ -290,7 +290,7 @@ var appRouter = function(app) {
 			'twitterAccountId': request.params.id
 		};
 		
-		console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for (token: " + accountID.token + ", twitter-account-id: " + accountID.twitter_account_id + ")");
+		console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 		
 		hashtags.post(accountID, request.body.hashtag, function (err, data){
 			
