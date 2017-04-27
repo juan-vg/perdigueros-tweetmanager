@@ -18,10 +18,10 @@ function getUserEmail(token, callback){
             error = false;
             data = dbData[0].email;
         } else if(!err){
-			console.log("HASHTAGS-GET-USER-EMAIL: TOKEN NOT FOUND!");
+            console.log("HASHTAGS-GET-USER-EMAIL: TOKEN NOT FOUND!");
             error = true;
             data = "NOT FOUND";
-		} else {
+        } else {
             console.log("HASHTAGS-GET-USER-EMAIL: DB ERROR!!!");
             error = true;
             data = "DB ERROR";
@@ -59,10 +59,10 @@ function verifyUser(accountID, callback){
             } else {
                 
                 if(data == "NOT FOUND"){
-					console.log("HASHTAGS-VERIFY-USER: CAN NOT VERIFY USER!");
-				} else {
-					console.log("HASHTAGS-VERIFY-USER: DB ERROR!!!");
-				}
+                    console.log("HASHTAGS-VERIFY-USER: CAN NOT VERIFY USER!");
+                } else {
+                    console.log("HASHTAGS-VERIFY-USER: DB ERROR!!!");
+                }
                 
                 success = false;
                 
