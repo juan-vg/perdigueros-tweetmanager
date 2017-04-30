@@ -8,6 +8,7 @@ var fs = require("fs"),
 	url = require("url");
 	
 var urlShortener = require('./url-shortener.js');
+var hashtags = require('./hashtags.js');
 
 var appRouter = function(app) {
 	
@@ -26,6 +27,12 @@ var appRouter = function(app) {
 	 *       url:
 	 *         type: string
 	 *         description: "The URL string"
+	 *   Hashtags:
+	 *     type: "object"
+	 *     properties:
+	 *       hashtag:
+	 *         type: string
+	 *         description: "The Hashtag string"
 	 */
 
 	
@@ -117,29 +124,274 @@ var appRouter = function(app) {
 	});
 	
 	//HASHTAGS
-	app.get("/hashtags", function(request, response) {
-
+	
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/hashtags:
+	 *   get:
+	 *     tags:
+	 *       - GET all hashtags
+	 *     description: Gets all hashtags for the provided twitter-account's {id}
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The hashtag list
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.get("/twitter-accounts/:id/hashtags", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+		
+		hashtags.getAll(accountID,	function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-ALL-HASHTAGS: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-GET-ALL-HASHTAGS: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+				} else {
+					console.log("APP-GET-ALL-HASHTAGS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 
 	});
 	
-	app.get("/hashtags/:id", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/hashtags/{hashtag}:
+	 *   get:
+	 *     tags:
+	 *       - GET hashtag info
+	 *     description: Gets the hashtag info for the provided (twitter-account's {id}, {hashtag})
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *       - name: hashtag
+	 *         in: path
+	 *         required: true
+	 *         description: The hashtag string to look for
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The hashtag info
+	 *       403:
+	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       404:
+	 *         description: Not found {hashtag}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.get("/twitter-accounts/:id/hashtags/:hashtag", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-HASHTAGS: Retrieving a hashtag for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+		
+		hashtags.get(accountID, request.params.hashtag, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-HASHTAGS: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-GET-HASHTAGS: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+				} else if(data == "NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Not found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Not Found");				
+				} else {
+					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 
-	app.post("/hashtags", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/hashtags:
+	 *   post:
+	 *     tags:
+	 *       - POST hashtag
+	 *     description: Creates a new hashtag for the provided twitter-account's {id}
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *       - name: hashtag
+	 *         in: body
+	 *         required: true
+	 *         description: The hashtag string to create
+	 *         schema:
+	 *           $ref: "#/definitions/Hashtags"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       201:
+	 *         description: Hashtag created
+	 *       403:
+	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       409:
+	 *         description: Conflict. The {hashtag} already exists for the provided twitter-account's {id}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.post("/twitter-accounts/:id/hashtags", function(request, response) {
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+		
+		hashtags.post(accountID, request.body.hashtag, function (err, data){
+			
+			if(!err){
+				console.log("APP-POST-HASHTAG: OK");
+				response.writeHead(201, {"Content-Type": "text/html"});
+				response.write("Created");
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-POST-HASHTAG: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+				} else if(data == "ALREADY EXISTS"){
+					console.log("APP-POST-HASHTAG: Conflict. Already exists!!!");
+					response.writeHead(409, {"Content-Type": "text/html"});
+					response.write("Hashtag already exists for the provided twitter account");				
+				} else {
+					console.log("APP-POST-HASHTAG: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
-	app.put("/hashtags/:id", function(request, response) {
-
-
+	app.put("/twitter-accounts/:id/hashtags/:hashtag", function(request, response) {
+		// Not implemented yet. Waiting for more data
+		console.log("APP-PUT-HASHTAG: Called!");
+		response.writeHead(501, {"Content-Type": "text/html"});
+		response.write("Not implemented yet");
 	});
 	
-	app.delete("/hashtags/:id", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/hashtags/{hashtag}:
+	 *   delete:
+	 *     tags:
+	 *       - DELETE hashtag
+	 *     description: Deletes the specified {hashtag} for the provided twitter-account's {id}
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *       - name: hashtag
+	 *         in: path
+	 *         required: true
+	 *         description: The hashtag string to delete
+	 *     produces:
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: Hashtag deleted
+	 *       403:
+	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       409:
+	 *         description: Conflict. The {hashtag} does not exist for the provided twitter-account's {id}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.delete("/twitter-accounts/:id/hashtags/:hashtag", function(request, response) {
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-DELETE-HASHTAG: Deleting hashtag " + request.params.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+		
+		hashtags.delete(accountID, request.params.hashtag, function (err, data){
+			
+			if(!err){
+				console.log("APP-DELETE-HASHTAG: OK");
+				response.writeHead(200, {"Content-Type": "text/html"});
+				response.write("Deleted");
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-DELETE-HASHTAG: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+				} else if(data == "NOT EXIST"){
+					console.log("APP-DELETE-HASHTAG: Conflict. Does not exist!!!");
+					response.writeHead(409, {"Content-Type": "text/html"});
+					response.write("Hashtag does not exist for the provided twitter account");				
+				} else {
+					console.log("APP-DELETE-HASHTAG: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	//USUARIOS FOLLOWED
