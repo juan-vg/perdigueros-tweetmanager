@@ -143,6 +143,7 @@ var appRouter = function(app) {
 	 *         description: The twitter account ID that owns the hashtag list
 	 *     produces:
 	 *       - application/json
+	 *       - text/html
 	 *     responses:
 	 *       200:
 	 *         description: The hashtag list
@@ -205,6 +206,7 @@ var appRouter = function(app) {
 	 *         description: The hashtag string to look for
 	 *     produces:
 	 *       - application/json
+	 *       - text/html
 	 *     responses:
 	 *       200:
 	 *         description: The hashtag info
@@ -274,6 +276,7 @@ var appRouter = function(app) {
 	 *           $ref: "#/definitions/Hashtags"
 	 *     produces:
 	 *       - application/json
+	 *       - text/html
 	 *     responses:
 	 *       201:
 	 *         description: Hashtag created
@@ -318,14 +321,77 @@ var appRouter = function(app) {
 		});
 	});
 	
-	app.put("/hashtags/:id", function(request, response) {
-
-
+	app.put("/twitter-accounts/:id/hashtags/:hashtag", function(request, response) {
+		// Not implemented yet. Waiting for more data
+		console.log("APP-PUT-HASHTAG: Called!");
+		response.writeHead(501, {"Content-Type": "text/html"});
+		response.write("Not implemented yet");
 	});
 	
-	app.delete("/hashtags/:id", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/hashtags/{hashtag}:
+	 *   delete:
+	 *     tags:
+	 *       - DELETE hashtag
+	 *     description: Deletes the specified {hashtag} for the provided twitter-account's {id}
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID that owns the hashtag list
+	 *       - name: hashtag
+	 *         in: path
+	 *         required: true
+	 *         description: The hashtag string to delete
+	 *     produces:
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: Hashtag deleted
+	 *       403:
+	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       409:
+	 *         description: Conflict. The {hashtag} does not exist for the provided twitter-account's {id}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.delete("/twitter-accounts/:id/hashtags/:hashtag", function(request, response) {
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-DELETE-HASHTAG: Deleting hashtag " + request.params.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+		
+		hashtags.delete(accountID, request.params.hashtag, function (err, data){
+			
+			if(!err){
+				console.log("APP-DELETE-HASHTAG: OK");
+				response.writeHead(200, {"Content-Type": "text/html"});
+				response.write("Deleted");
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-DELETE-HASHTAG: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+				} else if(data == "NOT EXIST"){
+					console.log("APP-DELETE-HASHTAG: Conflict. Does not exist!!!");
+					response.writeHead(409, {"Content-Type": "text/html"});
+					response.write("Hashtag does not exist for the provided twitter account");				
+				} else {
+					console.log("APP-DELETE-HASHTAG: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	//USUARIOS FOLLOWED
