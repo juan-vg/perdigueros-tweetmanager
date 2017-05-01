@@ -1,4 +1,4 @@
-# Perdigueros Awesome Tweetmanager (PAT)
+# Perdigueros Tweet Manager (PTM)
 
 ## Backend
 
