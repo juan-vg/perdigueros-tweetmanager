@@ -3,9 +3,12 @@ var url = require("url");
 var express = require("express");
 var bodyParser = require("body-parser");
 var swaggerJSDoc = require('swagger-jsdoc');
-//var mongoOp = require("./models/mongo");
+var mongoose = require("mongoose");
 var router = express.Router();
 var app = express();
+
+//database connection
+mongoose.connect('mongodb://localhost:27017/ptm');
 
 //swagger definition
 var swaggerDefinition = {
@@ -44,10 +47,6 @@ app.get('/swagger.json', function(req, res) {
 
 // hace publica la carpeta "public"
 app.use(express.static('./public'));
-
-//database connection
-var mongoose = require("mongoose");
-mongoose.connect('mongodb://localhost:27017/ptm');
 
 var server = app.listen(8888, function () {
     console.log("Servidor escuchando peticiones en el puerto %s...", server.address().port);

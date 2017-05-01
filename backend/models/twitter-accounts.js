@@ -6,13 +6,12 @@ var mongoSchema =  mongoose.Schema;
 //create schema
 var twitterAccountsSchema  = new mongoSchema({
 		"email" : String,
-		"idTwitterAccount" : {
+		"information" : {
 			"consumerKey" : String,
 			"consumerSecret" : String,
 			"accessToken" : String,
 			"accessTokenSecret" : String
 		},
-		"information" : String,
 		"description" : String,
 		"activated" : Boolean
 });
