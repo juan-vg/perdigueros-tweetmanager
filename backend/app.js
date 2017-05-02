@@ -90,15 +90,15 @@ var appRouter = function(app) {
 		twitterAccounts.getAll(request.headers.usertoken, function (err, data){
 				if(!err){	
 					if (data != null) {
-						console.log("APP-GET-ALL-ACCOUNTS: Accounts founded OK");
+						console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
 						
 						response.writeHead(200, {"Content-Type": "application/json"});
 						response.write(JSON.stringify(data));
 					} else {
-						console.log("APP-GET-ALL-ACCOUNTS: No accounts founded");
+						console.log("APP-GET-ALL-ACCOUNTS: No accounts found");
 						
 						response.writeHead(200, {"Content-Type": "text/html"});
-						response.write("No accounts founded.");
+						response.write("No accounts found.");
 					}
 				} else {
 					if (data = "FORBIDDEN") {
@@ -124,19 +124,19 @@ var appRouter = function(app) {
 		
 		twitterAccounts.getAccount(request.params.id, request.headers.usertoken, function (err, data){
 				if(!err){
-					console.log("APP-GET-ACCOUNTS-ID: Account founded OK");
+					console.log("APP-GET-ACCOUNTS-ID: Account found OK");
 					
-					response.writeHead(200, {"Content-Type": "text/html"});
+					response.writeHead(200, {"Content-Type": "application/json"});
 					response.write(JSON.stringify(data));
 					
 				} else if (data == "FORBIDDEN"){
-					console.log("APP-GET-ACCOUNTS-ID: No accounts founded");
+					console.log("APP-GET-ACCOUNTS-ID: No accounts found");
 					
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
 					
 				} else if (data == "NOT FOUND"){
-					console.log("APP-GET-ACCOUNTS-ID: No accounts founded");
+					console.log("APP-GET-ACCOUNTS-ID: No accounts found");
 					
 					response.writeHead(404, {"Content-Type": "text/html"});
 					response.write("Not found");
@@ -163,23 +163,23 @@ var appRouter = function(app) {
 		
 		twitterAccounts.postAccount(request.headers.usertoken, newAccount, function (err, data){
 			if(!err){
-				if (data !== null) {
-					console.log("APP-POST-ACCOUNT: OK");
+				console.log("APP-POST-ACCOUNT: OK");
+				
+				response.writeHead(201, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+			} else {
+				if (data == "DB ERROR") {
+					console.log("APP-POST-ACCOUNT: Error while performing query");
 					
-					response.writeHead(200, {"Content-Type": "text/html"});
-					response.write(JSON.stringify(data));
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Error while performing query");
 				} else {
-					console.log("APP-POST-ACCOUNT: Error while creating account");
+					console.log("APP-POST-ACCOUNT: Already exists");
 					
-					response.writeHead(200, {"Content-Type": "text/html"});
-					response.write("Error, the account has not been created.");
+					response.writeHead(409, {"Content-Type": "text/html"});
+					response.write("Account already exists");
 				}
 				
-			} else {
-				console.log("APP-POST-ACCOUNT: Error while performing query");
-				
-				response.writeHead(500, {"Content-Type": "text/html"});
-				response.write("Error while performing query");
 			}
 			response.end();
 		}
@@ -213,22 +213,30 @@ var appRouter = function(app) {
 	app.delete("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-DEL-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
 		
-		//TODO Comprobar que el id que pasa el usuario es correcto
-		twitterAccounts.deleteAccount(request.params.id, request.headers.token,
-			function (err){
+		twitterAccounts.deleteAccount(request.headers.usertoken, request.params.id,
+			function (err, res){
 				if(!err){
-					console.log("APP-DEL-ACCOUNTS-ID: Delete ok");
+					console.log("APP-DEL-ACCOUNTS-ID: Delete OK");
+					
 					response.writeHead(200, {"Content-Type": "text/html"});
 					response.write("Deleted account");
-					
-				} else if(err == 'forbidden'){
-					console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID is forbidden!!!");
-					response.writeHead(403, {"Content-Type": "text/html"});
-					response.write("The user does not own this account!");
 				} else {
-					console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID not found!!!");
-					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Account ID not found!");
+					if(res == 'FORBIDDEN'){
+						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID is forbidden");
+						
+						response.writeHead(403, {"Content-Type": "text/html"});
+						response.write("The user does not own this account!");
+					} else if(res == 'NOT FOUND') {
+						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID not found");
+						
+						response.writeHead(404, {"Content-Type": "text/html"});
+						response.write("Account ID not found!");
+					} else {
+						console.log("APP-DEL-ACCOUNTS-ID: Error performing query");
+						
+						response.writeHead(404, {"Content-Type": "text/html"});
+						response.write("Error performing query");
+					}
 				}
 				response.end();
 			}
