@@ -13,22 +13,33 @@ var appRouter = function(app) {
 	
 	/**
 	 * @swagger
-	 * definition:
-	 *   twitter-accounts:
+	 * definitions:
+	 *   Twitter-accounts:
+	 *     type: "object"
 	 *     properties:
-	 *       id:
-	 *         type: string
-	 *       info:
-	 *         type: string
+	 *       information:
+	 *         type: "object"
+	 *         description: "The tokens used to access Twitter"
 	 *       description:
 	 *         type: string
-	 *   urls:
+	 *         description: "The twitter account description"
+	 *       activated:
+	 *         type: boolean
+	 *         description: "Indicates whether the account is enabled or not"
+	 *   Urls:
+	 *     type: "object"
 	 *     properties:
-	 *       URL-ID:
+	 *       url:
 	 *         type: string
-	 *       URL:
+	 *         description: "The URL string"
+	 *   Hashtags:
+	 *     type: "object"
+	 *     properties:
+	 *       hashtag:
 	 *         type: string
+	 *         description: "The Hashtag string"
 	 */
+
 
 	
 	////////////////////////////////////////////////////////
@@ -44,10 +55,11 @@ var appRouter = function(app) {
 	 * login/signin:
 	 *   post:
 	 *     tags:
-	 *       - Login
+	 *       - POST login singin
 	 *     description: Log in the system
 	 *     produces:
 	 *       - application/json
+	 *       - text/html
 	 *     responses:
 	 *       200:
 	 *         description: Login OK 
@@ -71,18 +83,26 @@ var appRouter = function(app) {
 	//todas las cuentas
 	/**
 	 * @swagger
-	 * twitter-accounts/:
+	 * /twitter-accounts:
 	 *   get:
 	 *     tags:
-	 *       - GET accounts
-	 *     description: Get information of all accounts
+	 *       - GET all accounts
+	 *     description: Get information of all twitter accounts
+	 *     parameters:
+	 *       - name: usertoken
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
 	 *     produces:
 	 *       - text/html
+	 *       - application/json
 	 *     responses:
 	 *       200:
 	 *         description: Accounts have been successfully obtained 
+	 *       403:
+	 *         description: The user (token) does not have permission
 	 *       500:
-	 *         description: Error getting the accounts
+	 *         description: Error getting the accounts from database
 	 */
 	app.get("/twitter-accounts", function(request, response) {
 		console.log("APP-GET-ALL-ACCOUNTS");
@@ -119,6 +139,33 @@ var appRouter = function(app) {
 	});
 
 	//obtiene una cuenta
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}:
+	 *   get:
+	 *     tags:
+	 *       - GET single account
+	 *     description: Get information of a single account
+	 *     parameters:
+	 *       - name: usertoken
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID 
+	 *     produces:
+	 *       - text/html
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: Information about the twitter account 
+	 *       403:
+	 *         description: The user (token) does not have permission on that twitter account (id)
+	 *       500:
+	 *         description: Error getting the account information from database
+	 */
 	app.get("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-GET-ACCOUNTS-ID");
 		
@@ -153,6 +200,37 @@ var appRouter = function(app) {
 	});
 	
 	//crea una cuenta
+	/**
+	 * @swagger
+	 * /twitter-accounts:
+	 *   post:
+	 *     tags:
+	 *       - POST new twitter account
+	 *     description: Create a new twitter account
+	 *     parameters:
+	 *       - name: usertoken
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: description
+	 *         in: body
+	 *         required: true
+	 *         description: The twitter account description
+	 *       - name: information
+	 *         in: body
+	 *         required: true
+	 *         description: The tokens used to access Twitter
+	 *     produces:
+	 *       - text/html
+	 *       - application/json
+	 *     responses:
+	 *       201:
+	 *         description: Twitter account created 
+	 *       409:
+	 *         description: The account already exists.
+	 *       500:
+	 *         description: Error inserting the twitter account into the database
+	 */
 	app.post("/twitter-accounts", function(request, response) {
 		console.log("APP-POST-ACCOUNT");
 		
@@ -179,7 +257,6 @@ var appRouter = function(app) {
 					response.writeHead(409, {"Content-Type": "text/html"});
 					response.write("Account already exists");
 				}
-				
 			}
 			response.end();
 		}
@@ -193,22 +270,23 @@ var appRouter = function(app) {
 	 *   delete:
 	 *     tags:
 	 *       - DELETE account
-	 *     description: 
+	 *     description: Disable a twitter account
 	 *     parameters:
 	 *       - name: id
 	 *         in: path
 	 *         required: true
-	 *         description: The ID account
-	 *         type: string
+	 *         description: The twitter account ID 
 	 *     produces:
 	 *       - text/html
 	 *     responses:
 	 *       200:
 	 *         description: The account has been successfully removed 
 	 *       403:
-	 *         description: The user does not own this account
+	 *         description: The user (token) does not own this twitter account (id)
 	 *       404:
 	 *         description: Unable to find the requested {id}
+	 *       500:
+	 *         description: Error deleting twitter account
 	 */
 	app.delete("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-DEL-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
@@ -234,7 +312,7 @@ var appRouter = function(app) {
 					} else {
 						console.log("APP-DEL-ACCOUNTS-ID: Error performing query");
 						
-						response.writeHead(404, {"Content-Type": "text/html"});
+						response.writeHead(500, {"Content-Type": "text/html"});
 						response.write("Error performing query");
 					}
 				}
