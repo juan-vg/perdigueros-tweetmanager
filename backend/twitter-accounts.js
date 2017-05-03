@@ -2,25 +2,29 @@ var userModel = require("./models/user-accounts");
 var twiAccModel = require("./models/twitter-accounts");
 var objectID = require('mongodb').ObjectID;
 
-//Get the user email
-function getUserEmail(userTtoken, callback){
-	var error, data;
+//TODO cambiar tabs por espacios
+//TODO eliminar modelo de usuarios en el ultimo commit
 
-    userModel.find({"token" : userTtoken }, function(err, data) {
-        if(!err && data !== null){
-            console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: token: " + userTtoken + " -> email: " + data[0].email);
+//Get the user email
+function getUserEmail(userToken, callback){
+	var error, result;
+
+    userModel.find({"token" : userToken }, function(err, data) {
+    	console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: token: " + userToken + " data: " + data + "error: " + err);
+        if(!err && data.length > 0){
+            console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: token: " + userToken + " -> email: " + data[0].email);
             error = false;
-            data = data[0].email;
+            result = data[0].email;
         } else if(!err){
             console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: Token not found");
             error = true;
-            data = "NOT FOUND";
+            result = "NOT FOUND";
         } else {
             console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: Error while performing query");
             error = true;
-            data = "DB ERROR";
+            result = "DB ERROR";
         }
-        callback(error, data);
+        callback(error, result);
     });
 }
 
@@ -45,7 +49,6 @@ exports.getAll = function(userToken, callback){
 	    }	
 	    }], function(err, res) {
 			if(!err) {
-				console.log(res);
 				if(res[0] !== null && res.length > 0) {
 					console.log("TWITTER-ACCOUNTS-GET-ALL: Obtained User:", res[0].email);
 					console.log("TWITTER-ACCOUNTS-GET-ALL: Accounts in database: ", res[0].twitteraccounts);
@@ -64,76 +67,73 @@ exports.getAll = function(userToken, callback){
 				error = true;
 				result = [];
 			}  	
-			
 			callback(error, result);
 	});
 };
 
 //Get a single account by ID
 exports.getAccount = function(idAccount, userToken, callback){
-	var error;
-	var result;
-	
-	//TODO validar ID antes de hacer el find!!!!
+	var error, result;
 	
 	// Check if user owns that account and get the email
-	getUserEmail(userToken, function(err, email){
-
+	getUserEmail(userToken, function(err, data){
 		if(!err) {
-			twiAccModel.find({"email" : email, "_id" : new objectID(idAccount)}, function(errDb,data){
+			
+			// Check if ID is valid
+			var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
+			if(typeof idAccount == 'string' && (idAccount.length == 12 || idAccount.length == 24 )
+					&& checkForHexRegExp.test(idAccount)){
+				console.log("TWITTER-ACCOUNTS-GET-ID: ID is valid.");	
+				
+				twiAccModel.find({"email" : data, "_id" : new objectID(idAccount)}, function(errDb,data){
 
-				if(!errDb && data.lenght !== null){
-					console.log("TWITTER-ACCOUNTS-GET-ID: User owns that account");
-					
-					// Check if ID is valid
-					var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-					if(typeof idAccount == 'string' && (idAccount.length == 12 || idAccount.length == 24 )
-								&& checkForHexRegExp.test(idAccount)){
-							console.log("TWITTER-ACCOUNTS-GET-ID: ID is valid.");
-							
-							// Find twitter account
-							twiAccModel.findById(idAccount, function(errDb2,res){
-								console.log("TWITTER-ACCOUNTS-GET-ID: Checking database...");
-								
-								if(!errDb2 && res !== null){
-									console.log("TWITTER-ACCOUNTS-GET-ID: Account: ", res);
+					if(!errDb && data.lenght !== null){
+						console.log("TWITTER-ACCOUNTS-GET-ID: User owns that account");
+				
+								// Find twitter account
+								twiAccModel.findById(idAccount, function(errDb2,res){
+									console.log("TWITTER-ACCOUNTS-GET-ID: Checking database...");
+									
+									if(!errDb2 && res !== null){
+										console.log("TWITTER-ACCOUNTS-GET-ID: Account: ", res);
 
-									error = false;
-									result = res;
-								} else if (res === null) {
-									console.log("TWITTER-ACCOUNTS-GET-ID: There is no account with id=", idAccount );
+										error = false;
+										result = res;
+									} else if (res === null) {
+										console.log("TWITTER-ACCOUNTS-GET-ID: There is no account with id=", idAccount );
 
-									error = true;
-									result = "NOT FOUND"; //???
-								} else {
-									console.log("TWITTER-ACCOUNTS-GET-ID: Error while performing query" );
+										error = true;
+										result = "NOT FOUND"; //???
+									} else {
+										console.log("TWITTER-ACCOUNTS-GET-ID: Error while performing query" );
 
-									error = true;
-									result = "ERROR";
-								}
-								callback(error, result);
-							});
+										error = true;
+										result = "ERROR";
+									}
+									callback(error, result);
+								});
+						
 					} else {
+						console.log("TWITTER-ACCOUNTS-GET-ID: User does not own that account");
+						
+						error = true;
+						result = "FORBIDDEN" ; 
+						callback(error, result);
+					} 
+				});
+			} else {
 						console.log("TWITTER-ACCOUNTS-GET-ID: ID account is not valid");
 						
 						error = true;
 						result = "ID NOT VALID";
 						callback(error, result);
 					}
-				} else {
-					console.log("TWITTER-ACCOUNTS-GET-ID: User does not own that account");
-					
-					error = true;
-					result = "FORBIDDEN" ; 
-					callback(error, result);
-				} 
-			});
 		} else {
-			if(res == "NOT FOUND"){
-                console.log("TWITTER-ACCOUNTS-GET-ID: User does not own that account");
-            } else {
-                console.log("TWITTER-ACCOUNTS-GET-ID: DB error");
-            }
+			if(data == "NOT FOUND"){
+		        console.log("TWITTER-ACCOUNTS-GET-ID: User does not own that account");
+		    } else {
+		        console.log("TWITTER-ACCOUNTS-GET-ID: DB error");
+		    }
 		}
 	});
 };
@@ -143,7 +143,7 @@ exports.postAccount = function(userToken, newAccount, callback){
 	var error, result;	
 	console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account: ", newAccount);
 	
-	getUserEmail(userToken, function(err, email){
+	getUserEmail(userToken, function(err, data){
 		if(!err) {
 			
 			// Check if the account already exists
@@ -163,7 +163,7 @@ exports.postAccount = function(userToken, newAccount, callback){
 						var dbTwitterAccounts = new twiAccModel();
 						dbTwitterAccounts.information = newAccount.information;
 						dbTwitterAccounts.description = newAccount.description;
-						dbTwitterAccounts.email = email;
+						dbTwitterAccounts.email = data;
 						dbTwitterAccounts.activated = true;
 						
 						// Insert new data into DB
@@ -194,7 +194,7 @@ exports.postAccount = function(userToken, newAccount, callback){
 				}
 			});
 		} else {
-			if(res == "NOT FOUND"){
+			if(data == "NOT FOUND"){
                 console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: User can not be verified");
             } else {
                 console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: DB error");
@@ -217,14 +217,14 @@ exports.deleteAccount = function(userToken, idAccount, callback){
 						&& checkForHexRegExp.test(idAccount)){
 				console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: ID is valid.");
 				
-				// Check if the account exists
-				twiAccModel.find({"information": idAccount.information}, function(err,res){
+				// Check if the account belongs to the user
+				twiAccModel.find({"_id": new objectID(idAccount),"email": data}, function(err,res){
 					if(!err){
 						if(res !== null && res.length > 0){
-							 console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: Account exists ", res);
-							 
-							 // Disable account
-							 twiAccModel.update({"_id" : objectID(idAccount)},{$set : {"activated":false}}, 
+							 console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: Account exists and belongs to user. Disabling...");
+								 
+							// Disable account
+							 twiAccModel.update({"_id" : new objectID(idAccount)},{$set : {"activated":false}}, 
 									 function(err,res){
 								 if(!err){
 									 console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: Account disabled");
@@ -239,12 +239,12 @@ exports.deleteAccount = function(userToken, idAccount, callback){
 								 }
 								 callback(error, result);
 							 });
+							 
 						} else {
-							console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: Account does not exist.");
-							
-							error = true;
-							result = "NOT FOUND";
-							callback(error, result);
+							console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: The user has not permission to do this.");
+							 error = true;
+							 result = "FORBIDDEN";
+							 callback(error, result);
 						}
 					} else {
 						console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: Error while performing query.");
@@ -261,7 +261,7 @@ exports.deleteAccount = function(userToken, idAccount, callback){
 				callback(error, result);
 			}
 		} else {
-			if(res == "NOT FOUND"){
+			if(data == "NOT FOUND"){
                 console.log("TTWITTER-ACCOUNTS-DEL-ACCOUNT: User can not be verified");
                 
                 error = true;

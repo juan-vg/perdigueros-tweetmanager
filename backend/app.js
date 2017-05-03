@@ -1,10 +1,6 @@
 var fs = require("fs"),
 	querystring = require("querystring"),
 	util = require("util"),
-//	formidable = require("formidable"),
-//	mongoClient = require('mongodb').MongoClient,
-//	ObjectID = require('mongodb').ObjectID,
-//	mongoOp = require("../models/mongo"),
 	url = require("url");
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
@@ -303,7 +299,7 @@ var appRouter = function(app) {
 						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID is forbidden");
 						
 						response.writeHead(403, {"Content-Type": "text/html"});
-						response.write("The user does not own this account!");
+						response.write("Forbidden. The user does not own this account");
 					} else if(res == 'NOT FOUND') {
 						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID not found");
 						
