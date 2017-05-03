@@ -81,8 +81,8 @@ exports.getAccount = function(idAccount, userToken, callback){
 			
 			// Check if ID is valid
 			var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-			if(typeof idAccount == 'string' && (idAccount.length == 12 || idAccount.length == 24 )
-					&& checkForHexRegExp.test(idAccount)){
+			if(typeof idAccount == 'string' && (idAccount.length == 12 || idAccount.length == 24 ) &&
+					checkForHexRegExp.test(idAccount)){
 				console.log("TWITTER-ACCOUNTS-GET-ID: ID is valid.");	
 				
 				twiAccModel.find({"email" : data, "_id" : new objectID(idAccount)}, function(errDb,data){
@@ -178,7 +178,7 @@ exports.postAccount = function(userToken, newAccount, callback){
 
 							} else {
 								console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Error while saving account.");
-								error = true
+								error = true;
 								result = "DB ERROR";
 								
 							}
@@ -188,7 +188,7 @@ exports.postAccount = function(userToken, newAccount, callback){
 				} else {
 					console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Error while performing query.");
 					
-					error = true
+					error = true;
 					result = "DB ERROR";
 					callback(error, result);
 				}
@@ -213,8 +213,8 @@ exports.deleteAccount = function(userToken, idAccount, callback){
 			
 			//Check if ID is valid
 			var checkForHexRegExp = new RegExp("^[0-9a-fA-F]{24}$");
-			if(typeof idAccount == 'string' && (idAccount.length == 12 || idAccount.length == 24 )
-						&& checkForHexRegExp.test(idAccount)){
+			if(typeof idAccount == 'string' && (idAccount.length == 12 || idAccount.length == 24 ) &&
+						checkForHexRegExp.test(idAccount)){
 				console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: ID is valid.");
 				
 				// Check if the account belongs to the user
@@ -249,7 +249,7 @@ exports.deleteAccount = function(userToken, idAccount, callback){
 					} else {
 						console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: Error while performing query.");
 						
-						error = true
+						error = true;
 						result = "DB ERROR";
 						callback(error, result);
 					}
