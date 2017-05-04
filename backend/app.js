@@ -244,8 +244,8 @@ var appRouter = function(app) {
 			if(!err){
 				console.log("APP-POST-ACCOUNT: OK");
 				
-				response.writeHead(201, {"Content-Type": "application/json"});
-				response.write(JSON.stringify(data));
+				response.writeHead(201, {"Content-Type": "text/html"});
+				response.write("Created");
 			} else {
 				if (data == "DB ERROR") {
 					console.log("APP-POST-ACCOUNT: Error while performing query");
