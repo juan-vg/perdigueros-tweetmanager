@@ -38,4 +38,5 @@ jspm_packages
 
 # Eclipse metadata
 .project
+.settings/
 
