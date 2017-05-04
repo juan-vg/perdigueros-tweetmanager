@@ -267,7 +267,7 @@ var appRouter = function(app) {
 	//borra una cuenta
 	/**
 	 * @swagger
-	 * twitter-accounts/{id}:
+	 * /twitter-accounts/{id}:
 	 *   delete:
 	 *     tags:
 	 *       - DELETE account
