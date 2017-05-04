@@ -1,89 +1,61 @@
-var mongo = require('mongodb').MongoClient;
+var urlsModel = require('./models/urls.js');
 var objectID = require('mongodb').ObjectID;
 
-// MongoDB - URLs DB - connection
-var connection = 'mongodb://localhost:27017/urls';
 
 exports.post = function (urlStr, callback){
 	
-	var error;
+	var error, data;
 	
-	mongo.connect(connection, function(err, db) {
+	// Define data to insert
+	var dbUrls = new urlsModel();
+	dbUrls.url = urlStr;
+	
+	// Insert on MongoDB
+	dbUrls.save(function(err, result) {
 		
-		if(!err){
-			console.log("Connected to MongoDB server");
-			
-			// Get documents
-			var collection = db.collection('documents');
-			
-			// Define data to insert
-			var url = {urlStr: urlStr};
-			
-			// Insert on MongoDB
-			collection.insert(url, function(err, result) {
-				
-				if (!err) {
-					console.log("Inserted URL Id: ", result.insertedIds[0]);
-					error = false;
-					callback(error, result.insertedIds[0]);
-				} else {
-					console.log("ERROR: while inserting on DB");
-					error = true;
-					callback(error, null);
-				}
-			});
-			db.close();
+		if (!err) {
+			console.log("URL-SHORTENER-POST: Inserted URL Id: " + result._id);
+			error = false;
+			data = result._id;
 			
 		} else {
-			console.log("ERROR: while connecting to DB");
+			console.log("URL-SHORTENER-POST: ERROR while inserting on DB!!!");
 			error = true;
-			callback(error, null);
+			data = null;
 		}
+		
+		callback(error, data);
 	});
 };
 
 exports.get = function (urlId, callback){
 	
-	var error;
+	var error, data;
 	
 	// If the urlId is NOT valid
 	var checkId = new RegExp("^[0-9a-fA-F]{24}$");
 	if ( !(typeof urlId == 'string' && (urlId.length == 12 || urlId.length == 24) && checkId.test(urlId) ) ){
 		error = true;
-		callback(error, null);
+		data = null;
+		callback(error, data);
 		
 	} else {
 		// If the urlId is VALID
 		
-		mongo.connect(connection, function(err, db) {
-		
-			if(!err){
-				console.log("Connected to MongoDB server");
-				
-				// Get documents
-				var collection = db.collection('documents');
-				
-				// Look for intended url on MongoDB
-				collection.find({"_id" : new objectID(urlId) }).toArray(function(err, docs) {	
-					console.log("Checking DB...");
-					
-					if(!err && docs.length > 0){
-						console.log("URL: ", docs[0]);
-						error = false;
-						callback(error, docs[0].urlStr);
-					} else {
-						console.log("No URL with id=", urlId);
-						error = true;
-						callback(error, null);
-					}
-				});
-				db.close();
-				
+		// Look for intended url on MongoDB
+		urlsModel.find({"_id" : new objectID(urlId) }, function(err, dbData) {	
+			
+			if(!err && dbData.length > 0){
+				console.log("URL-SHORTENER-GET: URL: " + dbData[0].url);
+				error = false;
+				data = dbData[0].url;
 			} else {
-				console.log("ERROR: while connecting to DB");
+				console.log("URL-SHORTENER-GET: No URL with id=" + urlId);
 				error = true;
-				callback(error, null);
+				data = null;
 			}
+			
+			callback(error, data);
 		});
 	}
 };
