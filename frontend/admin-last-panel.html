@@ -60,7 +60,7 @@
 <div class="container">
     <div class="row">
         <!-- List with users -->
-        <div>
+        <div ng-app="UsersData" ng-controller="UserLastController">
 			<ul class="nav nav-pills">
   				<li><a href="admin-door-panel.html">Altas y Bajas</a></li>
   				<li class="active"><a href="admin-last-panel.html">Entradas</a></li>
@@ -73,18 +73,10 @@
 						<th class="text-center">Fecha</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody ng-repeat="i in users">
 					<tr>
-						<td class="text-center">User1</td>
-						<td class="text-center">05/01/1998 01:00</td>
-					</tr>
-					<tr>
-						<td class="text-center">User2</td>
-						<td class="text-center">15/07/1999 15:00</td>
-					</tr>
-					<tr>
-						<td class="text-center">User7</td>
-						<td class="text-center">01/03/1999 18:00</td>
+						<td class="text-center">{{i.name}}</td>
+						<td class="text-center">{{i.date}}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -103,5 +95,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <!-- Bootstrap js library required -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- Angular js library required -->
+    <script src="js/angular.min.js"></script>
+    <!-- Angular js Functions -->
+    <script src="angular.js"></script>
 </body>
 </html>

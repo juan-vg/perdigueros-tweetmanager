@@ -19,7 +19,7 @@
     <!-- Font Awesome library -->
     <link rel="stylesheet" href="css/font-awesome.min.css">
 </head>
-<body>
+<body ng-app="PwdCheck">
 
 	<!-- Static top navbar -->
 <nav class="navbar navbar-default navbar-static-top">
@@ -44,13 +44,15 @@
 <div class="container">
     <div class="row">
         <!-- Form with password -->
-        <div class="col-xs-4 col-xs-offset-4" ng-app="PwdCheck">
-			   <form name="myForm">
+        <div class="col-xs-4 col-xs-offset-4">
+			   <form name="myForm" ng-controller="PasswordController">
        				<label for="password">Contraseña</label>
-       				<input type="password" id="password" name="password" ng-model="formData.password" ng-minlength="8" ng-maxlength="20" required  />
+       				<input type="password" id="password" name="password" ng-model="password" ng-minlength="8" ng-maxlength="20" required  />
    					<span ng-show="!myForm.password.$error.required && (myForm.password.$error.minlength || myForm.password.$error.maxlength) && myForm.password.$dirty"><br />Contraseña minimo 8 caracteres y maximo de 20</span>
+   					<span ng-show="pwdError"><br />Contraseña incorrecta</span>
        				<br />
-   					<button type="submit"  class="btn btn-primary btn-lg center-block" ng-disabled="!myForm.$valid"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Entrar</button>
+   					<button type="submit" class="btn btn-primary btn-lg center-block" ng-click="checkPwd()" ng-disabled="!myForm.$valid"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Entrar</button>
+   					{{pwdError}}
 				</form>
         </div>
     </div>

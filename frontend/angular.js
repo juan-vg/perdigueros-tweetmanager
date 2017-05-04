@@ -1,16 +1,14 @@
-angular.module('PwdCheck', []).directive('validPasswordC', function () {
-    return {
-        require: 'ngModel',
-        link: function (scope, elm, attrs, ctrl) {
-            ctrl.$parsers.unshift(function (viewValue, $scope) {
-                var noMatch = viewValue != scope.myForm.password.$viewValue
-                ctrl.$setValidity('noMatch', !noMatch)
-            })
-        }
-    }
-});
+angular.module('PwdCheck', []).controller('PasswordController', function ($scope) {
+    $scope.pwdError =false;
+    $scope.checkPwd =function() {
+      if ($scope.password !== "12345678") {
+        $scope.pwdError =true;
+      }
+    };
+  });
 
-angular.module('UsersData', []).controller('UserController', function($scope) {
+var UsersData=angular.module('UsersData', []);
+UsersData.controller('UserController', function($scope) {
 	$scope.users =[
   					{
     					"name" : "alex",
@@ -37,7 +35,36 @@ angular.module('UsersData', []).controller('UserController', function($scope) {
 				break;
 			}
 		}
-		$scope.users.splice( index, 1 );		
+		$scope.users.splice( index, 1 );
 	};
 
+});
+
+UsersData.controller('UserDoorController', function($scope) {
+	$scope.users =[
+  					{
+    					"name" : "alex",
+    					"type" : "Salida",
+    					"date" : "05/01/1998 01:00"
+  					},
+    				{
+    					"name" : "albert",
+    					"type" : "Nuevo",
+    					"date" : "15/07/1999 15:00"
+  					},
+				];
+
+});
+UsersData.controller('UserLastController', function($scope) {
+	var moment = require('js/moment');
+	$scope.users =[
+  					{
+    					"name" : "alex",
+    					"date" : "05/01/1998 01:00"
+  					},
+    				{
+    					"name" : "albert",
+    					"date" : "15/07/1999 15:00"
+  					},
+				];
 });
