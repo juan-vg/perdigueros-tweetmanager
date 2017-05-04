@@ -277,6 +277,10 @@ var appRouter = function(app) {
 	 *         in: path
 	 *         required: true
 	 *         description: The twitter account ID 
+	 *       - name: usertoken
+     *         in: header
+     *         required: true
+     *         description: The user token
 	 *     produces:
 	 *       - text/html
 	 *     responses:
