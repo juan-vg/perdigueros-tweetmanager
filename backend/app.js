@@ -21,11 +21,11 @@ var appRouter = function(app) {
 	 *           consumerKey: 
 	 *             type: string
 	 *           consumerSecret:
-     *             type: string
+	 *             type: string
 	 *           accessToken: 
-     *             type: string
+	 *             type: string
 	 *           accessTokenSecret: 
-     *             type: string
+	 *             type: string
 	 *       description:
 	 *         type: string
 	 *         description: "The twitter account description"
@@ -278,9 +278,9 @@ var appRouter = function(app) {
 	 *         required: true
 	 *         description: The twitter account ID 
 	 *       - name: usertoken
-     *         in: header
-     *         required: true
-     *         description: The user token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
 	 *     produces:
 	 *       - text/html
 	 *     responses:
