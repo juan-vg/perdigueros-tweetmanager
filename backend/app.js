@@ -17,12 +17,18 @@ var appRouter = function(app) {
 	 *       information:
 	 *         type: "object"
 	 *         description: "The tokens used to access Twitter"
+	 *         properties:
+	 *           consumerKey: 
+	 *             type: string
+	 *           consumerSecret:
+     *             type: string
+	 *           accessToken: 
+     *             type: string
+	 *           accessTokenSecret: 
+     *             type: string
 	 *       description:
 	 *         type: string
 	 *         description: "The twitter account description"
-	 *       activated:
-	 *         type: boolean
-	 *         description: "Indicates whether the account is enabled or not"
 	 *   Urls:
 	 *     type: "object"
 	 *     properties:
@@ -209,14 +215,12 @@ var appRouter = function(app) {
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
-	 *       - name: description
+	 *       - name: twitteraccount
 	 *         in: body
 	 *         required: true
-	 *         description: The twitter account description
-	 *       - name: information
-	 *         in: body
-	 *         required: true
-	 *         description: The tokens used to access Twitter
+	 *         description: The twitter account description and the tokens used to access Twitter
+	 *         schema:
+	 *           $ref: "#/definitions/Twitter-accounts"
 	 *     produces:
 	 *       - text/html
 	 *       - application/json
