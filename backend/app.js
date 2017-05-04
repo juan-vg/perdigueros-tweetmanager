@@ -1,7 +1,7 @@
 var fs = require("fs"),
-querystring = require("querystring"),
-util = require("util"),
-url = require("url");
+    querystring = require("querystring"),
+    util = require("util"),
+    url = require("url");
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 
@@ -130,8 +130,7 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        }
-        );
+        });
     });
 
     //obtiene una cuenta
@@ -191,8 +190,7 @@ var appRouter = function(app) {
                 response.write("Error while performing query");
             }
             response.end();
-        }
-        );
+        });
     });
 
     //crea una cuenta
@@ -255,8 +253,7 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        }
-        );
+        });
     });
 
     //borra una cuenta
@@ -313,8 +310,7 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        }
-        );
+        });
     });
 
     //publicar tweet

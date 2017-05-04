@@ -2,9 +2,6 @@ var userModel = require("./models/user-accounts");
 var twiAccModel = require("./models/twitter-accounts");
 var objectID = require('mongodb').ObjectID;
 
-//TODO cambiar tabs por espacios
-//TODO eliminar modelo de usuarios en el ultimo commit
-
 //Get the user email
 function getUserEmail(userToken, callback){
     var error, result;
