@@ -5,6 +5,7 @@ var fs = require("fs"),
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
+var followedUsers = require('./followed-users.js');
 
 var appRouter = function(app) {
 	
@@ -622,19 +623,117 @@ var appRouter = function(app) {
 	});
 	
 	//USUARIOS FOLLOWED
-	app.get("/followed-users", function(request, response) {
-
-
+	//TODO 
+	app.get("/twitter-accounts/:id/followed-users", function(request, response) {
+	    
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+	        console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+	        
+	        followedUsers.getAll(accountID,  function (err, data){
+	            
+	            if(!err){
+	                console.log("APP-GET-ALL-FOLLOWED-USERS: OK");
+	                
+	                response.writeHead(200, {"Content-Type": "application/json"});
+	                response.write(JSON.stringify(data));
+	                
+	            } else {
+	                if(data == "FORBIDDEN"){
+	                    console.log("APP-GET-ALL-FOLLOWED-USERS: Forbidden!!!");
+	                    
+	                    response.writeHead(403, {"Content-Type": "text/html"});
+	                    response.write("Forbidden");
+	                } else {
+	                    console.log("APP-GET-ALL-FOLLOWED-USERS: DB ERROR!!!");
+	                    
+	                    response.writeHead(500, {"Content-Type": "text/html"});
+	                    response.write("Sorry, DB Error!");
+	                }
+	            }
+	            response.end();
+	        });
 	});
 	
-	app.get("/followed-users/:id", function(request, response) {
-
-
+	//TODO
+	app.get("/twitter-accounts/:id/followed-users/:user", function(request, response) {
+	    
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+	        console.log("APP-GET-FOLLOWED-USERS: Retrieving a hashtag for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+	        
+	        followedUsers.get(accountID, request.params.user, function (err, data){
+	            
+	            if(!err){
+	                console.log("APP-GET-FOLLOWED-USERS: OK");
+	                
+	                response.writeHead(200, {"Content-Type": "application/json"});
+	                response.write(JSON.stringify(data));
+	                
+	            } else {
+	                if(data == "FORBIDDEN"){
+	                    console.log("APP-GET-FOLLOWED-USERS: Forbidden!!!");
+	                    
+	                    response.writeHead(403, {"Content-Type": "text/html"});
+	                    response.write("Forbidden");
+	                } else if(data == "NOT FOUND"){
+	                    console.log("APP-GET-FOLLOWED-USERS: Not found!!!");
+	                    
+	                    response.writeHead(404, {"Content-Type": "text/html"});
+	                    response.write("Not Found");                
+	                } else {
+	                    console.log("APP-GET-FOLLOWED-USERS: DB ERROR!!!");
+	                    
+	                    response.writeHead(500, {"Content-Type": "text/html"});
+	                    response.write("Sorry, DB Error!");
+	                }
+	            }
+	            response.end();
+	        });
 	});
 
-	app.post("/followed-users", function(request, response) {
-
-
+	app.post("twitter-accounts/:id/followed-users", function(request, response) {
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+	        console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+	        
+	        hashtags.post(accountID, request.body.user, function (err, data){
+	            
+	            if(!err){
+	                console.log("APP-POST-FOLLOWED-USERS: OK");
+	                
+	                response.writeHead(201, {"Content-Type": "text/html"});
+	                response.write("Created");
+	                
+	            } else {
+	                if(data == "FORBIDDEN"){
+	                    console.log("APP-POST-FOLLOWED-USERS: Forbidden!!!");
+	                    
+	                    response.writeHead(403, {"Content-Type": "text/html"});
+	                    response.write("Forbidden");
+	                } else if(data == "ALREADY EXISTS"){
+	                    console.log("APP-POST-FOLLOWED-USERS: Conflict. Already exists!!!");
+	                    
+	                    response.writeHead(409, {"Content-Type": "text/html"});
+	                    response.write("Hashtag already exists for the provided twitter account");              
+	                } else {
+	                    console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
+	                    
+	                    response.writeHead(500, {"Content-Type": "text/html"});
+	                    response.write("Sorry, DB Error!");
+	                }
+	            }
+	            response.end();
+	        });
 	});
 	
 	app.put("/followed-users/:id", function(request, response) {
@@ -642,9 +741,42 @@ var appRouter = function(app) {
 
 	});
 	
-	app.delete("/followed-users/:id", function(request, response) {
-
-
+	app.delete("/twitter-accounts/:id/followed-users/:user", function(request, response) {
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+	        console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+	        
+	        follUsModel.delete(accountID, request.params.user, function (err, data){
+	            
+	            if(!err){
+	                console.log("APP-DELETE-FOLLOWED-USERS: OK");
+	                
+	                response.writeHead(200, {"Content-Type": "text/html"});
+	                response.write("Deleted");
+	                
+	            } else {
+	                if(data == "FORBIDDEN"){
+	                    console.log("APP-DELETE-FOLLOWED-USERS: Forbidden!!!");
+	                    
+	                    response.writeHead(403, {"Content-Type": "text/html"});
+	                    response.write("Forbidden");
+	                } else if(data == "NOT EXIST"){
+	                    console.log("APP-DELETE-FOLLOWED-USERS: Conflict. Does not exist!!!");
+	                    
+	                    response.writeHead(409, {"Content-Type": "text/html"});
+	                    response.write("Hashtag does not exist for the provided twitter account");              
+	                } else {
+	                    console.log("APP-DELETE-FOLLOWED-USERS: DB ERROR!!!");
+	                    
+	                    response.writeHead(500, {"Content-Type": "text/html"});
+	                    response.write("Sorry, DB Error!");
+	                }
+	            }
+	            response.end();
+	        });
 	});
 	
 	//ADMIN
