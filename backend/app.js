@@ -1,13 +1,9 @@
 var fs = require("fs"),
 	querystring = require("querystring"),
 	util = require("util"),
-//	formidable = require("formidable"),
-//	mongoClient = require('mongodb').MongoClient,
-//	ObjectID = require('mongodb').ObjectID,
-//	mongoOp = require("../models/mongo"),
 	url = require("url");
-	
 var urlShortener = require('./url-shortener.js');
+var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
 
 var appRouter = function(app) {
@@ -16,11 +12,23 @@ var appRouter = function(app) {
 	 * @swagger
 	 * definitions:
 	 *   Twitter-accounts:
+	 *     type: "object"
 	 *     properties:
-	 *       info:
-	 *         type: string
+	 *       information:
+	 *         type: "object"
+	 *         description: "The tokens used to access Twitter"
+	 *         properties:
+	 *           consumerKey: 
+	 *             type: string
+	 *           consumerSecret:
+	 *             type: string
+	 *           accessToken: 
+	 *             type: string
+	 *           accessTokenSecret: 
+	 *             type: string
 	 *       description:
 	 *         type: string
+	 *         description: "The twitter account description"
 	 *   Urls:
 	 *     type: "object"
 	 *     properties:
@@ -34,6 +42,7 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The Hashtag string"
 	 */
+
 
 	
 	////////////////////////////////////////////////////////
@@ -49,10 +58,11 @@ var appRouter = function(app) {
 	 * /login/signin:
 	 *   post:
 	 *     tags:
-	 *       - Login
+	 *       - POST login singin
 	 *     description: Log in the system
 	 *     produces:
 	 *       - application/json
+	 *       - text/html
 	 *     responses:
 	 *       200:
 	 *         description: Login OK 
@@ -74,29 +84,246 @@ var appRouter = function(app) {
 	});
 
 	//todas las cuentas
+	/**
+	 * @swagger
+	 * /twitter-accounts:
+	 *   get:
+	 *     tags:
+	 *       - GET all accounts
+	 *     description: Get information of all twitter accounts
+	 *     parameters:
+	 *       - name: usertoken
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *     produces:
+	 *       - text/html
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: Accounts have been successfully obtained 
+	 *       403:
+	 *         description: The user (token) does not have permission
+	 *       500:
+	 *         description: Error getting the accounts from database
+	 */
 	app.get("/twitter-accounts", function(request, response) {
-		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("prueba ok twitter-accounts");
-	
-		response.end();
+		console.log("APP-GET-ALL-ACCOUNTS");
+		
+		twitterAccounts.getAll(request.headers.usertoken, function (err, data){
+				if(!err){	
+					if (data !== null) {
+						console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
+						
+						response.writeHead(200, {"Content-Type": "application/json"});
+						response.write(JSON.stringify(data));
+					} else {
+						console.log("APP-GET-ALL-ACCOUNTS: No accounts found");
+						
+						response.writeHead(200, {"Content-Type": "text/html"});
+						response.write("No accounts found.");
+					}
+				} else {
+					if (data == "FORBIDDEN") {
+						console.log("APP-GET-ALL-ACCOUNTS: Forbbiden");
+						
+						response.writeHead(403, {"Content-Type": "text/html"});
+						response.write("Forbidden");
+					} else {
+						console.log("APP-GET-ALL-ACCOUNTS: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Error getting the accounts");
+					}
+				}
+				response.end();
+			}
+		);
 	});
 
 	//obtiene una cuenta
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}:
+	 *   get:
+	 *     tags:
+	 *       - GET single account
+	 *     description: Get information of a single account
+	 *     parameters:
+	 *       - name: usertoken
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID 
+	 *     produces:
+	 *       - text/html
+	 *       - application/json
+	 *     responses:
+	 *       200:
+	 *         description: Information about the twitter account 
+	 *       403:
+	 *         description: The user (token) does not have permission on that twitter account (id)
+	 *       500:
+	 *         description: Error getting the account information from database
+	 */
 	app.get("/twitter-accounts/:id", function(request, response) {
-
-
+		console.log("APP-GET-ACCOUNTS-ID");
+		
+		twitterAccounts.getAccount(request.params.id, request.headers.usertoken, function (err, data){
+				if(!err){
+					console.log("APP-GET-ACCOUNTS-ID: Account found OK");
+					
+					response.writeHead(200, {"Content-Type": "application/json"});
+					response.write(JSON.stringify(data));
+					
+				} else if (data == "FORBIDDEN"){
+					console.log("APP-GET-ACCOUNTS-ID: No accounts found");
+					
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if (data == "NOT FOUND"){
+					console.log("APP-GET-ACCOUNTS-ID: No accounts found");
+					
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Not found");
+					
+				} else {
+					console.log("APP-GET-ACCOUNTS-ID: Error while performing query");
+					
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Error while performing query");
+				}
+				response.end();
+			}
+		);
 	});
 	
 	//crea una cuenta
-	app.post("/twitter-accounts/:id", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts:
+	 *   post:
+	 *     tags:
+	 *       - POST new twitter account
+	 *     description: Create a new twitter account
+	 *     parameters:
+	 *       - name: usertoken
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: twitteraccount
+	 *         in: body
+	 *         required: true
+	 *         description: The twitter account description and the tokens used to access Twitter
+	 *         schema:
+	 *           $ref: "#/definitions/Twitter-accounts"
+	 *     produces:
+	 *       - text/html
+	 *       - application/json
+	 *     responses:
+	 *       201:
+	 *         description: Twitter account created 
+	 *       409:
+	 *         description: The account already exists.
+	 *       500:
+	 *         description: Error inserting the twitter account into the database
+	 */
+	app.post("/twitter-accounts", function(request, response) {
+		console.log("APP-POST-ACCOUNT");
+		
+		var newAccount = {
+				"description": request.body.description,
+				"information": request.body.information
+		};
+		
+		twitterAccounts.postAccount(request.headers.usertoken, newAccount, function (err, data){
+			if(!err){
+				console.log("APP-POST-ACCOUNT: OK");
+				
+				response.writeHead(201, {"Content-Type": "text/html"});
+				response.write("Created");
+			} else {
+				if (data == "DB ERROR") {
+					console.log("APP-POST-ACCOUNT: Error while performing query");
+					
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Error while performing query");
+				} else {
+					console.log("APP-POST-ACCOUNT: Already exists");
+					
+					response.writeHead(409, {"Content-Type": "text/html"});
+					response.write("Account already exists");
+				}
+			}
+			response.end();
+		}
+	);
 	});
 	
 	//borra una cuenta
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}:
+	 *   delete:
+	 *     tags:
+	 *       - DELETE account
+	 *     description: Disable a twitter account
+	 *     parameters:
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID 
+	 *       - name: usertoken
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *     produces:
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The account has been successfully disabled 
+	 *       403:
+	 *         description: The user (token) does not own this twitter account (id)
+	 *       404:
+	 *         description: Unable to find the requested {id}
+	 *       500:
+	 *         description: Error deleting twitter account
+	 */
 	app.delete("/twitter-accounts/:id", function(request, response) {
-
-
+		console.log("APP-DEL-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
+		
+		twitterAccounts.deleteAccount(request.headers.usertoken, request.params.id,
+			function (err, res){
+				if(!err){
+					console.log("APP-DEL-ACCOUNTS-ID: Delete OK");
+					
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Deleted account");
+				} else {
+					if(res == 'FORBIDDEN'){
+						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID is forbidden");
+						
+						response.writeHead(403, {"Content-Type": "text/html"});
+						response.write("Forbidden. The user does not own this account");
+					} else if(res == 'NOT FOUND') {
+						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID not found");
+						
+						response.writeHead(404, {"Content-Type": "text/html"});
+						response.write("Account ID not found!");
+					} else {
+						console.log("APP-DEL-ACCOUNTS-ID: Error performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Error performing query");
+					}
+				}
+				response.end();
+			}
+		);
 	});
 	
 	//publicar tweet
