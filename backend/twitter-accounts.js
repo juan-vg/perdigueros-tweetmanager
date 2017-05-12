@@ -1,28 +1,8 @@
 var userModel = require("./models/user-accounts");
 var twiAccModel = require("./models/twitter-accounts");
+var verificator = require("./account-verifications");
 var objectID = require('mongodb').ObjectID;
 
-//Get the user email
-function getUserEmail(userToken, callback){
-    var error, result;
-
-    userModel.find({"token" : userToken }, function(err, data) {
-        if(!err && data.length > 0){
-            console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: token: " + userToken + " -> email: " + data[0].email);
-            error = false;
-            result = data[0].email;
-        } else if(!err){
-            console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: Token not found");
-            error = true;
-            result = "NOT FOUND";
-        } else {
-            console.log("TWITTER-ACCOUNTS-GET-USER-EMAIL: Error while performing query");
-            error = true;
-            result = "DB ERROR";
-        }
-        callback(error, result);
-    });
-}
 
 //Get all twitter accounts
 exports.getAll = function(userToken, callback){
@@ -71,7 +51,7 @@ exports.getAccount = function(idAccount, userToken, callback){
     var error, result;
 
     // Check if user owns that account and get the email
-    getUserEmail(userToken, function(err, data){
+    verificator.getUserEmail(userToken, function(err, data){
         if(!err) {
 
             // Check if ID is valid
@@ -141,7 +121,7 @@ exports.postAccount = function(userToken, newAccount, callback){
     var error, result;	
     console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account: ", newAccount);
 
-    getUserEmail(userToken, function(err, data){
+    verificator.getUserEmail(userToken, function(err, data){
         if(!err) {
 
             // Check if the account already exists
@@ -206,7 +186,7 @@ exports.deleteAccount = function(userToken, idAccount, callback){
     var error, result;
     console.log("TWITTER-ACCOUNTS-DEL-ACCOUNT: Trying to disable account: ", idAccount);
 
-    getUserEmail(userToken, function(err, data){
+    verificator.getUserEmail(userToken, function(err, data){
         if(!err) {
 
             //Check if ID is valid

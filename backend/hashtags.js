@@ -1,83 +1,14 @@
-var usersModel = require("./models/user-accounts");
-var twiAccModel = require("./models/twitter-accounts");
 var hashtagsModel = require("./models/hashtags");
-
+var verificator = require('./account-verifications.js');
 var objectID = require('mongodb').ObjectID;
 
-
-//accountID {token, idTwitterAcount}
-
-function getUserEmail(token, callback){
-    
-    var error, data;
-    
-    // get user from token
-    usersModel.find({"token" : token }, function(err, dbData) {
-        if(!err && dbData.length > 0){
-            console.log("HASHTAGS-GET-USER-EMAIL: token: " + token + " -> email: " + dbData[0].email);
-            error = false;
-            data = dbData[0].email;
-        } else if(!err){
-            console.log("HASHTAGS-GET-USER-EMAIL: TOKEN NOT FOUND!");
-            error = true;
-            data = "NOT FOUND";
-        } else {
-            console.log("HASHTAGS-GET-USER-EMAIL: DB ERROR!!!");
-            error = true;
-            data = "DB ERROR";
-        }
-        callback(error, data);
-    });
-}
-
-function verifyUser(accountID, callback){
-    
-    var success;
-    
-    // get user email from token
-    getUserEmail(accountID.token, function(error, data){
-            
-            if(!error){
-                
-                // check if the email matchs the twitterAccountId
-                twiAccModel.find({"email" : data, "_id" : new objectID(accountID.twitterAccountId)},
-                    
-                    function(err,dbData){
-                        
-                        if(!err && dbData.length > 0){
-                            console.log("HASHTAGS-VERIFY-USER: email: " + data + " owns TwitterAccount: " + accountID.twitterAccountId);
-                            success = true;
-                        } else {
-                            console.log("HASHTAGS-VERIFY-USER: email: " + data + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
-                            success = false;
-                        }
-                        
-                        callback(success);
-                    }
-                );
-                
-            } else {
-                
-                if(data == "NOT FOUND"){
-                    console.log("HASHTAGS-VERIFY-USER: CAN NOT VERIFY USER!");
-                } else {
-                    console.log("HASHTAGS-VERIFY-USER: DB ERROR!!!");
-                }
-                
-                success = false;
-                
-                callback(success);
-            }
-        }
-    );
-}
 
 exports.getAll = function (accountID, callback){
 
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success){
         
         if(success){
             
@@ -119,7 +50,7 @@ exports.get = function (accountID, hashtag, callback){
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success){
         
         if(success){
             
@@ -162,7 +93,7 @@ exports.post = function (accountID, hashtag, callback){
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success){
         
         if(success){
             
@@ -288,7 +219,7 @@ exports.delete = function (accountID, hashtag, callback){
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success){
         
         if(success){
             
