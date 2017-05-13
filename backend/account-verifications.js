@@ -10,33 +10,33 @@ var objectID = require('mongodb').ObjectID;
 // Checks if the supplied token has needed permissions
 // PROVIDES PERMISSION BYPASS FOR ADMIN
 function verifyUser(accountID, callback){
-	
-	var success;
+    
+    var success;
     
     verifyAdmin(accountID, function(success){
-		
-		console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + accountID.token);
-		
-		// Admin permission bypass
-		if(success){
-			console.log("ACC-VERIFS-VERIFY-USER: ADMIN DETECTED. WHATEVER YOU WANT WILL BE GRANTED MY LORD. COME IN");
-			callback(success);
-		} else {
+        
+        console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + accountID.token);
+        
+        // Admin permission bypass
+        if(success){
+            console.log("ACC-VERIFS-VERIFY-USER: ADMIN DETECTED. WHATEVER YOU WANT WILL BE GRANTED MY LORD. COME IN");
+            callback(success);
+        } else {
 
-			if(accountID.twitterAccountId){
-				checkTokenForTwitterAccount(accountID, function(success){
-					callback(success);
-				});
-			} else if(accountID.userAccountId) {
-				checkTokenForUserAccount(accountID, function(success){
-					callback(success);
-				});
-			} else {
-				success = false;
-				callback(success);
-			}
-		}
-	});
+            if(accountID.twitterAccountId){
+                checkTokenForTwitterAccount(accountID, function(success){
+                    callback(success);
+                });
+            } else if(accountID.userAccountId) {
+                checkTokenForUserAccount(accountID, function(success){
+                    callback(success);
+                });
+            } else {
+                success = false;
+                callback(success);
+            }
+        }
+    });
 }
 module.exports.verifyUser = verifyUser;
 
@@ -68,10 +68,10 @@ function getUserEmail(token, callback){
     // get user email from DB data
     getUser(token, function(err, dbData){
         if(!err){
-			console.log("ACC-VERIFS-GET-USER-EMAIL: email: " + dbData.email);
+            console.log("ACC-VERIFS-GET-USER-EMAIL: email: " + dbData.email);
             data = dbData.email;
         } else {
-			console.log("ACC-VERIFS-GET-USER-EMAIL: ERROR! (" + dbData + ")");
+            console.log("ACC-VERIFS-GET-USER-EMAIL: ERROR! (" + dbData + ")");
             data = dbData;
         }
         callback(err, data);
@@ -82,8 +82,8 @@ module.exports.getUserEmail = getUserEmail;
 
 // Checks if the supplied token has access to the twitter account
 function checkTokenForTwitterAccount(accountID, callback){
-	
-	var success;
+    
+    var success;
     
     // get user email from token
     getUserEmail(accountID.token, function(err, data){
@@ -125,8 +125,8 @@ function checkTokenForTwitterAccount(accountID, callback){
 
 // Checks if the supplied token has access to the user account
 function checkTokenForUserAccount(accountID, callback){
-	
-	var success;
+    
+    var success;
     
     // get user email from token
     getUser(accountID.token, function(err, data){
@@ -135,12 +135,12 @@ function checkTokenForUserAccount(accountID, callback){
             
             // check if the provided ID matchs the current userAccountId stored in DB
             if(dbData.length > 0 && dbData[0]._id == accountID.userAccountId){
-				console.log("ACC-VERIFS-CHK-TKN-4-USR-ACC: GRANTED");
-				success = true;
-			} else {
-				console.log("ACC-VERIFS-CHK-TKN-4-USR-ACC: FORBIDDEN");
-				success = false;
-			}
+                console.log("ACC-VERIFS-CHK-TKN-4-USR-ACC: GRANTED");
+                success = true;
+            } else {
+                console.log("ACC-VERIFS-CHK-TKN-4-USR-ACC: FORBIDDEN");
+                success = false;
+            }
             
         } else {
             
@@ -165,18 +165,18 @@ function getUser(token, callback){
     
     // get valid-user data from token
     usersModel.find({"token" : token, "validated": true, "activated": true }, {"password":0},
-		function(err, dbData) {
-			if(!err && dbData.length > 0){
-				error = false;
-				data = dbData[0];
-			} else if(!err){
-				error = true;
-				data = "NOT FOUND";
-			} else {
-				error = true;
-				data = "DB ERROR";
-			}
-			callback(error, data);
-		}
+        function(err, dbData) {
+            if(!err && dbData.length > 0){
+                error = false;
+                data = dbData[0];
+            } else if(!err){
+                error = true;
+                data = "NOT FOUND";
+            } else {
+                error = true;
+                data = "DB ERROR";
+            }
+            callback(error, data);
+        }
     );
 }
