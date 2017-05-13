@@ -4,15 +4,17 @@ var mongoose = require("mongoose");
 var mongoSchema =   mongoose.Schema;
 
 var usersAccountsSchema = new mongoSchema({
+	"loginType": String, // local, Facebook, Google, OpenID, ...
 	"name": String,
 	"surname": String,
 	"email": String,
 	"password": String,
 	"registrationDate": Date,
 	"lastAccess": Date,
-	"activated": Boolean,
 	"admin": Boolean,
-	"token": String
+	"token": String,
+	"validated": Boolean, // true if (external login | confirmed email)
+	"activated": Boolean // false if it is a "deleted" account
 });
 
 var dbUsers = mongoose.model('useraccounts', usersAccountsSchema);
