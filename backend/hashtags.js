@@ -1,6 +1,6 @@
 var hashtagsModel = require("./models/hashtags");
-var accaccVerificator = require("./account-verifications");
-var dbaccVerificator = require("./db-verifications");
+var accVerificator = require("./account-verifications");
+var dbVerificator = require("./db-verifications");
 var objectID = require('mongodb').ObjectID;
 
 //ADMIN BYPASS
