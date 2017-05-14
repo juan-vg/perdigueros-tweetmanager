@@ -101,26 +101,26 @@ function checkTokenForTwitterAccount(accountID, callback){
                 function(err, dbData){
                     
                     if(!err && dbData.length > 0){
-						
-						// check if the email matchs the twitterAccountId
+                        
+                        // check if the email matchs the twitterAccountId
                         if(data == dbData[0].email){
-							console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " owns TwitterAccount: " + accountID.twitterAccountId);
-							success = true;
-							reason = null;
-						} else {
-							console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
-							success = false;
-							reason = "FORBIDDEN";
-						}
+                            console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " owns TwitterAccount: " + accountID.twitterAccountId);
+                            success = true;
+                            reason = null;
+                        } else {
+                            console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
+                            success = false;
+                            reason = "FORBIDDEN";
+                        }
  
                     } else if(!err){
-						console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: TwitterAccount: " + accountID.twitterAccountId + " NOT found!");
+                        console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: TwitterAccount: " + accountID.twitterAccountId + " NOT found!");
                         success = false;
                         reason = "ACCOUNT NOT FOUND";
-					} else {
+                    } else {
                         console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: DB ERROR!!!");
                         success = false;
-						reason = "DB ERROR";
+                        reason = "DB ERROR";
                     }
                     
                     callback(success, reason);
