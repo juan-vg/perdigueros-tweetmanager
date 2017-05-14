@@ -125,7 +125,7 @@ var appRouter = function(app) {
 					}
 				} else {
 					if (data == "FORBIDDEN") {
-						console.log("APP-GET-ALL-ACCOUNTS: Forbbiden");
+						console.log("APP-GET-ALL-ACCOUNTS: Forbidden");
 						
 						response.writeHead(403, {"Content-Type": "text/html"});
 						response.write("Forbidden");
@@ -180,7 +180,7 @@ var appRouter = function(app) {
 					response.write(JSON.stringify(data));
 					
 				} else if (data == "FORBIDDEN"){
-					console.log("APP-GET-ACCOUNTS-ID: No accounts found");
+					console.log("APP-GET-ACCOUNTS-ID: Forbidden");
 					
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
@@ -400,6 +400,10 @@ var appRouter = function(app) {
 					console.log("APP-GET-ALL-HASHTAGS: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-ALL-HASHTAGS: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
 				} else {
 					console.log("APP-GET-ALL-HASHTAGS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -465,10 +469,14 @@ var appRouter = function(app) {
 					console.log("APP-GET-HASHTAGS: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
-				} else if(data == "NOT FOUND"){
-					console.log("APP-GET-HASHTAGS: Not found!!!");
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Not Found");				
+					response.write("Twitter account NOT Found");				
+				} else if(data == "NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Hashtag NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Hashtag NOT Found");				
 				} else {
 					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -538,6 +546,10 @@ var appRouter = function(app) {
 					console.log("APP-POST-HASHTAG: Conflict. Already exists!!!");
 					response.writeHead(409, {"Content-Type": "text/html"});
 					response.write("Hashtag already exists for the provided twitter account");				
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT Found");				
 				} else {
 					console.log("APP-POST-HASHTAG: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -608,9 +620,13 @@ var appRouter = function(app) {
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
 				} else if(data == "NOT EXIST"){
-					console.log("APP-DELETE-HASHTAG: Conflict. Does not exist!!!");
-					response.writeHead(409, {"Content-Type": "text/html"});
-					response.write("Hashtag does not exist for the provided twitter account");				
+					console.log("APP-DELETE-HASHTAG: Hashtag NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Hashtag NOT found");				
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT Found");				
 				} else {
 					console.log("APP-DELETE-HASHTAG: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});

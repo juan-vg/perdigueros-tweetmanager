@@ -8,7 +8,7 @@ exports.getAll = function (accountID, callback){
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verificator.verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success, reason){
         
         if(success){
             
@@ -37,8 +37,23 @@ exports.getAll = function (accountID, callback){
             );
             
         } else {
-            error = true;
-            data = "FORBIDDEN";
+			
+			if(reason == "ACCOUNT NOT FOUND"){
+				console.log("HASHTAGS-GET-ALL: Twitter account NOT FOUND");
+
+				error = true;
+				data = "ACCOUNT NOT FOUND";
+			} else if(reason == "DB ERROR") {
+				console.log("HASHTAGS-GET-ALL: DB ERROR!!!" );
+
+				error = true;
+				data = "DB ERROR";
+			} else {
+				console.log("HASHTAGS-GET-ALL: User does not own that account");
+
+				error = true;
+				data = "FORBIDDEN" ;
+			}
             
             callback(error, data);
         }
@@ -50,7 +65,7 @@ exports.get = function (accountID, hashtag, callback){
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verificator.verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success, reason){
         
         if(success){
             
@@ -79,8 +94,23 @@ exports.get = function (accountID, hashtag, callback){
             );
             
         } else {
-            error = true;
-            data = "FORBIDDEN";
+			
+            if(reason == "ACCOUNT NOT FOUND"){
+				console.log("HASHTAGS-GET: Twitter account NOT FOUND");
+
+				error = true;
+				data = "ACCOUNT NOT FOUND";
+			} else if(reason == "DB ERROR") {
+				console.log("HASHTAGS-GET: DB ERROR!!!" );
+
+				error = true;
+				data = "DB ERROR";
+			} else {
+				console.log("HASHTAGS-GET: User does not own that account");
+
+				error = true;
+				data = "FORBIDDEN" ;
+			}
             
             callback(error, data);
         }
@@ -93,7 +123,7 @@ exports.post = function (accountID, hashtag, callback){
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verificator.verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success, reason){
         
         if(success){
             
@@ -139,8 +169,22 @@ exports.post = function (accountID, hashtag, callback){
             );
             
         } else {
-            error = true;
-            data = "FORBIDDEN";
+            if(reason == "ACCOUNT NOT FOUND"){
+				console.log("HASHTAGS-POST: Twitter account NOT FOUND");
+
+				error = true;
+				data = "ACCOUNT NOT FOUND";
+			} else if(reason == "DB ERROR") {
+				console.log("HASHTAGS-POST: DB ERROR!!!" );
+
+				error = true;
+				data = "DB ERROR";
+			} else {
+				console.log("HASHTAGS-POST: User does not own that account");
+
+				error = true;
+				data = "FORBIDDEN" ;
+			}
             
             callback(error, data);
         }
@@ -219,7 +263,7 @@ exports.delete = function (accountID, hashtag, callback){
     var error, data;
     
     // check if the token has access to twitterAccountId
-    verificator.verifyUser(accountID, function(success){
+    verificator.verifyUser(accountID, function(success, reason){
         
         if(success){
             
@@ -260,8 +304,22 @@ exports.delete = function (accountID, hashtag, callback){
             );
             
         } else {
-            error = true;
-            data = "FORBIDDEN";
+            if(reason == "ACCOUNT NOT FOUND"){
+				console.log("HASHTAGS-DELETE: Twitter account NOT FOUND");
+
+				error = true;
+				data = "ACCOUNT NOT FOUND";
+			} else if(reason == "DB ERROR") {
+				console.log("HASHTAGS-DELETE: DB ERROR!!!" );
+
+				error = true;
+				data = "DB ERROR";
+			} else {
+				console.log("HASHTAGS-DELETE: User does not own that account");
+
+				error = true;
+				data = "FORBIDDEN" ;
+			}
             
             callback(error, data);
         }
