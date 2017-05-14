@@ -112,17 +112,10 @@ var appRouter = function(app) {
 		
 		twitterAccounts.getAll(request.headers.usertoken, function (err, data){
 				if(!err){	
-					if (data !== null) {
-						console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
+					console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
 						
-						response.writeHead(200, {"Content-Type": "application/json"});
-						response.write(JSON.stringify(data));
-					} else {
-						console.log("APP-GET-ALL-ACCOUNTS: No accounts found");
-						
-						response.writeHead(200, {"Content-Type": "text/html"});
-						response.write("No accounts found.");
-					}
+					response.writeHead(200, {"Content-Type": "application/json"});
+					response.write(JSON.stringify(data));
 				} else {
 					if (data == "FORBIDDEN") {
 						console.log("APP-GET-ALL-ACCOUNTS: Forbidden");

@@ -2,7 +2,7 @@ var hashtagsModel = require("./models/hashtags");
 var verificator = require('./account-verifications.js');
 var objectID = require('mongodb').ObjectID;
 
-
+//ADMIN BYPASS
 exports.getAll = function (accountID, callback){
 
     var error, data;
@@ -60,6 +60,7 @@ exports.getAll = function (accountID, callback){
     });
 };
 
+//ADMIN BYPASS
 exports.get = function (accountID, hashtag, callback){
     
     var error, data;
@@ -118,6 +119,7 @@ exports.get = function (accountID, hashtag, callback){
     
 };
 
+//ADMIN BYPASS
 exports.post = function (accountID, hashtag, callback){
     
     var error, data;
@@ -258,6 +260,7 @@ exports.put = function (accountID, hashtag, callback){
 */    
 };
 
+//ADMIN BYPASS
 exports.delete = function (accountID, hashtag, callback){
     
     var error, data;

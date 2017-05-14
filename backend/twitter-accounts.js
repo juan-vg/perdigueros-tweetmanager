@@ -52,9 +52,7 @@ exports.getAll = function(userToken, callback){
 				callback(error, result);
 			});
 			
-		} else {
-			// FORBIDDEN O DBERROR
-			
+		} else {			
 			if(data == "DB ERROR"){
 				console.log("TWITTER-ACCOUNTS-GET-ALL: Error while performing query.");
 
