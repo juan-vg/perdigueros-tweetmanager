@@ -32,6 +32,10 @@ function verifyUser(accountID, callback){
                 checkTokenForUserAccount(accountID, function(success, reason){
                     callback(success, reason);
                 });
+            } else if(accountID.lookingForEmail) {
+                getUserEmail(accountID.token, function(success, reason){
+                    callback(success, reason);
+                });
             } else {
                 success = false;
                 reason = "METHOD NOT FOUND";

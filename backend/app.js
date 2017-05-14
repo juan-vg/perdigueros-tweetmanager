@@ -252,6 +252,11 @@ var appRouter = function(app) {
 					
 					response.writeHead(500, {"Content-Type": "text/html"});
 					response.write("Error while performing query");
+				} else if (data == "FORBIDDEN") {
+					console.log("APP-POST-ACCOUNT: Forbidden");
+					
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
 				} else {
 					console.log("APP-POST-ACCOUNT: Already exists");
 					
