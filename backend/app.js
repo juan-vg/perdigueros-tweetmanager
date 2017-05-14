@@ -89,7 +89,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts:
 	 *   get:
 	 *     tags:
-	 *       - GET all accounts
+	 *       - GET all twitter accounts (ADMIN)
 	 *     description: Get information of all twitter accounts
 	 *     parameters:
 	 *       - name: usertoken
@@ -140,7 +140,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}:
 	 *   get:
 	 *     tags:
-	 *       - GET single account
+	 *       - GET single twitter account (ADMIN)
 	 *     description: Get information of a single account
 	 *     parameters:
 	 *       - name: usertoken
@@ -269,7 +269,7 @@ var appRouter = function(app) {
 	 *   delete:
 	 *     tags:
 	 *       - DELETE account
-	 *     description: Disable a twitter account
+	 *     description: Disable a twitter account (ADMIN)
 	 *     parameters:
 	 *       - name: id
 	 *         in: path
@@ -355,7 +355,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags:
 	 *   get:
 	 *     tags:
-	 *       - GET all hashtags
+	 *       - GET all hashtags (ADMIN)
 	 *     description: Gets all hashtags for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
@@ -418,7 +418,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags/{hashtag}:
 	 *   get:
 	 *     tags:
-	 *       - GET hashtag info
+	 *       - GET hashtag info (ADMIN)
 	 *     description: Gets the hashtag info for the provided (twitter-account's {id}, {hashtag})
 	 *     parameters:
 	 *       - name: token
@@ -490,7 +490,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags:
 	 *   post:
 	 *     tags:
-	 *       - POST hashtag
+	 *       - POST hashtag (ADMIN)
 	 *     description: Creates a new hashtag for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
@@ -570,7 +570,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags/{hashtag}:
 	 *   delete:
 	 *     tags:
-	 *       - DELETE hashtag
+	 *       - DELETE hashtag (ADMIN)
 	 *     description: Deletes the specified {hashtag} for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
