@@ -138,7 +138,6 @@ function checkTokenForTwitterAccount(accountID, callback){
             }
             
             success = false;
-            
             callback(success, reason);
         }
     });
