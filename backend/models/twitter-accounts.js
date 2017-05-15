@@ -12,7 +12,8 @@ var twitterAccountsSchema  = new mongoSchema({
         "accessToken" : String,
         "accessTokenSecret" : String
     },
-    "description" : String
+    "description" : String,
+    "activated" : Boolean
 });
 
 //create model if not exists.
