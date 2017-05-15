@@ -89,7 +89,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts:
 	 *   get:
 	 *     tags:
-	 *       - GET all accounts
+	 *       - GET all twitter accounts (ADMIN)
 	 *     description: Get information of all twitter accounts
 	 *     parameters:
 	 *       - name: usertoken
@@ -112,20 +112,13 @@ var appRouter = function(app) {
 		
 		twitterAccounts.getAll(request.headers.usertoken, function (err, data){
 				if(!err){	
-					if (data !== null) {
-						console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
+					console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
 						
-						response.writeHead(200, {"Content-Type": "application/json"});
-						response.write(JSON.stringify(data));
-					} else {
-						console.log("APP-GET-ALL-ACCOUNTS: No accounts found");
-						
-						response.writeHead(200, {"Content-Type": "text/html"});
-						response.write("No accounts found.");
-					}
+					response.writeHead(200, {"Content-Type": "application/json"});
+					response.write(JSON.stringify(data));
 				} else {
 					if (data == "FORBIDDEN") {
-						console.log("APP-GET-ALL-ACCOUNTS: Forbbiden");
+						console.log("APP-GET-ALL-ACCOUNTS: Forbidden");
 						
 						response.writeHead(403, {"Content-Type": "text/html"});
 						response.write("Forbidden");
@@ -147,7 +140,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}:
 	 *   get:
 	 *     tags:
-	 *       - GET single account
+	 *       - GET single twitter account (ADMIN)
 	 *     description: Get information of a single account
 	 *     parameters:
 	 *       - name: usertoken
@@ -163,9 +156,13 @@ var appRouter = function(app) {
 	 *       - application/json
 	 *     responses:
 	 *       200:
-	 *         description: Information about the twitter account 
+	 *         description: Information about the twitter account
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: The user (token) does not have permission on that twitter account (id)
+	 *       404:
+	 *         description: Unable to find the requested {id}
 	 *       500:
 	 *         description: Error getting the account information from database
 	 */
@@ -179,8 +176,14 @@ var appRouter = function(app) {
 					response.writeHead(200, {"Content-Type": "application/json"});
 					response.write(JSON.stringify(data));
 					
+				} else if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
 				} else if (data == "FORBIDDEN"){
-					console.log("APP-GET-ACCOUNTS-ID: No accounts found");
+					console.log("APP-GET-ACCOUNTS-ID: Forbidden");
 					
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
@@ -226,7 +229,9 @@ var appRouter = function(app) {
 	 *       - application/json
 	 *     responses:
 	 *       201:
-	 *         description: Twitter account created 
+	 *         description: Twitter account created
+	 *       403:
+	 *         description: The user (token) can not be verified
 	 *       409:
 	 *         description: The account already exists.
 	 *       500:
@@ -252,6 +257,11 @@ var appRouter = function(app) {
 					
 					response.writeHead(500, {"Content-Type": "text/html"});
 					response.write("Error while performing query");
+				} else if (data == "FORBIDDEN") {
+					console.log("APP-POST-ACCOUNT: Forbidden");
+					
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
 				} else {
 					console.log("APP-POST-ACCOUNT: Already exists");
 					
@@ -271,7 +281,7 @@ var appRouter = function(app) {
 	 *   delete:
 	 *     tags:
 	 *       - DELETE account
-	 *     description: Disable a twitter account
+	 *     description: Disable a twitter account (ADMIN)
 	 *     parameters:
 	 *       - name: id
 	 *         in: path
@@ -285,7 +295,9 @@ var appRouter = function(app) {
 	 *       - text/html
 	 *     responses:
 	 *       200:
-	 *         description: The account has been successfully disabled 
+	 *         description: The account has been successfully disabled
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: The user (token) does not own this twitter account (id)
 	 *       404:
@@ -304,7 +316,13 @@ var appRouter = function(app) {
 					response.writeHead(200, {"Content-Type": "text/html"});
 					response.write("Deleted account");
 				} else {
-					if(res == 'FORBIDDEN'){
+					if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				    } else if(res == 'FORBIDDEN'){
 						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID is forbidden");
 						
 						response.writeHead(403, {"Content-Type": "text/html"});
@@ -357,7 +375,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags:
 	 *   get:
 	 *     tags:
-	 *       - GET all hashtags
+	 *       - GET all hashtags (ADMIN)
 	 *     description: Gets all hashtags for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
@@ -374,8 +392,12 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: The hashtag list
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
 	 *       500:
 	 *         description: DB error
 	 */
@@ -396,10 +418,20 @@ var appRouter = function(app) {
 				response.write(JSON.stringify(data));
 				
 			} else {
-				if(data == "FORBIDDEN"){
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
 					console.log("APP-GET-ALL-HASHTAGS: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-ALL-HASHTAGS: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
 				} else {
 					console.log("APP-GET-ALL-HASHTAGS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -416,7 +448,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags/{hashtag}:
 	 *   get:
 	 *     tags:
-	 *       - GET hashtag info
+	 *       - GET hashtag info (ADMIN)
 	 *     description: Gets the hashtag info for the provided (twitter-account's {id}, {hashtag})
 	 *     parameters:
 	 *       - name: token
@@ -437,10 +469,12 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: The hashtag info
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
 	 *       404:
-	 *         description: Not found {hashtag}
+	 *         description: Not found {id} OR {hashtag}
 	 *       500:
 	 *         description: DB error
 	 */
@@ -461,14 +495,24 @@ var appRouter = function(app) {
 				response.write(JSON.stringify(data));
 				
 			} else {
-				if(data == "FORBIDDEN"){
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
 					console.log("APP-GET-HASHTAGS: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
-				} else if(data == "NOT FOUND"){
-					console.log("APP-GET-HASHTAGS: Not found!!!");
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Not Found");				
+					response.write("Twitter account NOT Found");				
+				} else if(data == "NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Hashtag NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Hashtag NOT Found");				
 				} else {
 					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -484,7 +528,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags:
 	 *   post:
 	 *     tags:
-	 *       - POST hashtag
+	 *       - POST hashtag (ADMIN)
 	 *     description: Creates a new hashtag for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
@@ -507,8 +551,12 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: Hashtag created
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
 	 *       409:
 	 *         description: Conflict. The {hashtag} already exists for the provided twitter-account's {id}
 	 *       500:
@@ -530,7 +578,13 @@ var appRouter = function(app) {
 				response.write("Created");
 				
 			} else {
-				if(data == "FORBIDDEN"){
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
 					console.log("APP-POST-HASHTAG: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
@@ -538,6 +592,10 @@ var appRouter = function(app) {
 					console.log("APP-POST-HASHTAG: Conflict. Already exists!!!");
 					response.writeHead(409, {"Content-Type": "text/html"});
 					response.write("Hashtag already exists for the provided twitter account");				
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT Found");				
 				} else {
 					console.log("APP-POST-HASHTAG: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -560,7 +618,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags/{hashtag}:
 	 *   delete:
 	 *     tags:
-	 *       - DELETE hashtag
+	 *       - DELETE hashtag (ADMIN)
 	 *     description: Deletes the specified {hashtag} for the provided twitter-account's {id}
 	 *     parameters:
 	 *       - name: token
@@ -580,8 +638,12 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Hashtag deleted
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       404:
+	 *         description: Not found {id} OR {hashtag}
 	 *       409:
 	 *         description: Conflict. The {hashtag} does not exist for the provided twitter-account's {id}
 	 *       500:
@@ -603,14 +665,24 @@ var appRouter = function(app) {
 				response.write("Deleted");
 				
 			} else {
-				if(data == "FORBIDDEN"){
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
 					console.log("APP-DELETE-HASHTAG: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
 				} else if(data == "NOT EXIST"){
-					console.log("APP-DELETE-HASHTAG: Conflict. Does not exist!!!");
-					response.writeHead(409, {"Content-Type": "text/html"});
-					response.write("Hashtag does not exist for the provided twitter account");				
+					console.log("APP-DELETE-HASHTAG: Hashtag NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Hashtag NOT found");				
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT Found");				
 				} else {
 					console.log("APP-DELETE-HASHTAG: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
