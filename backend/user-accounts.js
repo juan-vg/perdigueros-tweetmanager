@@ -205,7 +205,7 @@ exports.put = function (accountID, passwordSet, callback){
             callback(error, data);
         }
     });
-}
+};
 
 // ADMIN AND THE USER
 exports.delete = function (accountID, callback){
