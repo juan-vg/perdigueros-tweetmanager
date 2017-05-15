@@ -6,6 +6,7 @@ var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
 var followedUsers = require('./followed-users.js');
+var userAccounts = require('./user-accounts.js');
 
 var appRouter = function(app) {
 	
@@ -49,6 +50,15 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The user to be followed"
 	 *          
+	 *   Passwords:
+	 *     type: "object"
+	 *     properties:
+	 *       oldPasswd:
+	 *         type: string
+	 *         description: "The OLD password"
+	 *       newPasswd:
+	 *         type: string
+	 *         description: "The NEW password"
 	 */
 
 
@@ -325,7 +335,7 @@ var appRouter = function(app) {
 					response.write("Deleted account");
 				} else {
 					if (data == "ID NOT VALID"){
-					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					console.log("APP-DEL-ACCOUNTS-ID: Bad request. ID not valid");
 					
 					response.writeHead(400, {"Content-Type": "text/html"});
 					response.write("Bad request. Twitter account ID not valid");
@@ -427,7 +437,7 @@ var appRouter = function(app) {
 				
 			} else {
 				if (data == "ID NOT VALID"){
-					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					console.log("APP-GET-ALL-HASHTAGS: Bad request. ID not valid");
 					
 					response.writeHead(400, {"Content-Type": "text/html"});
 					response.write("Bad request. Twitter account ID not valid");
@@ -436,10 +446,12 @@ var appRouter = function(app) {
 					console.log("APP-GET-ALL-HASHTAGS: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+					
 				} else if(data == "ACCOUNT NOT FOUND"){
 					console.log("APP-GET-ALL-HASHTAGS: Twitter account NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
 					response.write("Twitter account NOT found");
+					
 				} else {
 					console.log("APP-GET-ALL-HASHTAGS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -504,7 +516,7 @@ var appRouter = function(app) {
 				
 			} else {
 				if (data == "ID NOT VALID"){
-					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					console.log("APP-GET-HASHTAGS: Bad request. ID not valid");
 					
 					response.writeHead(400, {"Content-Type": "text/html"});
 					response.write("Bad request. Twitter account ID not valid");
@@ -513,14 +525,17 @@ var appRouter = function(app) {
 					console.log("APP-GET-HASHTAGS: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+					
 				} else if(data == "ACCOUNT NOT FOUND"){
 					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Twitter account NOT Found");				
+					response.write("Twitter account NOT Found");
+									
 				} else if(data == "NOT FOUND"){
 					console.log("APP-GET-HASHTAGS: Hashtag NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Hashtag NOT Found");				
+					response.write("Hashtag NOT Found");
+									
 				} else {
 					console.log("APP-GET-HASHTAGS: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -587,7 +602,7 @@ var appRouter = function(app) {
 				
 			} else {
 				if (data == "ID NOT VALID"){
-					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					console.log("APP-POST-HASHTAG: Bad request. ID not valid");
 					
 					response.writeHead(400, {"Content-Type": "text/html"});
 					response.write("Bad request. Twitter account ID not valid");
@@ -596,14 +611,17 @@ var appRouter = function(app) {
 					console.log("APP-POST-HASHTAG: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+					
 				} else if(data == "ALREADY EXISTS"){
 					console.log("APP-POST-HASHTAG: Conflict. Already exists!!!");
 					response.writeHead(409, {"Content-Type": "text/html"});
-					response.write("Hashtag already exists for the provided twitter account");				
+					response.write("Hashtag already exists for the provided twitter account");
+									
 				} else if(data == "ACCOUNT NOT FOUND"){
 					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Twitter account NOT Found");				
+					response.write("Twitter account NOT Found");
+									
 				} else {
 					console.log("APP-POST-HASHTAG: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -674,7 +692,7 @@ var appRouter = function(app) {
 				
 			} else {
 				if (data == "ID NOT VALID"){
-					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					console.log("APP-DELETE-HASHTAG: Bad request. ID not valid");
 					
 					response.writeHead(400, {"Content-Type": "text/html"});
 					response.write("Bad request. Twitter account ID not valid");
@@ -683,14 +701,17 @@ var appRouter = function(app) {
 					console.log("APP-DELETE-HASHTAG: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+					
 				} else if(data == "NOT EXIST"){
 					console.log("APP-DELETE-HASHTAG: Hashtag NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Hashtag NOT found");				
+					response.write("Hashtag NOT found");
+								
 				} else if(data == "ACCOUNT NOT FOUND"){
-					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
+					console.log("APP-DELETE-HASHTAG: Twitter account NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
-					response.write("Twitter account NOT Found");				
+					response.write("Twitter account NOT Found");
+									
 				} else {
 					console.log("APP-DELETE-HASHTAG: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -1068,30 +1089,303 @@ var appRouter = function(app) {
 	});
 	
 	//ADMIN
+	
+	/**
+	 * @swagger
+	 * /users:
+	 *   get:
+	 *     tags:
+	 *       - GET all users (ADMIN ONLY)
+	 *     description: Gets all users
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The user list
+	 *       403:
+	 *         description: Given token does not have permission to do this
+	 *       500:
+	 *         description: DB error
+	 */
 	app.get("/users", function(request, response) {
-
-
+		
+		var accountID = {
+			'token': request.headers.token
+		};
+		
+		console.log("APP-GET-ALL-USERS: Retrieving all users");
+		
+		userAccounts.getAll(accountID,	function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-ALL-USERS: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if(data == "FORBIDDEN"){
+					console.log("APP-GET-ALL-USERS: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else {
+					console.log("APP-GET-ALL-USERS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
+	/**
+	 * @swagger
+	 * /users/{id}:
+	 *   get:
+	 *     tags:
+	 *       - GET user info (ADMIN)
+	 *     description: Gets the user info (except password)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The user {id}
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The user info
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to do this
+	 *       404:
+	 *         description: Unable to find the requested user {id}
+	 *       500:
+	 *         description: DB error
+	 */
 	app.get("/users/:id", function(request, response) {
-
+		
+		var accountID = {
+			'token': request.headers.token,
+			'userAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-USER-ID: Retrieving user " + accountID.userAccountId);
+		
+		userAccounts.get(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-USER-ID: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-USER-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. User account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-USER-ID: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "USER NOT FOUND"){
+					console.log("APP-GET-USER-ID: User account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("User account NOT Found");
+									
+				} else {
+					console.log("APP-GET-USER-ID: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 
 	});
 	
+	/**
+	 * @swagger
+	 * /users/{id}:
+	 *   put:
+	 *     tags:
+	 *       - PUT new passwd (UPDATE PASSWD)
+	 *     description: Updates user password
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The user {id}
+	 *       - name: passwordSet
+	 *         in: body
+	 *         required: true
+	 *         description: The OLD and the NEW passwords
+	 *         schema:
+	 *           $ref: "#/definitions/Passwords"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The user info
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       401:
+	 *         description: The provided {oldPasswd} does not match the one in DB
+	 *       403:
+	 *         description: Given token does not have permission to do this
+	 *       404:
+	 *         description: Unable to find the requested user {id}
+	 *       500:
+	 *         description: DB error
+	 */
 	app.put("/users/:id", function(request, response) {
-
+		
+		var accountID = {
+			'token': request.headers.token,
+			'userAccountId': request.params.id
+		};
+		
+		var passwordSet = {
+			'oldPasswd': request.body.oldPasswd,
+			'newPasswd': request.body.newPasswd
+		};
+		
+		console.log("APP-PUT-USER: Updating password for user " + accountID.userAccountId);
+		
+		userAccounts.put(accountID, passwordSet, function (err, data){
+			
+			if(!err){
+				console.log("APP-PUT-USER: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				//response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-PUT-USER: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. User account ID not valid");
+					
+				} else if (data == "INCORRECT PASSWD"){
+					console.log("APP-PUT-USER: Unauthorized. OLD passwd does not match");
+					
+					response.writeHead(401, {"Content-Type": "text/html"});
+					response.write("Unauthorized. OLD passwd does not match");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-PUT-USER: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "USER NOT FOUND"){
+					console.log("APP-PUT-USER: User account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("User account NOT Found");
+									
+				} else {
+					console.log("APP-PUT-USER: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 
 	});
 	
+	/**
+	 * @swagger
+	 * /users/{id}:
+	 *   delete:
+	 *     tags:
+	 *       - DELETE user (ADMIN)
+	 *     description: deletes de user
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The user {id}
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: User deleted
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to do this
+	 *       404:
+	 *         description: Unable to find the requested user {id}
+	 *       500:
+	 *         description: DB error
+	 */
 	app.delete("/users/:id", function(request, response) {
-
-
-	});
-	
-	//cambiar passwd
-	app.post("/users/:id/changepass", function(request, response) {
-
-
+		
+		var accountID = {
+			'token': request.headers.token,
+			'userAccountId': request.params.id
+		};
+		
+		console.log("APP-DELETE-USER: Deleting user " + accountID.userAccountId);
+		
+		userAccounts.delete(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-DELETE-USER: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				//response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-DELETE-USER: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. User account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-DELETE-USER: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "USER NOT FOUND"){
+					console.log("APP-DELETE-USER: User account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("User account NOT Found");
+									
+				} else {
+					console.log("APP-DELETE-USER: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
+		
 	});
 	
 	//STATS
