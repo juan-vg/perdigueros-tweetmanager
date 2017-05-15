@@ -3,6 +3,7 @@ var verificator = require('./account-verifications.js');
 var objectID = require('mongodb').ObjectID;
 
 
+//ONLY ADMIN
 exports.getAll = function (accountID, callback){
 
     var error, data;
@@ -45,6 +46,7 @@ exports.getAll = function (accountID, callback){
     });
 };
 
+// ADMIN AND THE USER
 exports.get = function (accountID, callback){
     
     var error, data;
@@ -84,6 +86,7 @@ exports.get = function (accountID, callback){
     
 };
 
+// ADMIN AND THE USER
 exports.delete = function (accountID, callback){
     
     var error, data;
