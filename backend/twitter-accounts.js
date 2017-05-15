@@ -165,6 +165,7 @@ exports.postAccount = function(userToken, newAccount, callback){
                         dbTwitterAccounts.information = newAccount.information;
                         dbTwitterAccounts.description = newAccount.description;
                         dbTwitterAccounts.email = data;
+                        dbTwitterAccounts.activated = true;
 
                         // Insert new data into DB
                         dbTwitterAccounts.save(function(err, res){
