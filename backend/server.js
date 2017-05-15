@@ -51,6 +51,18 @@ var swaggerSpec = swaggerJSDoc(options);
 //Acepta JSON y valores codificados en la propia URL
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ "extended": true }));
+
+//Previene mostrar info sensible por errores del body parser
+app.use(function (error, req, res, next) {
+  if (error instanceof SyntaxError) {
+    console.log("SERVER-ERROR: Syntax error");
+	res.writeHead(400, {"Content-Type": "text/html"});
+	res.write("Body params syntax ERROR!!");
+	res.end();
+  } else {
+    next();
+  }
+});
  
 // Todos los endpoint del API se encuentran en este fichero
 var routes = require("./app.js")(app);
