@@ -1,5 +1,7 @@
 var userAccModel = require("./models/user-accounts");
-var verificator = require('./account-verifications.js');
+var accVerificator = require('./account-verifications.js');
+var dbVerificator = require('./db-verifications.js');
+var crypto = require('crypto');
 var objectID = require('mongodb').ObjectID;
 
 
@@ -9,12 +11,12 @@ exports.getAll = function (accountID, callback){
     var error, data;
     
     // check if the token has access admin permissions
-    verificator.verifyAdmin(accountID, function(success){
+    accVerificator.verifyAdmin(accountID, function(success, reason){
         
         if(success){
             
             // get all users (avoiding retrieval of password)
-            userAccModel.find({}, {"password":0},
+            userAccModel.find({"activated": true}, {"password":0},
             
                 function(err, dbData){
                     
@@ -51,94 +53,245 @@ exports.get = function (accountID, callback){
     
     var error, data;
     
-    // check if the token has the needed permissions
-    verificator.verifyUser(accountID, function(success){
-        
+    // Check if ID is valid
+    dbVerificator.verifyDbId(accountID.userAccountId, function(success){
         if(success){
             
-            // get the specified user (avoiding retrieval of password)
-            userAccModel.find({'_id' : new objectID(accountID.userAccountId)}, {"password":0},
-            
-                function(err, dbData){
+            // check if the token has the needed permissions
+            accVerificator.verifyUser(accountID, function(success, reason){
+                
+                if(success){
                     
-                    if(!err && dbData.length > 0){
-                        
-						// retrieve data
-						error = false;
-						data = dbData;
+                    // get the specified user (avoiding retrieval of password)
+                    userAccModel.find({'_id' : new objectID(accountID.userAccountId)}, {"password":0},
+                    
+                        function(err, dbData){
+                            
+                            if(!err && dbData.length > 0){
+                                
+                                // retrieve data
+                                error = false;
+                                data = dbData;
 
-                    } else {
+                            } else {
+                                error = true;
+                                data = "DB ERROR";
+                            }
+                            
+                            callback(error, data);
+                        }
+                    );
+                    
+                } else {
+                    if(reason == "USER NOT FOUND"){
+                        console.log("USER-ACC-GET: User account NOT FOUND");
+
+                        error = true;
+                        data = "USER NOT FOUND";
+                    } else if(reason == "DB ERROR") {
+                        console.log("USER-ACC-GET: DB ERROR!!!" );
+
                         error = true;
                         data = "DB ERROR";
+                    } else {
+                        console.log("USER-ACC-GET: User has NOT permissions");
+
+                        error = true;
+                        data = "FORBIDDEN" ;
                     }
                     
                     callback(error, data);
                 }
-            );
+            });
             
         } else {
-            error = true;
-            data = "FORBIDDEN";
+            console.log("USER-ACC-GET-ID: ID account is not valid");
             
+            error = true;
+            data = "ID NOT VALID";
             callback(error, data);
         }
-    }); 
-    
+    });
 };
+
+// ONLY THE USER
+// Update passwd
+exports.put = function (accountID, passwordSet, callback){
+
+    var error, data;
+    
+    // Check if ID is valid
+    dbVerificator.verifyDbId(accountID.userAccountId, function(success){
+        if(success){
+    
+            // check if the token has the needed permissions
+            accVerificator.verifyUser(accountID, function(success, reason){
+                
+                if(success){
+                    
+                    var oldPasswd = crypto.createHash('sha256').update(passwordSet.oldPasswd).digest('base64');
+                    
+                    // check if the specified user exists
+                    // check if the OLD passwd matches the one in the DB
+                    userAccModel.find({'_id' : new objectID(accountID.userAccountId), 'password': oldPasswd},
+                        
+                        function(err, dbData){
+                            
+                            if(!err){
+                                
+                                if(dbData.length > 0){
+                                    
+                                    var newPasswd = crypto.createHash('sha256').update(passwordSet.newPasswd).digest('base64');
+                                    
+                                    // existing user & correct passwd-> update passwd
+                                    userAccModel.update({"_id" : new objectID(accountID.userAccountId)},{$set : {"password": newPasswd}},
+                                        function(err, res){
+                                            if(!err){
+                                                error = false;
+                                                result = null;
+                                            } else {
+                                                error = true;
+                                                result = "DB ERROR";
+                                            }
+                                            callback(error, data);
+                                        }
+                                    );
+
+                                } else {
+                                    console.log("USER-ACC-PUT: OLD Passwd does NOT match");
+                                    
+                                    error = true;
+                                    data = "INCORRECT PASSWD";
+                                    callback(error, data);
+                                }
+                                
+                            } else {
+                                console.log("USER-ACC-PUT: DB ERROR!!!" );
+                                
+                                error = true;
+                                data = "DB ERROR";
+                                callback(error, data);
+                            }
+                        }
+                    );
+                    
+                } else {
+                    if(reason == "USER NOT FOUND"){
+                        console.log("USER-ACC-PUT: User account NOT FOUND");
+
+                        error = true;
+                        data = "USER NOT FOUND";
+                    } else if(reason == "DB ERROR") {
+                        console.log("USER-ACC-PUT: DB ERROR!!!" );
+
+                        error = true;
+                        data = "DB ERROR";
+                    } else {
+                        console.log("USER-ACC-PUT: User has NOT permissions");
+
+                        error = true;
+                        data = "FORBIDDEN" ;
+                    }
+                    
+                    callback(error, data);
+                }
+            });
+             
+        } else {
+            console.log("USER-ACC-PUT: ID account is not valid");
+            
+            error = true;
+            data = "ID NOT VALID";
+            callback(error, data);
+        }
+    });
+}
 
 // ADMIN AND THE USER
 exports.delete = function (accountID, callback){
     
     var error, data;
     
-    // check if the token has the needed permissions
-    verificator.verifyUser(accountID, function(success){
-        
+    // Check if ID is valid
+    dbVerificator.verifyDbId(accountID.userAccountId, function(success){
         if(success){
-            
-            // check if the specified user exists
-            userAccModel.find({'_id' : new objectID(accountID.userAccountId)},
+    
+            // check if the token has the needed permissions
+            accVerificator.verifyUser(accountID, function(success, reason){
                 
-                function(err, dbData){
+                if(success){
                     
-                    if(!err){
+                    // check if the specified user exists
+                    //   - Not needed (because verifyUser) if the token is owned by the user
+                    //   - Needed if the token is owned by the ADMIN
+                    userAccModel.find({'_id' : new objectID(accountID.userAccountId)},
                         
-                        if(dbData.length > 0){
-                            // existing user -> delete user
-                            userAccModel.remove({'_id': new objectID(dbData[0]._id)}, function(err, result) {
-                                if(!err){
-                                    error = false;
-                                    data = null;
-                                    callback(error, data);
-                                    //TODO: guardar usuario (dbData[0]) con activated=false
+                        function(err, dbData){
+                            
+                            if(!err){
+                                
+                                if(dbData.length > 0){
+                                    // existing user -> delete (disable) user
+                                    userAccModel.update({"_id" : new objectID(accountID.userAccountId)},{$set : {"activated":false}},
+                                        function(err, res){
+                                            if(!err){
+                                                error = false;
+                                                result = null;
+                                            } else {
+                                                error = true;
+                                                result = "DB ERROR";
+                                            }
+                                            callback(error, data);
+                                        }
+                                    );
+
                                 } else {
+                                    // user does not exist
+                                    console.log("USER-ACC-DELETE: User account NOT FOUND");
+                                    
                                     error = true;
-                                    data = "DB ERROR";
+                                    data = "USER NOT FOUND";
                                     callback(error, data);
                                 }
-                            });
-
-                        } else {
-                            // user does not exist
-                            error = true;
-                            data = "NOT EXIST";
-                            callback(error, data);
+                                
+                            } else {
+                                console.log("USER-ACC-DELETE: DB ERROR!!!" );
+                                
+                                error = true;
+                                data = "DB ERROR";
+                                callback(error, data);
+                            }
                         }
-                        
-                    } else {
+                    );
+                    
+                } else {
+                    if(reason == "USER NOT FOUND"){
+                        console.log("USER-ACC-DELETE: User account NOT FOUND");
+
+                        error = true;
+                        data = "USER NOT FOUND";
+                    } else if(reason == "DB ERROR") {
+                        console.log("USER-ACC-DELETE: DB ERROR!!!" );
+
                         error = true;
                         data = "DB ERROR";
-                        callback(error, data);
+                    } else {
+                        console.log("USER-ACC-DELETE: User has NOT permissions");
+
+                        error = true;
+                        data = "FORBIDDEN" ;
                     }
+                    
+                    callback(error, data);
                 }
-            );
-            
+            });
+              
         } else {
-            error = true;
-            data = "FORBIDDEN";
+            console.log("USER-ACC-GET-ID: ID account is not valid");
             
+            error = true;
+            data = "ID NOT VALID";
             callback(error, data);
         }
-    });   
-    
+    });
 };
