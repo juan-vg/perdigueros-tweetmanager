@@ -718,7 +718,7 @@ var appRouter = function(app) {
      *       - name: id
      *         in: path
      *         required: true
-     *         description: The twitter account ID that owns the hashtag list
+     *         description: The twitter account ID that owns the followed users list
      *     produces:
      *       - application/json
      *       - text/html
@@ -854,7 +854,7 @@ var appRouter = function(app) {
      *       - name: id
      *         in: path
      *         required: true
-     *         description: The twitter account ID that owns the hashtag list
+     *         description: The twitter account ID that owns the followed users list
      *       - name: user
      *         in: body
      *         required: true
@@ -916,7 +916,7 @@ var appRouter = function(app) {
 	
 	/**
      * @swagger
-     * /twitter-accounts/{id}/followed-users:
+     * /twitter-accounts/{id}/followed-users/{user}:
      *   put:
      *     tags:
      *       - PUT followed user
@@ -931,6 +931,10 @@ var appRouter = function(app) {
      *         required: true
      *         description: The twitter account ID that owns the followed users list
      *       - name: user
+     *         in: path
+     *         required: true
+     *         description: The user to be updated
+     *       - name: newuser
      *         in: body
      *         required: true
      *         description: The new user to be followed
@@ -956,10 +960,10 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-PUT-FOLLOWED-USERS: Updating user " + request.params.user + " by " + request.body.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-PUT-FOLLOWED-USERS: Updating user " + request.params.user + " by " + request.body.newuser + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
         
-        followedUsers.put(accountID, request.params.user, request.body.user, function (err, data){
-           
+        followedUsers.put(accountID, request.params.user, request.body.newuser, function (err, data){
+            
             if(!err){
                 console.log("APP-PUT-FOLLOWED-USERS: OK");
                 
@@ -1050,7 +1054,7 @@ var appRouter = function(app) {
 	                console.log("APP-DELETE-FOLLOWED-USERS: Conflict. Does not exist!!!");
 
 	                response.writeHead(409, {"Content-Type": "text/html"});
-	                response.write("Hashtag does not exist for the provided twitter account"); 
+	                response.write("Followed user does not exist for the provided twitter account"); 
 
 	            } else {
 	                console.log("APP-DELETE-FOLLOWED-USERS: DB ERROR!!!");

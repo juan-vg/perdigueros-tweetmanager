@@ -11,6 +11,7 @@ var usersAccountsSchema = new mongoSchema({
 	"registrationDate": Date,
 	"lastAccess": Date,
 	"activated": Boolean,
+	"validated": Boolean,
 	"admin": Boolean,
 	"token": String
 });
