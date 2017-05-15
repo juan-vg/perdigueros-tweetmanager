@@ -42,6 +42,13 @@ var appRouter = function(app) {
 	 *       hashtag:
 	 *         type: string
 	 *         description: "The Hashtag string"
+	 *   Followed-users:
+	 *     type: "object"
+	 *     properties:
+	 *       user:
+	 *         type: string
+	 *         description: "The user to be followed"
+	 *          
 	 */
 
 
@@ -623,6 +630,34 @@ var appRouter = function(app) {
 	});
 	
 	//USUARIOS FOLLOWED
+	
+	/**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users:
+     *   get:
+     *     tags:
+     *       - GET all followed users
+     *     description: Gets all followed users for the provided twitter-account's {id}
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the hashtag list
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The followed users list
+     *       403:
+     *         description: Given token does not have permission to the provided twitter-account's {id}
+     *       500:
+     *         description: DB error
+     */
 	app.get("/twitter-accounts/:id/followed-users", function(request, response) {
 	    
 	    var accountID = {
@@ -630,8 +665,7 @@ var appRouter = function(app) {
 	            'twitterAccountId': request.params.id
 	        };
 	        
-	    console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for (token: " 
-	            + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+	    console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 
 	    followedUsers.getAll(accountID,  function (err, data){
 
@@ -659,6 +693,39 @@ var appRouter = function(app) {
 	    });
 	});
 	
+	/**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users/{user}:
+     *   get:
+     *     tags:
+     *       - GET followed user info
+     *     description: Gets the followed user info for the provided (twitter-account's {id}, {user})
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the followed user list
+     *       - name: user
+     *         in: path
+     *         required: true
+     *         description: The followed user to look for
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The followed user info
+     *       403:
+     *         description: Given token does not own the provided twitter-account's {id}
+     *       404:
+     *         description: Not found {user}
+     *       500:
+     *         description: DB error
+     */
 	app.get("/twitter-accounts/:id/followed-users/:user", function(request, response) {
 	    
 	    var accountID = {
@@ -666,8 +733,7 @@ var appRouter = function(app) {
 	            'twitterAccountId': request.params.id
 	        };
 	        
-        console.log("APP-GET-FOLLOWED-USERS: Retrieving a followed user for (token: " 
-                + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-FOLLOWED-USERS: Retrieving a followed user for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
         
         followedUsers.get(accountID, request.params.user, function (err, data){
             
@@ -701,15 +767,48 @@ var appRouter = function(app) {
         });
 	});
 
+	 /**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users:
+     *   post:
+     *     tags:
+     *       - POST followed user
+     *     description: Creates a new followed user for the provided twitter-account's {id}
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the hashtag list
+     *       - name: user
+     *         in: body
+     *         required: true
+     *         description: The user to be followed
+     *         schema:
+     *           $ref: "#/definitions/Followed-users"
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       201:
+     *         description: Followed user created
+     *       403:
+     *         description: Given token does not own the provided twitter-account's {id}
+     *       409:
+     *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
+     *       500:
+     *         description: DB error
+     */
 	app.post("/twitter-accounts/:id/followed-users", function(request, response) {
 	    var accountID = {
 	            'token': request.headers.token,
 	            'twitterAccountId': request.params.id
 	        };
 	        
-	    console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.user 
-	            + " for (token: " + accountID.token + ", twitterAccountId: " 
-	            + accountID.twitterAccountId + ")");
+	    console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 	        
         followedUsers.post(accountID, request.body.user, function (err, data){
             
@@ -743,6 +842,41 @@ var appRouter = function(app) {
         });
 	});
 	
+	/**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users:
+     *   put:
+     *     tags:
+     *       - PUT followed user
+     *     description: Updates the followed user for the provided twitter-account's {id}
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the followed users list
+     *       - name: user
+     *         in: body
+     *         required: true
+     *         description: The new user to be followed
+     *         schema:
+     *           $ref: "#/definitions/Followed-users"
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: Followed user updated
+     *       403:
+     *         description: Given token does not own the provided twitter-account's {id}
+     *       409:
+     *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
+     *       500:
+     *         description: DB error
+     */
 	app.put("/twitter-accounts/:id/followed-users/:user", function(request, response) {
 	    
 	    var accountID = {
@@ -750,16 +884,14 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-PUT-FOLLOWED-USERS: Updating user " + request.params.user + " by " 
-                + request.body.user + " for (token: " + accountID.token + ", twitterAccountId: " 
-                + accountID.twitterAccountId + ")");
+        console.log("APP-PUT-FOLLOWED-USERS: Updating user " + request.params.user + " by " + request.body.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
         
         followedUsers.put(accountID, request.params.user, request.body.user, function (err, data){
            
             if(!err){
                 console.log("APP-PUT-FOLLOWED-USERS: OK");
                 
-                response.writeHead(201, {"Content-Type": "text/html"});
+                response.writeHead(200, {"Content-Type": "text/html"});
                 response.write("Updated");
                 
             } else {
@@ -786,15 +918,46 @@ var appRouter = function(app) {
         });
 	});
 	
+	   /**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users/{user}:
+     *   delete:
+     *     tags:
+     *       - DELETE followed user
+     *     description: Deletes the specified {user} for the provided twitter-account's {id}
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the followed user list
+     *       - name: user
+     *         in: path
+     *         required: true
+     *         description: The followed user to delete
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: Followed user deleted
+     *       403:
+     *         description: Given token does not own the provided twitter-account's {id}
+     *       409:
+     *         description: Conflict. The {user} does not exist for the provided twitter-account's {id}
+     *       500:
+     *         description: DB error
+     */
 	app.delete("/twitter-accounts/:id/followed-users/:user", function(request, response) {
 	    var accountID = {
 	            'token': request.headers.token,
 	            'twitterAccountId': request.params.id
 	        };
 	        
-	    console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user 
-	            + " for (token: " + accountID.token + ", twitterAccountId: " 
-	            + accountID.twitterAccountId + ")");
+	    console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 
 	    followedUsers.delete(accountID, request.params.user, function (err, data){
 
