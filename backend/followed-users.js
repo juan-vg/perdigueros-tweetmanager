@@ -4,8 +4,8 @@ var follUsModel = require("./models/followed-users");
 var verificator = require("./account-verifications");
 var objectID = require('mongodb').ObjectID;
 
-//Get all followed users
-exports.getAll = function(userToken, idAccount, callback){
+// Get all followed users
+exports.getAll = function(accountID, callback){
 
     var error, data;
     
@@ -22,13 +22,13 @@ exports.getAll = function(userToken, idAccount, callback){
                     if(!err){
                         error = false;
                         
-                        // retrieve data
+                        //Rretrieve data
                         if(dbData.length > 0){
                             console.log("FOLLOWED-USERS-GET-ALL: Obtained User:", dbData);
                             data = dbData;
                         } else {
                             
-                            //no results
+                            // No results
                             console.log("FOLLOWED-USERS-GET-ALL: There is no user information.");
                             data = [];
                         }
@@ -47,13 +47,12 @@ exports.getAll = function(userToken, idAccount, callback){
             
             error = true;
             data = "FORBIDDEN";
-            
             callback(error, data);
         }
     });
 };
 
-//Get a single followed user by ID 
+// Get a single followed user by ID 
 exports.get = function (accountID, user, callback){
     
     var error, data;
@@ -70,7 +69,7 @@ exports.get = function (accountID, user, callback){
                     
                     if(!err){
                         
-                        // retrieve data
+                        // Retrieve data
                         if(dbData.length > 0){
                             console.log("FOLLOWED-USERS-GET-ID: ", dbData);
                             
@@ -101,7 +100,7 @@ exports.get = function (accountID, user, callback){
     }); 
 };
 
-//Create new followed user app.post("/followed-users", function(request, response) {
+// Create new followed user app.post("/followed-users", function(request, response) {
 exports.post = function (accountID, user, callback){
     
     var error, data;
@@ -112,7 +111,7 @@ exports.post = function (accountID, user, callback){
         if(success){
             
             // Check if the specified user already exists
-            hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'user': user},
+            follUsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'user': user},
                 
                 function(err,dbData){
                     
@@ -120,7 +119,7 @@ exports.post = function (accountID, user, callback){
                         
                         if(dbData.length > 0){
                             
-                            // already exists
+                            // Already exists
                             console.log("FOLLOWED-USERS-POST-ID: User already exists");
                             
                             error = true;
@@ -128,12 +127,12 @@ exports.post = function (accountID, user, callback){
                             callback(error, data);
                         } else {
                             
-                            // everything ok
-                            var dbFollUsers = new follUsersModel();
+                            // Everything ok
+                            var dbFollUsers = new follUsModel();
                             dbFollUsers.twitterAccountId = accountID.twitterAccountId;
                             dbFollUsers.user = user;
                             
-                            // save new followed user
+                            // Save new followed user
                             dbFollUsers.save(function(err, result) {
                                 if(!err){
                                     
@@ -141,14 +140,13 @@ exports.post = function (accountID, user, callback){
                                     
                                     error = false;
                                     data = null;
-                                    callback(error, data);
                                 } else {
                                     console.log("FOLLOWED-USERS-POST-ID: Error while performing query.");
                                     
                                     error = true;
                                     data = "DB ERROR";
-                                    callback(error, data);
                                 }
+                                callback(error, data);
                             });
                         }
                     } else {
@@ -162,6 +160,7 @@ exports.post = function (accountID, user, callback){
             );
         } else {
             console.log("FOLLOWED-USERS-POST-ID: Forbidden.");
+            
             error = true;
             data = "FORBIDDEN";
             callback(error, data);
@@ -170,17 +169,74 @@ exports.post = function (accountID, user, callback){
 };
 
 
-//Update a followed user app.put("/followed-users/:id", function(request, response) {
-exports.put = function(accountID, user, callback){
+//Update a followed user 
+exports.put = function(accountID, user, newUser, callback){
     
     //TODO
-    var error, data;
-    error = false;
-    data = null;
+    var error, data;   
+    
+    // Check if user owns that account
+    verificator.verifyUser(accountID, function(success){
+        
+        if(success){
+
+            // Check if the specified user already exists
+            follUsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'user': user},
+
+                    function(err,dbData){
+
+                if(!err){
+
+                    if(dbData.length > 0){
+
+                        // Already exists -> everything ok
+                        console.log("FOLLOWED-USERS-POST-ID: User already exists. Updating..");
+
+                        // Update followed user 
+                        var update = {'user' : newUser };
+                        var conditions = {'user' : user };
+                        follUsModel.findOneAndUpdate(conditions, update, function(err, result) {
+                            if(!err){
+
+                                console.log("FOLLOWED-USERS-PUT-ID: Updated followed user");
+
+                                error = false;
+                                data = null;
+                            } else {
+                                console.log("FOLLOWED-USERS-PUT-ID: Error while performing query.");
+
+                                error = true;
+                                data = "DB ERROR";
+                            }
+                            callback(error, data);
+                        });
+                    } else {
+
+                        // Followed user does not exists
+                        error = true;
+                        data = "DOES NOT EXISTS";
+                        callback(error, data);
+                    }
+                } else {
+                    console.log("FOLLOWED-USERS-PUT-ID: Error while performing query.");
+
+                    error = true;
+                    data = "DB ERROR";
+                    callback(error, data);
+                }
+            });
+        } else {
+            console.log("FOLLOWED-USERS-PUT-ID: Forbidden.");
+
+            error = true;
+            data = "FORBIDDEN";
+            callback(error, data);
+        }
+    }); 
 };
 
 
-//Delete a followed user app.delete("/followed-users/:id", function(request, response) {
+// Delete a followed user app.delete("/followed-users/:id", function(request, response) {
 exports.delete = function (accountID, user, callback){
     
     var error, data;
@@ -191,7 +247,7 @@ exports.delete = function (accountID, user, callback){
         if(success){
             
             // Check if the specified user exists
-            follUsersModel.find({'twitterAccountId' : accountID.twitterAccountId, 'user': user},
+            follUsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'user': user},
                 
                 function(err,dbData){
                     
@@ -199,21 +255,20 @@ exports.delete = function (accountID, user, callback){
                         
                         if(dbData.length > 0){
                             
-                            // existing user -> delete user
-                            follUsersModel.remove({'_id': new objectID(dbData[0]._id)}, function(err, result) {
+                            // Existing followed user -> delete followed user
+                            follUsModel.remove({'_id': new objectID(dbData[0]._id)}, function(err, result) {
                                 if(!err){
                                     error = false;
                                     data = null;
-                                    callback(error, data);
                                 } else {
                                     error = true;
                                     data = "DB ERROR";
-                                    callback(error, data);
                                 }
+                                callback(error, data);
                             });
                         } else {
                             
-                            // hashtag does not exist
+                            // Followed user does not exist
                             error = true;
                             data = "NOT EXIST";
                             callback(error, data);
