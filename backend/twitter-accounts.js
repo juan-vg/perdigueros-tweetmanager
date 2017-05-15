@@ -9,8 +9,6 @@ var objectID = require('mongodb').ObjectID;
 //ADMIN BYPASS
 exports.getAll = function(userToken, callback){
     var error, result;
-
-    //console.log("TWITTER-ACCOUNTS-GET-ALL: Checking database...");
     
     var accountID = {
         'token': userToken,

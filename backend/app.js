@@ -5,6 +5,7 @@ var fs = require("fs"),
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
+var followedUsers = require('./followed-users.js');
 var userAccounts = require('./user-accounts.js');
 
 var appRouter = function(app) {
@@ -42,6 +43,13 @@ var appRouter = function(app) {
 	 *       hashtag:
 	 *         type: string
 	 *         description: "The Hashtag string"
+	 *   Followed-users:
+	 *     type: "object"
+	 *     properties:
+	 *       newuser:
+	 *         type: string
+	 *         description: "The user to be followed"
+	 *          
 	 *   Passwords:
 	 *     type: "object"
 	 *     properties:
@@ -715,29 +723,289 @@ var appRouter = function(app) {
 	});
 	
 	//USUARIOS FOLLOWED
-	app.get("/followed-users", function(request, response) {
+	
+	/**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users:
+     *   get:
+     *     tags:
+     *       - GET all followed users
+     *     description: Gets all followed users for the provided twitter-account's {id}
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the followed users list
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The followed users list
+     *       403:
+     *         description: Given token does not have permission to the provided twitter-account's {id}
+     *       500:
+     *         description: DB error
+     */
+	app.get("/twitter-accounts/:id/followed-users", function(request, response) {
+	    
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+	    console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 
+	    followedUsers.getAll(accountID,  function (err, data){
 
+	        if(!err){
+	            console.log("APP-GET-ALL-FOLLOWED-USERS: OK");
+
+	            response.writeHead(200, {"Content-Type": "application/json"});
+	            response.write(JSON.stringify(data));
+
+	        } else {
+	            if(data == "FORBIDDEN"){
+	                console.log("APP-GET-ALL-FOLLOWED-USERS: Forbidden!!!");
+
+	                response.writeHead(403, {"Content-Type": "text/html"});
+	                response.write("Forbidden");
+
+	            } else {
+	                console.log("APP-GET-ALL-FOLLOWED-USERS: DB ERROR!!!");
+
+	                response.writeHead(500, {"Content-Type": "text/html"});
+	                response.write("Sorry, DB Error!");
+	            }
+	        }
+	        response.end();
+	    });
 	});
 	
-	app.get("/followed-users/:id", function(request, response) {
-
-
+	/**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users/{user}:
+     *   get:
+     *     tags:
+     *       - GET followed user info
+     *     description: Gets the followed user info for the provided (twitter-account's {id}, {user})
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the followed user list
+     *       - name: user
+     *         in: path
+     *         required: true
+     *         description: The followed user to look for
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The followed user info
+     *       403:
+     *         description: Given token does not own the provided twitter-account's {id}
+     *       404:
+     *         description: Not found {user}
+     *       500:
+     *         description: DB error
+     */
+	app.get("/twitter-accounts/:id/followed-users/:user", function(request, response) {
+	    
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+        console.log("APP-GET-FOLLOWED-USERS: Retrieving a followed user for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        
+        followedUsers.get(accountID, request.params.user, function (err, data){
+            
+            if(!err){
+                console.log("APP-GET-FOLLOWED-USERS: OK");
+                
+                response.writeHead(200, {"Content-Type": "application/json"});
+                response.write(JSON.stringify(data));
+                
+            } else {
+                if(data == "FORBIDDEN"){
+                    console.log("APP-GET-FOLLOWED-USERS: Forbidden!!!");
+                    
+                    response.writeHead(403, {"Content-Type": "text/html"});
+                    response.write("Forbidden");
+                    
+                } else if(data == "NOT FOUND"){
+                    console.log("APP-GET-FOLLOWED-USERS: Not found!!!");
+                    
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Not Found");  
+                    
+                } else {
+                    console.log("APP-GET-FOLLOWED-USERS: DB ERROR!!!");
+                    
+                    response.writeHead(500, {"Content-Type": "text/html"});
+                    response.write("Sorry, DB Error!");
+                }
+            }
+            response.end();
+        });
 	});
 
-	app.post("/followed-users", function(request, response) {
-
-
+	 /**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users:
+     *   post:
+     *     tags:
+     *       - POST followed user
+     *     description: Creates a new followed user for the provided twitter-account's {id}
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the followed users list
+     *       - name: newuser
+     *         in: body
+     *         required: true
+     *         description: The user to be followed
+     *         schema:
+     *           $ref: "#/definitions/Followed-users"
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       201:
+     *         description: Followed user created
+     *       403:
+     *         description: Given token does not own the provided twitter-account's {id}
+     *       409:
+     *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
+     *       500:
+     *         description: DB error
+     */
+	app.post("/twitter-accounts/:id/followed-users", function(request, response) {
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+	    console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+	        
+        followedUsers.post(accountID, request.body.newuser, function (err, data){
+            
+            if(!err){
+                console.log("APP-POST-FOLLOWED-USERS: OK");
+                
+                response.writeHead(201, {"Content-Type": "text/html"});
+                response.write("Created");
+                
+            } else {
+                if(data == "FORBIDDEN"){
+                    console.log("APP-POST-FOLLOWED-USERS: Forbidden!!!");
+                    
+                    response.writeHead(403, {"Content-Type": "text/html"});
+                    response.write("Forbidden");
+                    
+                } else if(data == "ALREADY EXISTS"){
+                    console.log("APP-POST-FOLLOWED-USERS: Conflict. Already exists!!!");
+                    
+                    response.writeHead(409, {"Content-Type": "text/html"});
+                    response.write("Followed user already exists for the provided twitter account");    
+                    
+                } else {
+                    console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
+                    
+                    response.writeHead(500, {"Content-Type": "text/html"});
+                    response.write("Sorry, DB Error!");
+                }
+            }
+            response.end();
+        });
 	});
 	
-	app.put("/followed-users/:id", function(request, response) {
+	 /**
+     * @swagger
+     * /twitter-accounts/{id}/followed-users/{user}:
+     *   delete:
+     *     tags:
+     *       - DELETE followed user
+     *     description: Deletes the specified {user} for the provided twitter-account's {id}
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID that owns the followed user list
+     *       - name: user
+     *         in: path
+     *         required: true
+     *         description: The followed user to delete
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: Followed user deleted
+     *       403:
+     *         description: Given token does not own the provided twitter-account's {id}
+     *       409:
+     *         description: Conflict. The {user} does not exist for the provided twitter-account's {id}
+     *       500:
+     *         description: DB error
+     */
+	app.delete("/twitter-accounts/:id/followed-users/:user", function(request, response) {
+	    var accountID = {
+	            'token': request.headers.token,
+	            'twitterAccountId': request.params.id
+	        };
+	        
+	    console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 
+	    followedUsers.delete(accountID, request.params.user, function (err, data){
 
-	});
-	
-	app.delete("/followed-users/:id", function(request, response) {
+	        if(!err){
+	            console.log("APP-DELETE-FOLLOWED-USERS: OK");
 
+	            response.writeHead(200, {"Content-Type": "text/html"});
+	            response.write("Deleted");
 
+	        } else {
+	            if(data == "FORBIDDEN"){
+	                console.log("APP-DELETE-FOLLOWED-USERS: Forbidden!!!");
+
+	                response.writeHead(403, {"Content-Type": "text/html"});
+	                response.write("Forbidden");
+
+	            } else if(data == "NOT EXIST"){
+	                console.log("APP-DELETE-FOLLOWED-USERS: Conflict. Does not exist!!!");
+
+	                response.writeHead(409, {"Content-Type": "text/html"});
+	                response.write("Followed user does not exist for the provided twitter account"); 
+
+	            } else {
+	                console.log("APP-DELETE-FOLLOWED-USERS: DB ERROR!!!");
+
+	                response.writeHead(500, {"Content-Type": "text/html"});
+	                response.write("Sorry, DB Error!");
+	            }
+	        }
+	        response.end();
+        });
 	});
 	
 	//ADMIN
