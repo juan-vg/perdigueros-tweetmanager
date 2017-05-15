@@ -96,7 +96,7 @@ function checkTokenForTwitterAccount(accountID, callback){
             
         if(!err){
 
-            twiAccModel.find({"_id" : new objectID(accountID.twitterAccountId)},
+            twiAccModel.find({"_id" : new objectID(accountID.twitterAccountId), "activated": true},
                 
                 function(err, dbData){
                     
