@@ -156,9 +156,13 @@ var appRouter = function(app) {
 	 *       - application/json
 	 *     responses:
 	 *       200:
-	 *         description: Information about the twitter account 
+	 *         description: Information about the twitter account
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: The user (token) does not have permission on that twitter account (id)
+	 *       404:
+	 *         description: Unable to find the requested {id}
 	 *       500:
 	 *         description: Error getting the account information from database
 	 */
@@ -171,6 +175,12 @@ var appRouter = function(app) {
 					
 					response.writeHead(200, {"Content-Type": "application/json"});
 					response.write(JSON.stringify(data));
+					
+				} else if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
 					
 				} else if (data == "FORBIDDEN"){
 					console.log("APP-GET-ACCOUNTS-ID: Forbidden");
@@ -219,7 +229,9 @@ var appRouter = function(app) {
 	 *       - application/json
 	 *     responses:
 	 *       201:
-	 *         description: Twitter account created 
+	 *         description: Twitter account created
+	 *       403:
+	 *         description: The user (token) can not be verified
 	 *       409:
 	 *         description: The account already exists.
 	 *       500:
@@ -283,7 +295,9 @@ var appRouter = function(app) {
 	 *       - text/html
 	 *     responses:
 	 *       200:
-	 *         description: The account has been successfully disabled 
+	 *         description: The account has been successfully disabled
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: The user (token) does not own this twitter account (id)
 	 *       404:
@@ -302,7 +316,13 @@ var appRouter = function(app) {
 					response.writeHead(200, {"Content-Type": "text/html"});
 					response.write("Deleted account");
 				} else {
-					if(res == 'FORBIDDEN'){
+					if (data == "ID NOT VALID"){
+					console.log("APP-GET-ACCOUNTS-ID: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				    } else if(res == 'FORBIDDEN'){
 						console.log("APP-DEL-ACCOUNTS-ID: Requested Account-ID is forbidden");
 						
 						response.writeHead(403, {"Content-Type": "text/html"});
@@ -374,6 +394,8 @@ var appRouter = function(app) {
 	 *         description: The hashtag list
 	 *       403:
 	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
 	 *       500:
 	 *         description: DB error
 	 */
@@ -442,7 +464,7 @@ var appRouter = function(app) {
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
 	 *       404:
-	 *         description: Not found {hashtag}
+	 *         description: Not found {id} OR {hashtag}
 	 *       500:
 	 *         description: DB error
 	 */
@@ -515,6 +537,8 @@ var appRouter = function(app) {
 	 *         description: Hashtag created
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
 	 *       409:
 	 *         description: Conflict. The {hashtag} already exists for the provided twitter-account's {id}
 	 *       500:
@@ -592,6 +616,8 @@ var appRouter = function(app) {
 	 *         description: Hashtag deleted
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
+	 *       404:
+	 *         description: Not found {id} OR {hashtag}
 	 *       409:
 	 *         description: Conflict. The {hashtag} does not exist for the provided twitter-account's {id}
 	 *       500:

@@ -33,8 +33,8 @@ function verifyUser(accountID, callback){
                     callback(success, reason);
                 });
             } else if(accountID.lookingForEmail) {
-                getUserEmail(accountID.token, function(success, reason){
-                    callback(success, reason);
+                getUserEmail(accountID.token, function(err, reason){
+                    callback(!err, reason);
                 });
             } else {
                 success = false;
