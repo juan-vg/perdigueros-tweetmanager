@@ -45,7 +45,7 @@ var appRouter = function(app) {
 	 *   Followed-users:
 	 *     type: "object"
 	 *     properties:
-	 *       user:
+	 *       newuser:
 	 *         type: string
 	 *         description: "The user to be followed"
 	 *          
@@ -855,7 +855,7 @@ var appRouter = function(app) {
      *         in: path
      *         required: true
      *         description: The twitter account ID that owns the followed users list
-     *       - name: user
+     *       - name: newuser
      *         in: body
      *         required: true
      *         description: The user to be followed
@@ -880,9 +880,9 @@ var appRouter = function(app) {
 	            'twitterAccountId': request.params.id
 	        };
 	        
-	    console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+	    console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
 	        
-        followedUsers.post(accountID, request.body.user, function (err, data){
+        followedUsers.post(accountID, request.body.newuser, function (err, data){
             
             if(!err){
                 console.log("APP-POST-FOLLOWED-USERS: OK");
