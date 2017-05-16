@@ -1,5 +1,6 @@
 var usersModel = require("./models/user-accounts");
 var twiAccModel = require("./models/twitter-accounts");
+var tokenExpire = require("./token-expire.js");
 
 var objectID = require('mongodb').ObjectID;
 
@@ -129,9 +130,14 @@ function checkTokenForTwitterAccount(accountID, callback){
             
         } else {
             
-            if(data == "NOT FOUND"){
+            if(data == "TOKEN EXPIRED"){
+                console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: TOKEN EXPIRED!");
+                reason = "FORBIDDEN";
+                
+            } else if(data == "NOT FOUND"){
                 console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: CAN NOT VERIFY USER!");
                 reason = "USER NOT FOUND";
+                
             } else {
                 console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: DB ERROR!!!");
                 reason = "DB ERROR";
@@ -167,9 +173,14 @@ function checkTokenForUserAccount(accountID, callback){
             
         } else {
             
-            if(data == "NOT FOUND"){
+            if(data == "TOKEN EXPIRED"){
+                console.log("ACC-VERIFS-CHK-TKN-4-USR-ACC: TOKEN EXPIRED!");
+                reason = "FORBIDDEN";
+                
+            } else if(data == "NOT FOUND"){
                 console.log("ACC-VERIFS-CHK-TKN-4-USR-ACC: CAN NOT VERIFY USER!");
                 reason = "USER NOT FOUND";
+                
             } else {
                 console.log("ACC-VERIFS-CHK-TKN-4-USR-ACC: DB ERROR!!!");
                 reason = "DB ERROR";
@@ -192,16 +203,28 @@ function getUser(token, callback){
     usersModel.find({"token" : token, "validated": true, "activated": true, "firstLogin": false }, {"password":0},
         function(err, dbData) {
             if(!err && dbData.length > 0){
-                error = false;
-                data = dbData[0];
+				
+				tokenExpire.verifyToken(token, function(err, data){
+					if(!err){
+						error = false;
+						data = dbData[0];
+					} else {
+						error = true;
+						data = "TOKEN EXPIRED";
+					}
+					callback(error, data);
+				});
+                
             } else if(!err){
                 error = true;
                 data = "NOT FOUND";
+                callback(error, data);
             } else {
                 error = true;
                 data = "DB ERROR";
+                callback(error, data);
             }
-            callback(error, data);
+            
         }
     );
 }
