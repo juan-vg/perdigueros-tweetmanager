@@ -1415,7 +1415,7 @@ var appRouter = function(app) {
 		);
 	});
 	
-	//SUBIR IMAGEN
+	//IMAGENES
 	app.get("/images/:id", function(request, response) {
 	    
 	    console.log("APP-GET-IMAGE: Requesting an image...");
@@ -1428,7 +1428,7 @@ var appRouter = function(app) {
                 response.write(res.data);
                 
             } else {
-                if(res == "NO DATA"){
+                if (res == "NOT FOUND"){
                     console.log("APP-GET-IMAGE: Not found data.");
                     
                     response.writeHead(404, {"Content-Type": "text/html"});
@@ -1439,12 +1439,11 @@ var appRouter = function(app) {
                     response.writeHead(500, {"Content-Type": "text/html"});
                     response.write("Error.");
                 }
-                
             }
 	        response.end();
 	    });
 	});
-////TODO quitar!!!!!
+////TODO quitar esto y carpeta html!!!!!
     app.get("/prueba", function (request, response) {
 
         fs.readFile('html/start.html', function (error, data) {
@@ -1486,15 +1485,13 @@ var appRouter = function(app) {
                     response.end();
                 });
             } else {
-                console.log("APP-POST-IMAGE: Parse error" );
+                console.log("APP-POST-IMAGE: Parse form error" );
                 
                 response.writeHead(500, {"Content-Type": "text/html"});
                 response.write("Error.");
                 response.end();
             }
         });
-
-
     });
 };
 

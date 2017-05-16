@@ -20,7 +20,7 @@ exports.get = function (imageId, callback){
             } else {
                 console.log("UPLOAD-IMAGES-GET: There is no data.");
                 error = true;
-                data = "NO DATA";
+                data = "NOT FOUND";
             }
         } else {
             console.log("UPLOAD-IMAGES-GET: Error while performing query.");
@@ -48,14 +48,14 @@ exports.post = function (image , callback){
 
     dbImages.save(function(err, res){
         if (!err){
-            console.log("UPLOAD-IMAGES-POST: Image saved successfully.");
+            console.log("UPLOAD-IMAGES-POST: Image stored successfully.");
 
             error = false;
-            data = res.hash; //???? Es necesario devolver algo??
+            data = res.hash; 
             callback(error, data);
 
         } else {
-            console.log("UPLOAD-IMAGES-POST: Error while saving the image");
+            console.log("UPLOAD-IMAGES-POST: Error while storing the image");
 
             error = true;
             data = null;
