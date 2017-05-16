@@ -9,16 +9,16 @@ exports.sendMail = function(emailData, callback){
 	
 	// body
 	if(emailData.type == "validate"){
-		message += 'We are glad to inform you that your new account'
-		    +' has been created.\nPlease, use the following code in order to validate your email.\n\nCode: ' + emailData.code;
+		message += 'We are glad to inform you that your new account';
+		message += ' has been created.\nPlease, use the following code in order to validate your email.\n\nCode: ' + emailData.code;
 		    
 	} else if(emailData.type == "passwd"){
-		message += 'We have created a new password for you.\n'
-		    +'\n\nPassword: ' + emailData.passwd;
+		message += 'We have created a new password for you.\n';
+		message += '\n\nPassword: ' + emailData.passwd;
 	} else {
 		//TODO
-		message += 'Hello '+ emailData.name +', we are glad to inform you that your new account '+ emailData.account 
-		    +' has been created. Please, use the following code in order to validate your email. Code: ' + emailData.code;
+		message += 'Hello '+ emailData.name +', we are glad to inform you that your new account '+ emailData.account;
+		message += ' has been created. Please, use the following code in order to validate your email. Code: ' + emailData.code;
 	}
 	
 	// footer

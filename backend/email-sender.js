@@ -24,10 +24,15 @@ module.exports = function(params) {
         };
 
         transporter.sendMail(options, function(err, suc){
-            err ? params.errorCallback(err) : params.successCallback(suc);
+			
+			if(!err){
+				params.successCallback(suc);
+			} else {
+				params.errorCallback(err);
+			}
         });
-    }
-}
+    };
+};
 /*
 // setup email data with unicode symbols
 let mailOptions = {
