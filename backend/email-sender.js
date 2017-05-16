@@ -24,12 +24,12 @@ module.exports = function(params) {
         };
 
         transporter.sendMail(options, function(err, suc){
-			
-			if(!err){
-				params.successCallback(suc);
-			} else {
-				params.errorCallback(err);
-			}
+            
+            if(!err){
+                params.successCallback(suc);
+            } else {
+                params.errorCallback(err);
+            }
         });
     };
 };
