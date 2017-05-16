@@ -152,6 +152,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: User created
+	 *       409:
+	 *         description: Email address already in use
 	 *       500:
 	 *         description: DB error
 	 */
@@ -173,10 +175,18 @@ var appRouter = function(app) {
 					response.write("Created");
 					
 				} else {
-					console.log("APP-LOGIN-SIGNUP: Error while performing query");
+					if(data == "ALREADY EXISTS"){
+						console.log("APP-LOGIN-SIGNUP: Already exists");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("Email address already in use");
+						
+					} else {
+						console.log("APP-LOGIN-SIGNUP: Error while performing query");
 					
-					response.writeHead(500, {"Content-Type": "text/html"});
-					response.write("Sorry, DB error!");
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
 				}
 				response.end();
 			}

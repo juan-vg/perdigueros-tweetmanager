@@ -75,44 +75,60 @@ exports.signup = function (accountData, callback) {
     
     var error, data;
     
-    var dbUsers = new userAccModel();
-    dbUsers.loginType = "local";
-    dbUsers.name = accountData.name;
-    dbUsers.surname = accountData.surname;
-    dbUsers.email = accountData.email;
-    dbUsers.registrationDate = new Date();
-    dbUsers.validated = false;
-    dbUsers.validateHash = crypto.randomBytes(20).toString('hex');
-    dbUsers.firstLogin = true;
-    dbUsers.activated = true;
-    
-    dbUsers.save(function(err,dbData){
+    userAccModel.find({"email": accountData.email}, function(err, dbData){
         if(!err){
-            
-            var emailData = {
-                "type": "validate",
-                "name": dbUsers.name,
-                "code": dbUsers.validateHash,
-                "to": dbUsers.email
-            };
-            
-            // async (not waiting for callback)
-            mailCreator.sendMail(emailData, function(err, mData){
-                if(err){
-                    console.log("LOGIN-SIGNUP: ERROR sending email to " + dbUsers.email);
-                }
-            });
-            
-            error = false;
-            data = null;
-            callback(error, data);
+            if(dbData.length > 0){
+                error = true;
+                data = "ALREADY EXISTS";
+                callback(error, data);
+                
+            } else {
+                var dbUsers = new userAccModel();
+                dbUsers.loginType = "local";
+                dbUsers.name = accountData.name;
+                dbUsers.surname = accountData.surname;
+                dbUsers.email = accountData.email;
+                dbUsers.registrationDate = new Date();
+                dbUsers.validated = false;
+                dbUsers.validateHash = crypto.randomBytes(20).toString('hex');
+                dbUsers.firstLogin = true;
+                dbUsers.activated = true;
+                
+                dbUsers.save(function(err,dbData){
+                    if(!err){
+                        
+                        var emailData = {
+                            "type": "validate",
+                            "name": dbUsers.name,
+                            "code": dbUsers.validateHash,
+                            "to": dbUsers.email
+                        };
+                        
+                        // async (not waiting for callback)
+                        mailCreator.sendMail(emailData, function(err, mData){
+                            if(err){
+                                console.log("LOGIN-SIGNUP: ERROR sending email to " + dbUsers.email);
+                            }
+                        });
+                        
+                        error = false;
+                        data = null;
+                        callback(error, data);
+                        
+                    } else {
+                        error = true;
+                        data = "DB ERROR";
+                        callback(error, data);
+                    }
+                });
+            }
             
         } else {
             error = true;
             data = "DB ERROR";
             callback(error, data);
         }
-    });
+    }
 };
 
 exports.validateUser = function (accountID, callback) {
