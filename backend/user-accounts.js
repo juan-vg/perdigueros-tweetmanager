@@ -148,10 +148,10 @@ exports.put = function (accountID, passwordSet, callback){
                                         function(err, res){
                                             if(!err){
                                                 error = false;
-                                                result = null;
+                                                data = null;
                                             } else {
                                                 error = true;
-                                                result = "DB ERROR";
+                                                data = "DB ERROR";
                                             }
                                             callback(error, data);
                                         }
@@ -236,10 +236,10 @@ exports.delete = function (accountID, callback){
                                         function(err, res){
                                             if(!err){
                                                 error = false;
-                                                result = null;
+                                                data = null;
                                             } else {
                                                 error = true;
-                                                result = "DB ERROR";
+                                                data = "DB ERROR";
                                             }
                                             callback(error, data);
                                         }
