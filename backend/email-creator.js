@@ -4,17 +4,26 @@ exports.sendMail = function(emailData, callback){
 	
 	var error, data;
 	
-	var message;
+	// header
+	var message = 'Hello '+ emailData.name +',\n\n';
 	
+	// body
 	if(emailData.type == "validate"){
-		message = 'Hello '+ emailData.name +',\n\nWe are glad to inform you that your new account'
-		    +' has been created.\nPlease, use the following code in order to validate your email.\n\nCode: ' + emailData.code
-		    + '\n\n\nBest regards,\nThe PTM team';
+		message += 'We are glad to inform you that your new account'
+		    +' has been created.\nPlease, use the following code in order to validate your email.\n\nCode: ' + emailData.code;
+		    
+	} else if(emailData.type == "passwd"){
+		message += 'We have created a new password for you.\n'
+		    +'\n\nPassword: ' + emailData.passwd;
 	} else {
 		//TODO
-		message = 'Hello '+ emailData.name +', we are glad to inform you that your new account '+ emailData.account 
+		message += 'Hello '+ emailData.name +', we are glad to inform you that your new account '+ emailData.account 
 		    +' has been created. Please, use the following code in order to validate your email. Code: ' + emailData.code;
 	}
+	
+	// footer
+	message += '\n\n\nBest regards,\nThe PTM team.\nA Zaratech Dynamics product.\nAll rights registered 2017.';
+	
 
 	var mail = new Mail({
 		to: emailData.to,

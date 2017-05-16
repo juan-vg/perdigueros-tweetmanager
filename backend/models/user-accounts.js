@@ -16,6 +16,7 @@ var usersAccountsSchema = new mongoSchema({
 	"tokenExpire": Date, // Updated on every access
 	"validated": Boolean, // true if (external login | confirmed email)
 	"validateHash": String, // send to email in order to verify it
+	"firstLogin": Boolean, // true if the user has not logged in yet
 	"activated": Boolean // false if it is a "deleted" account
 });
 

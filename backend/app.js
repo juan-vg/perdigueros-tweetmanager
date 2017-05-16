@@ -95,7 +95,7 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The user email"
 	 * 
-	 *    Validate:
+	 *   Validate:
 	 *     type: "object"
 	 *     properties:
 	 *       email:
@@ -105,12 +105,25 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The emailed code"
 	 * 
-	 *    UserEmail:
+	 *   UserEmail:
 	 *     type: "object"
 	 *     properties:
 	 *       email:
 	 *         type: string
 	 *         description: "The user email"
+	 * 
+	 *   FirstLogin:
+	 *     type: "object"
+	 *     properties:
+	 *       email:
+	 *         type: string
+	 *         description: "The user email"
+	 *       oldPasswd:
+	 *         type: string
+	 *         description: "The OLD password"
+	 *       newPasswd:
+	 *         type: string
+	 *         description: "The NEW password"
 	 * 
 	 */
 
@@ -156,7 +169,7 @@ var appRouter = function(app) {
 				if(!err){	
 					console.log("APP-LOGIN-SIGNUP: OK");
 						
-					response.writeHead(201, {"Content-Type": "text/html", "token": data});
+					response.writeHead(201, {"Content-Type": "text/html"});
 					response.write("Created");
 					
 				} else {
@@ -195,6 +208,8 @@ var appRouter = function(app) {
 	 *         description: Incorrect login
 	 *       409:
 	 *         description: Must validate the account (email)
+	 *       459:
+	 *         description: Must change password first (returns the email)
 	 *       500:
 	 *         description: DB error
 	 */
@@ -211,9 +226,17 @@ var appRouter = function(app) {
 				if(!err){	
 					console.log("APP-LOGIN-SIGNIN: OK");
 						
-					response.writeHead(200, {"Content-Type": "text/html", "token": data});
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write(JSON.stringify(data));
+					
 				} else {
-					if (data == "MUST VALIDATE") {
+					if (data == "MUST CHANGE PASSWD") {
+						console.log("APP-LOGIN-SIGNIN: Must change password");
+						
+						response.writeHead(459, {"Content-Type": "text/html"});
+						response.write(request.body.email);
+						
+					} else if (data == "MUST VALIDATE") {
 						console.log("APP-LOGIN-SIGNIN: Must validate account");
 						
 						response.writeHead(409, {"Content-Type": "text/html"});
@@ -264,8 +287,38 @@ var appRouter = function(app) {
 	 *         description: DB error
 	 */
 	app.post("/login/validate", function(request, response) {
-
-
+		
+		console.log("APP-LOGIN-VALIDATE: Trying to validate user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email,
+			"validationHash": request.body.code
+		};
+		
+		login.validateUser(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-VALIDATE: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Validate OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-VALIDATE: Incorrect validation code");
+						
+						response.writeHead(401, {"Content-Type": "text/html"});
+						response.write("Incorrect validation code");
+						
+					} else {
+						console.log("APP-LOGIN-VALIDATE: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
 	});
 	
 	//resend validation email
@@ -289,12 +342,43 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Email sent
+	 *       409:
+	 *         description: User already validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/validate/resend", function(request, response) {
-
-
+		
+		console.log("APP-LOGIN-VALIDATE-RESEND: Resending validation email to user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email
+		};
+		
+		login.resendEmail(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-VALIDATE-RESEND: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Sent OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-VALIDATE-RESEND: Incorrect");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("User already validated, not active, or not existing email");
+						
+					} else {
+						console.log("APP-LOGIN-VALIDATE-RESEND: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
 	});
 	
 	//remember passwd
@@ -318,12 +402,105 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: New password sent
+	 *       409:
+	 *         description: User not validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/remember", function(request, response) {
-
-
+		
+		console.log("APP-LOGIN-REMEMBER: Resending password to user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email
+		};
+		
+		login.rememberPasswd(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-REMEMBER: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Password sent OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-REMEMBER: Incorrect");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("User not validated, not active, or not existing email");
+						
+					} else {
+						console.log("APP-LOGIN-REMEMBER: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
+	});
+	
+	//first login
+	/**
+	 * @swagger
+	 * /login/firstlogin:
+	 *   post:
+	 *     tags:
+	 *       - Login
+	 *     description: Changes the password
+	 *     parameters:
+	 *       - name: emailAndPasswordSet
+	 *         in: body
+	 *         required: true
+	 *         description: The user email, and the OLD and NEW passwords
+	 *         schema:
+	 *           $ref: "#/definitions/FirstLogin"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: New password sent
+	 *       409:
+	 *         description: User not validated, not active, or not existing email
+	 *       500:
+	 *         description: DB error
+	 */
+	app.post("/login/firstlogin", function(request, response) {
+		
+		console.log("APP-LOGIN-FIRSTLOGIN: Changing password to user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email,
+			'oldPasswd': request.body.oldPasswd,
+			'newPasswd': request.body.newPasswd
+		};
+		
+		login.firstLogin(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-FIRSTLOGIN: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Password changed OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-FIRSTLOGIN: Incorrect");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("User not validated, old password not correct, or not existing email");
+						
+					} else {
+						console.log("APP-LOGIN-FIRSTLOGIN: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
 	});
 	
 

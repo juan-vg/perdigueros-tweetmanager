@@ -23,9 +23,9 @@ exports.getAll = function(userToken, callback){
             var query;
             
             if(data == "ADMIN"){
-                query = {};
+                query = {"activated": true};
             } else {
-                query = {'email': data};
+                query = {'email': data, "activated": true};
             }
             
             twiAccModel.find(query, function(err, res){
@@ -87,7 +87,7 @@ exports.getAccount = function(idAccount, userToken, callback){
                 if(success){
                     
                     // Find twitter account
-                    twiAccModel.findById(idAccount, function(err, res){
+                    twiAccModel.find({"_id": new ObjectID(idAccount), "activated": true}, function(err, res){
                         //console.log("TWITTER-ACCOUNTS-GET-ID: Checking database...");
 
                         if(!err){
@@ -140,7 +140,7 @@ exports.getAccount = function(idAccount, userToken, callback){
 //Create new account
 exports.postAccount = function(userToken, newAccount, callback){
     var error, result;  
-    console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account: ", newAccount);
+    console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account: ", newAccount.description);
 
     accVerificator.getUserEmail(userToken, function(err, data){
         if(!err) {
