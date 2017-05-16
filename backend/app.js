@@ -1414,13 +1414,44 @@ var appRouter = function(app) {
 	
 	//SUBIR IMAGEN
 	app.get("/images/:id", function(request, response) {
-
+	    
+	    console.log("APP-GET-IMAGE: Requesting an image...");
+	    
+	    upload-images.get(request.path.id, function(err,res){
+	        if(!err){
+                console.log("APP-GET-IMAGE: ", res);
+                
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write("Image saved (" + res + ")");
+                
+            } else {
+                console.log("APP-GET-IMAGE: Error while saving the image.");
+                
+                response.writeHead(500, {"Content-Type": "text/html"});
+                response.write("Error.");
+            }
+	    });
 
 	});
 	
 	app.post("/images", function(request, response) {
-
-
+	    
+	    console.log("APP-POST-IMAGE: Posted image is: " + request.files.image);
+	    
+        upload-images.post(request.files.image, function (err, res){
+            if(!err){
+                console.log("APP-POST-IMAGE: Image saved.");
+                
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write("Image saved (" + res + ")");
+                
+            } else {
+                console.log("APP-POST-IMAGE: Error while saving the image.");
+                
+                response.writeHead(500, {"Content-Type": "text/html"});
+                response.write("Error.");
+            }
+        });
 	});
 };
 
