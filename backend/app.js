@@ -7,11 +7,20 @@ var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
 var followedUsers = require('./followed-users.js');
 var userAccounts = require('./user-accounts.js');
+var login = require('./login.js');
 
 var appRouter = function(app) {
 	
 	/**
 	 * @swagger
+	 * tags:
+	 * - name: "Login"
+	 * - name: "Users"
+	 * - name: "Twitter Accounts"
+	 * - name: "Hashtags"
+	 * - name: "Followed"
+	 * - name: "URL shortener"
+	 * 
 	 * definitions:
 	 *   Twitter-accounts:
 	 *     type: "object"
@@ -31,18 +40,21 @@ var appRouter = function(app) {
 	 *       description:
 	 *         type: string
 	 *         description: "The twitter account description"
+	 * 
 	 *   Urls:
 	 *     type: "object"
 	 *     properties:
 	 *       url:
 	 *         type: string
 	 *         description: "The URL string"
+	 * 
 	 *   Hashtags:
 	 *     type: "object"
 	 *     properties:
 	 *       hashtag:
 	 *         type: string
 	 *         description: "The Hashtag string"
+	 * 
 	 *   Followed-users:
 	 *     type: "object"
 	 *     properties:
@@ -59,15 +71,126 @@ var appRouter = function(app) {
 	 *       newPasswd:
 	 *         type: string
 	 *         description: "The NEW password"
+	 * 
+	 *   Signin:
+	 *     type: "object"
+	 *     properties:
+	 *       email:
+	 *         type: string
+	 *         description: "The user email"
+	 *       passwd:
+	 *         type: string
+	 *         description: "The user password"
+	 * 
+	 *   Signup:
+	 *     type: "object"
+	 *     properties:
+	 *       name:
+	 *         type: string
+	 *         description: "The user real name"
+	 *       surname:
+	 *         type: string
+	 *         description: "The user real surname"
+	 *       email:
+	 *         type: string
+	 *         description: "The user email"
+	 * 
+	 *   Validate:
+	 *     type: "object"
+	 *     properties:
+	 *       email:
+	 *         type: string
+	 *         description: "The user email"
+	 *       code:
+	 *         type: string
+	 *         description: "The emailed code"
+	 * 
+	 *   UserEmail:
+	 *     type: "object"
+	 *     properties:
+	 *       email:
+	 *         type: string
+	 *         description: "The user email"
+	 * 
+	 *   FirstLogin:
+	 *     type: "object"
+	 *     properties:
+	 *       email:
+	 *         type: string
+	 *         description: "The user email"
+	 *       oldPasswd:
+	 *         type: string
+	 *         description: "The OLD password"
+	 *       newPasswd:
+	 *         type: string
+	 *         description: "The NEW password"
+	 * 
 	 */
 
 
 	
 	////////////////////////////////////////////////////////
 	
-	//registro
+	//register
+	/**
+	 * @swagger
+	 * /login/signup:
+	 *   post:
+	 *     tags:
+	 *       - Login
+	 *     description: Register a new user
+	 *     parameters:
+	 *       - name: userdata
+	 *         in: body
+	 *         required: true
+	 *         description: The user account data needed in order to register the account
+	 *         schema:
+	 *           $ref: "#/definitions/Signup"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       201:
+	 *         description: User created
+	 *       409:
+	 *         description: Email address already in use
+	 *       500:
+	 *         description: DB error
+	 */
 	app.post("/login/signup", function(request, response) {
-
+		
+		console.log("APP-LOGIN-SIGNUP: Trying to create user " + request.body.email);
+		
+		var accountData = {
+			"name": request.body.name,
+			"surname": request.body.surname,
+			"email": request.body.email
+		};
+		
+		login.signup(accountData, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-SIGNUP: OK");
+						
+					response.writeHead(201, {"Content-Type": "text/html"});
+					response.write("Created");
+					
+				} else {
+					if(data == "ALREADY EXISTS"){
+						console.log("APP-LOGIN-SIGNUP: Already exists");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("Email address already in use");
+						
+					} else {
+						console.log("APP-LOGIN-SIGNUP: Error while performing query");
+					
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
 	});
 
 	//login
@@ -76,8 +199,15 @@ var appRouter = function(app) {
 	 * /login/signin:
 	 *   post:
 	 *     tags:
-	 *       - POST login singin
+	 *       - Login
 	 *     description: Log in the system
+	 *     parameters:
+	 *       - name: logindata
+	 *         in: body
+	 *         required: true
+	 *         description: The user account data needed in order to log in
+	 *         schema:
+	 *           $ref: "#/definitions/Signin"
 	 *     produces:
 	 *       - application/json
 	 *       - text/html
@@ -85,21 +215,304 @@ var appRouter = function(app) {
 	 *       200:
 	 *         description: Login OK 
 	 *       401:
-	 *         description: Unable to log in
+	 *         description: Incorrect login
+	 *       409:
+	 *         description: Must validate the account (email)
+	 *       459:
+	 *         description: Must change password first (returns the email)
+	 *       500:
+	 *         description: DB error
 	 */
 	app.post("/login/signin", function(request, response) {
-
-		response.writeHead(200, {"Content-Type": "text/html"});
-		response.write("prueba ok signin");
+		
+		console.log("APP-LOGIN-SIGNIN: Trying to authenticate user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email,
+			"passwd": request.body.passwd
+		};
+		
+		login.localSignin(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-SIGNIN: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write(JSON.stringify(data));
+					
+				} else {
+					if (data == "MUST CHANGE PASSWD") {
+						console.log("APP-LOGIN-SIGNIN: Must change password");
+						
+						response.writeHead(459, {"Content-Type": "text/html"});
+						response.write(request.body.email);
+						
+					} else if (data == "MUST VALIDATE") {
+						console.log("APP-LOGIN-SIGNIN: Must validate account");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("Must validate the account");
+						
+					} else if (data == "INCORRECT") {
+						console.log("APP-LOGIN-SIGNIN: Incorrect passwd");
+						
+						response.writeHead(401, {"Content-Type": "text/html"});
+						response.write("Incorrect login");
+						
+					} else {
+						console.log("APP-LOGIN-SIGNIN: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
+	});
 	
-		response.end();
+	//validate email
+	/**
+	 * @swagger
+	 * /login/validate:
+	 *   post:
+	 *     tags:
+	 *       - Login
+	 *     description: Validates the emailed code
+	 *     parameters:
+	 *       - name: validationdata
+	 *         in: body
+	 *         required: true
+	 *         description: The data needed in order to validate the account
+	 *         schema:
+	 *           $ref: "#/definitions/Validate"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: Account validated
+	 *       401:
+	 *         description: Incorrect validation code
+	 *       500:
+	 *         description: DB error
+	 */
+	app.post("/login/validate", function(request, response) {
+		
+		console.log("APP-LOGIN-VALIDATE: Trying to validate user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email,
+			"validationHash": request.body.code
+		};
+		
+		login.validateUser(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-VALIDATE: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Validate OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-VALIDATE: Incorrect validation code");
+						
+						response.writeHead(401, {"Content-Type": "text/html"});
+						response.write("Incorrect validation code");
+						
+					} else {
+						console.log("APP-LOGIN-VALIDATE: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
 	});
-
-	//recordar passwd
+	
+	//resend validation email
+	/**
+	 * @swagger
+	 * /login/validate/resend:
+	 *   post:
+	 *     tags:
+	 *       - Login
+	 *     description: Resends the validation email
+	 *     parameters:
+	 *       - name: useremail
+	 *         in: body
+	 *         required: true
+	 *         description: The user email
+	 *         schema:
+	 *           $ref: "#/definitions/UserEmail"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: Email sent
+	 *       409:
+	 *         description: User already validated, not active, or not existing email
+	 *       500:
+	 *         description: DB error
+	 */
+	app.post("/login/validate/resend", function(request, response) {
+		
+		console.log("APP-LOGIN-VALIDATE-RESEND: Resending validation email to user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email
+		};
+		
+		login.resendEmail(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-VALIDATE-RESEND: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Sent OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-VALIDATE-RESEND: Incorrect");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("User already validated, not active, or not existing email");
+						
+					} else {
+						console.log("APP-LOGIN-VALIDATE-RESEND: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
+	});
+	
+	//remember passwd
+	/**
+	 * @swagger
+	 * /login/remember:
+	 *   post:
+	 *     tags:
+	 *       - Login
+	 *     description: Sends a new password to the user's email
+	 *     parameters:
+	 *       - name: useremail
+	 *         in: body
+	 *         required: true
+	 *         description: The user email
+	 *         schema:
+	 *           $ref: "#/definitions/UserEmail"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: New password sent
+	 *       409:
+	 *         description: User not validated, not active, or not existing email
+	 *       500:
+	 *         description: DB error
+	 */
 	app.post("/login/remember", function(request, response) {
-
-
+		
+		console.log("APP-LOGIN-REMEMBER: Resending password to user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email
+		};
+		
+		login.rememberPasswd(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-REMEMBER: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Password sent OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-REMEMBER: Incorrect");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("User not validated, not active, or not existing email");
+						
+					} else {
+						console.log("APP-LOGIN-REMEMBER: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
 	});
+	
+	//first login
+	/**
+	 * @swagger
+	 * /login/firstlogin:
+	 *   post:
+	 *     tags:
+	 *       - Login
+	 *     description: Changes the password
+	 *     parameters:
+	 *       - name: emailAndPasswordSet
+	 *         in: body
+	 *         required: true
+	 *         description: The user email, and the OLD and NEW passwords
+	 *         schema:
+	 *           $ref: "#/definitions/FirstLogin"
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: New password sent
+	 *       409:
+	 *         description: User not validated, not active, or not existing email
+	 *       500:
+	 *         description: DB error
+	 */
+	app.post("/login/firstlogin", function(request, response) {
+		
+		console.log("APP-LOGIN-FIRSTLOGIN: Changing password to user " + request.body.email);
+		
+		var accountID = {
+			"email": request.body.email,
+			'oldPasswd': request.body.oldPasswd,
+			'newPasswd': request.body.newPasswd
+		};
+		
+		login.firstLogin(accountID, function (err, data){
+				if(!err){	
+					console.log("APP-LOGIN-FIRSTLOGIN: OK");
+						
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write("Password changed OK");
+					
+				} else {
+					if (data == "INCORRECT") {
+						console.log("APP-LOGIN-FIRSTLOGIN: Incorrect");
+						
+						response.writeHead(409, {"Content-Type": "text/html"});
+						response.write("User not validated, old password not correct, or not existing email");
+						
+					} else {
+						console.log("APP-LOGIN-FIRSTLOGIN: Error while performing query");
+						
+						response.writeHead(500, {"Content-Type": "text/html"});
+						response.write("Sorry, DB error!");
+					}
+				}
+				response.end();
+			}
+		);
+	});
+	
 
 	//todas las cuentas
 	/**
@@ -107,8 +520,8 @@ var appRouter = function(app) {
 	 * /twitter-accounts:
 	 *   get:
 	 *     tags:
-	 *       - GET all twitter accounts (ADMIN)
-	 *     description: Get information of all twitter accounts
+	 *       - Twitter Accounts
+	 *     description: Get information of all twitter accounts (ADMIN)
 	 *     parameters:
 	 *       - name: usertoken
 	 *         in: header
@@ -158,8 +571,8 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}:
 	 *   get:
 	 *     tags:
-	 *       - GET single twitter account (ADMIN)
-	 *     description: Get information of a single account
+	 *       - Twitter Accounts
+	 *     description: Get information of a single account (ADMIN)
 	 *     parameters:
 	 *       - name: usertoken
 	 *         in: header
@@ -229,7 +642,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts:
 	 *   post:
 	 *     tags:
-	 *       - POST new twitter account
+	 *       - Twitter Accounts
 	 *     description: Create a new twitter account
 	 *     parameters:
 	 *       - name: usertoken
@@ -298,7 +711,7 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}:
 	 *   delete:
 	 *     tags:
-	 *       - DELETE account
+	 *       - Twitter Accounts
 	 *     description: Disable a twitter account (ADMIN)
 	 *     parameters:
 	 *       - name: id
@@ -393,8 +806,8 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags:
 	 *   get:
 	 *     tags:
-	 *       - GET all hashtags (ADMIN)
-	 *     description: Gets all hashtags for the provided twitter-account's {id}
+	 *       - Hashtags
+	 *     description: Gets all hashtags for the provided twitter-account's {id} (ADMIN)
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
@@ -468,8 +881,8 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags/{hashtag}:
 	 *   get:
 	 *     tags:
-	 *       - GET hashtag info (ADMIN)
-	 *     description: Gets the hashtag info for the provided (twitter-account's {id}, {hashtag})
+	 *       - Hashtags
+	 *     description: Gets the hashtag info for the provided (twitter-account's {id}, {hashtag}) (ADMIN)
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
@@ -551,8 +964,8 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags:
 	 *   post:
 	 *     tags:
-	 *       - POST hashtag (ADMIN)
-	 *     description: Creates a new hashtag for the provided twitter-account's {id}
+	 *       - Hashtags
+	 *     description: Creates a new hashtag for the provided twitter-account's {id} (ADMIN)
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
@@ -644,8 +1057,8 @@ var appRouter = function(app) {
 	 * /twitter-accounts/{id}/hashtags/{hashtag}:
 	 *   delete:
 	 *     tags:
-	 *       - DELETE hashtag (ADMIN)
-	 *     description: Deletes the specified {hashtag} for the provided twitter-account's {id}
+	 *       - Hashtags
+	 *     description: Deletes the specified {hashtag} for the provided twitter-account's {id} (ADMIN)
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
@@ -729,8 +1142,8 @@ var appRouter = function(app) {
      * /twitter-accounts/{id}/followed-users:
      *   get:
      *     tags:
-     *       - GET all followed users
-     *     description: Gets all followed users for the provided twitter-account's {id}
+     *       - Followed
+     *     description: Gets all followed users for the provided twitter-account's {id} (ADMIN)
      *     parameters:
      *       - name: token
      *         in: header
@@ -791,8 +1204,8 @@ var appRouter = function(app) {
      * /twitter-accounts/{id}/followed-users/{user}:
      *   get:
      *     tags:
-     *       - GET followed user info
-     *     description: Gets the followed user info for the provided (twitter-account's {id}, {user})
+     *       - Followed
+     *     description: Gets the followed user info for the provided (twitter-account's {id}, {user}) (ADMIN)
      *     parameters:
      *       - name: token
      *         in: header
@@ -865,8 +1278,8 @@ var appRouter = function(app) {
      * /twitter-accounts/{id}/followed-users:
      *   post:
      *     tags:
-     *       - POST followed user
-     *     description: Creates a new followed user for the provided twitter-account's {id}
+     *       - Followed
+     *     description: Creates a new followed user for the provided twitter-account's {id} (ADMIN)
      *     parameters:
      *       - name: token
      *         in: header
@@ -940,8 +1353,8 @@ var appRouter = function(app) {
      * /twitter-accounts/{id}/followed-users/{user}:
      *   delete:
      *     tags:
-     *       - DELETE followed user
-     *     description: Deletes the specified {user} for the provided twitter-account's {id}
+     *       - Followed
+     *     description: Deletes the specified {user} for the provided twitter-account's {id} (ADMIN)
      *     parameters:
      *       - name: token
      *         in: header
@@ -1015,8 +1428,8 @@ var appRouter = function(app) {
 	 * /users:
 	 *   get:
 	 *     tags:
-	 *       - GET all users (ADMIN ONLY)
-	 *     description: Gets all users
+	 *       - Users
+	 *     description: Gets all users (ADMIN ONLY)
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
@@ -1069,8 +1482,8 @@ var appRouter = function(app) {
 	 * /users/{id}:
 	 *   get:
 	 *     tags:
-	 *       - GET user info (ADMIN)
-	 *     description: Gets the user info (except password)
+	 *       - Users
+	 *     description: Gets the user info (except password) (ADMIN)
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
@@ -1144,7 +1557,7 @@ var appRouter = function(app) {
 	 * /users/{id}:
 	 *   put:
 	 *     tags:
-	 *       - PUT new passwd (UPDATE PASSWD)
+	 *       - Users
 	 *     description: Updates user password
 	 *     parameters:
 	 *       - name: token
@@ -1238,8 +1651,8 @@ var appRouter = function(app) {
 	 * /users/{id}:
 	 *   delete:
 	 *     tags:
-	 *       - DELETE user (ADMIN)
-	 *     description: deletes de user
+	 *       - Users
+	 *     description: Deletes de user (ADMIN)
 	 *     parameters:
 	 *       - name: token
 	 *         in: header
@@ -1335,7 +1748,7 @@ var appRouter = function(app) {
 	 * /urls/{id}:
 	 *   get:
 	 *     tags:
-	 *       - GET short url
+	 *       - URL shortener
 	 *     description: Request the real URL associated with the provided {id}
 	 *     parameters:
 	 *       - name: id
@@ -1374,7 +1787,7 @@ var appRouter = function(app) {
 	 * /urls:
 	 *   post:
 	 *     tags:
-	 *       - POST short url
+	 *       - URL shortener
 	 *     description: Creates a new short URL associated with the provided {url}
 	 *     consumes:
 	 *       - application/json

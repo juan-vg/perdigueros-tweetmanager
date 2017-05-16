@@ -189,7 +189,7 @@ function getUser(token, callback){
     var error, data;
     
     // get valid-user data from token
-    usersModel.find({"token" : token, "validated": true, "activated": true }, {"password":0},
+    usersModel.find({"token" : token, "validated": true, "activated": true, "firstLogin": false }, {"password":0},
         function(err, dbData) {
             if(!err && dbData.length > 0){
                 error = false;
