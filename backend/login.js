@@ -128,7 +128,7 @@ exports.signup = function (accountData, callback) {
             data = "DB ERROR";
             callback(error, data);
         }
-    }
+    });
 };
 
 exports.validateUser = function (accountID, callback) {
