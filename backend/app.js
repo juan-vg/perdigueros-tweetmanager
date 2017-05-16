@@ -7,6 +7,9 @@ var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
 var followedUsers = require('./followed-users.js');
 var userAccounts = require('./user-accounts.js');
+//TODO
+var uploadImages = require('./upload-images.js');
+var formidable = require('formidable');
 
 var appRouter = function(app) {
 	
@@ -1417,42 +1420,82 @@ var appRouter = function(app) {
 	    
 	    console.log("APP-GET-IMAGE: Requesting an image...");
 	    
-	    upload-images.get(request.path.id, function(err,res){
+	    uploadImages.get(request.params.id, function(err,res){
 	        if(!err){
-                console.log("APP-GET-IMAGE: ", res);
+                console.log("APP-GET-IMAGE: Obtained image.");
                 
-                response.writeHead(200, {"Content-Type": "text/html"});
-                response.write("Image saved (" + res + ")");
+                response.writeHead(200, {"Content-Type": res.contentType});
+                response.write(res.data);
                 
             } else {
-                console.log("APP-GET-IMAGE: Error while saving the image.");
+                if(res == "NO DATA"){
+                    console.log("APP-GET-IMAGE: Not found data.");
+                    
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Not found.");
+                } else {
+                    console.log("APP-GET-IMAGE: Error while saving the image.");
+                    
+                    response.writeHead(500, {"Content-Type": "text/html"});
+                    response.write("Error.");
+                }
                 
-                response.writeHead(500, {"Content-Type": "text/html"});
-                response.write("Error.");
             }
+	        response.end();
 	    });
-
 	});
-	
-	app.post("/images", function(request, response) {
-	    
-	    console.log("APP-POST-IMAGE: Posted image is: " + request.files.image);
-	    
-        upload-images.post(request.files.image, function (err, res){
-            if(!err){
-                console.log("APP-POST-IMAGE: Image saved.");
-                
-                response.writeHead(200, {"Content-Type": "text/html"});
-                response.write("Image saved (" + res + ")");
-                
+////TODO quitar!!!!!
+    app.get("/prueba", function (request, response) {
+
+        fs.readFile('html/start.html', function (error, data) {
+            
+            if (error) {
+                console.log("ERROR: can not read the file.")
+                response.writeHead(500, {"Content-Type": "text/html"});
+                response.write("Error");
             } else {
-                console.log("APP-POST-IMAGE: Error while saving the image.");
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write(data);
+            }
+            response.end();
+        });
+    });
+    ///////////////
+	
+    app.post("/images", function(request, response) {
+
+        var form = new formidable.IncomingForm();
+        form.parse(request, function(error, fields, image) {
+            if (!error) {
+                console.log("APP-POST-IMAGE: Received image.");
+
+                //TODO upload es el nombre del campo en el formulario!!!!
+                uploadImages.post(image.upload, function (err, res){
+                    if(!err){
+                        console.log("APP-POST-IMAGE: Image saved.");
+
+                        response.writeHead(200, {"Content-Type": "text/html"});
+                        response.write("Image saved (" + res + ").");
+
+                    } else {
+                        console.log("APP-POST-IMAGE: Error while saving the image.");
+
+                        response.writeHead(500, {"Content-Type": "text/html"});
+                        response.write("Error.");
+                    }
+                    response.end();
+                });
+            } else {
+                console.log("APP-POST-IMAGE: Parse error" );
                 
                 response.writeHead(500, {"Content-Type": "text/html"});
                 response.write("Error.");
+                response.end();
             }
         });
-	});
+
+
+    });
 };
 
 module.exports = appRouter;
