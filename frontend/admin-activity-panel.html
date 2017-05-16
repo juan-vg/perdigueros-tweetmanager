@@ -18,6 +18,18 @@
     <link href="css/common-styles.css" rel="stylesheet">
     <!-- Font Awesome library -->
     <link rel="stylesheet" href="css/font-awesome.min.css">
+            <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <!-- Bootstrap js library required -->
+        <script src="js/bootstrap.min.js"></script>
+        <!-- Angular js library required -->
+        <script src="js/angular.min.js"></script>
+        <script src="js/Chart.bundle.min.js"></script>
+        <script src="https://www.google.com/jsapi"></script>
+        <script src="js/chartkick.js"></script>
+        <script src="js/angular-chart.min.js"></script>
+        <script src="js/angular_data.js"></script>
+        
 </head>
 <body>
 
@@ -39,14 +51,16 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right">
-            	       <!-- Back link -->
-            	       <li><a href="admin-main-panel.html"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Control</a></li>
+                        <!-- Accounts link -->
+                        <li><a href="admin-accounts-panel.html"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Cuentas de Twitter</a></li>
+            	       <!-- Users link -->
+            	       <li><a href="admin-main-panel.html"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Usuarios</a></li>
                             <!-- Right list with logout button-->
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                                 aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                    <li><a href="#">Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                                    <li><a href="admin-login-panel.html">Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
                             </ul>
                         </li>
                     </ul>
@@ -63,10 +77,20 @@
   				          <li  class="active"><a href="admin-activity-panel.html">Actividad</a></li>
 			         </ul>
                 </div>
+                <div class="col-xs-12" ng-app="StadisticsData" ng-controller="StadisticsController">
+
+                    <h2 align="center">Tweets por zona</h2>
+                    <div id="map" style="height: 400px;"></div>
+                    <h2 align="center">Tweets por dia</h2>
+                    <canvas id="tweetsday" class="chart chart-bar"
+                        chart-data="data" chart-labels="labels" chart-options="options" chart-dataset-override="dataset" chart-colors="colors">
+                    </canvas>
+                    <h2 align="center">Top Tweets por Usuario</h2>
+                    <canvas id="tweetsuser" class="chart chart-bar"
+                        chart-data="data2" chart-labels="labels2" chart-options="options2" >
+                    </canvas>
+                </div>
             </div>
-        </div>
-        <div class="col-xs-4">
-        <canvas id="myChart" class='img-responsive'></canvas>
         </div>
         <!-- Footer -->
         <footer class="footer">
@@ -74,49 +98,5 @@
             <p class="text-center">@Copyright PTM</p>
         </div>
         </footer>
-        <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-        <!-- Bootstrap js library required -->
-        <script src="js/bootstrap.min.js"></script>
-        <script src="js/Chart.min.js"></script>
-        <script>
-var ctx = document.getElementById("myChart");
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-        datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
-</script>
     </body>
 </html>
