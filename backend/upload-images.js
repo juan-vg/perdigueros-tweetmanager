@@ -16,7 +16,7 @@ exports.get = function (imageId, callback){
                 // Search the image on the server
                 try {
                     error = false;
-                    data =  fs.readFileSync("img/" + imageId + ".png");
+                    data =  fs.readFileSync(res[0].route);
 
                 } catch(fileErr) {
                     console.log("UPLOAD-IMAGES-GET: This image is not on the server.");
