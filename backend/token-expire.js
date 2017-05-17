@@ -10,7 +10,7 @@ exports.update = function(token){
 			//ignore
 		}
 	});
-}
+};
 
 function updateToken(token, callback){
     
@@ -42,7 +42,7 @@ function updateToken(token, callback){
             callback(error, data);
         }
     });
-};
+}
 
 function verifyToken(token, callback){
     
