@@ -10,6 +10,7 @@ var userAccounts = require('./user-accounts.js');
 var uploadImages = require('./upload-images.js');
 var formidable = require('formidable');
 var login = require('./login.js');
+var adminStats = require('./admin-stats.js');
 
 var appRouter = function(app) {
 	
@@ -1742,7 +1743,22 @@ var appRouter = function(app) {
 	
 	app.get("/stats/app", function(request, response) {
 
-
+	    console.log("APP-GET-ADMIN-STATS: Request stats.");
+	    var accountID = { "token" : request.headers.token };
+	    
+	    adminStats.get(accountID, function(err, res){
+	        if(!err){
+	            console.log("APP-GET-ADMIN-STATS: OK");
+	            
+	            response.writeHead(200, {"Content-Type": "application/json"});
+	            response.write(JSON.stringify(res));
+	        } else {
+	            console.log("APP-GET-ADMIN-STATS: Forbidden!!!");
+	            
+	            response.writeHead(403, {"Content-Type": "text/html"});
+                response.write("Forbidden");
+	        }
+	    });
 	});
 	
 	//ACORTAR URL
