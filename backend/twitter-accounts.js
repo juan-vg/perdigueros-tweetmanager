@@ -87,7 +87,7 @@ exports.getAccount = function(idAccount, userToken, callback){
                 if(success){
                     
                     // Find twitter account
-                    twiAccModel.find({"_id": new ObjectID(idAccount), "activated": true}, function(err, res){
+                    twiAccModel.find({"_id": new objectID(idAccount), "activated": true}, function(err, res){
                         //console.log("TWITTER-ACCOUNTS-GET-ID: Checking database...");
 
                         if(!err){
