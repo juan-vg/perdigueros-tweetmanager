@@ -7,6 +7,8 @@ var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
 var followedUsers = require('./followed-users.js');
 var userAccounts = require('./user-accounts.js');
+var uploadImages = require('./upload-images.js');
+var formidable = require('formidable');
 var login = require('./login.js');
 
 var appRouter = function(app) {
@@ -20,6 +22,7 @@ var appRouter = function(app) {
 	 * - name: "Hashtags"
 	 * - name: "Followed"
 	 * - name: "URL shortener"
+   * - name: "Images"
 	 * 
 	 * definitions:
 	 *   Twitter-accounts:
@@ -1825,16 +1828,103 @@ var appRouter = function(app) {
 		);
 	});
 	
-	//SUBIR IMAGEN
+	//IMAGENES
+	 /**
+     * @swagger
+     * /images/{id}:
+     *   get:
+     *     tags:
+     *       - Images
+     *     description: Request an image associated with the provided {id}
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The image name
+     *         type: string
+     *     produces:
+     *       - image/png
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The image associated with the provided {id}
+     *       404:
+     *         description: Unable to find the requested {id}
+     *       500:
+     *         description: Error getting the image
+     */
 	app.get("/images/:id", function(request, response) {
-
-
+	    
+	    console.log("APP-GET-IMAGE: Requesting an image...");
+	    
+	    uploadImages.get(request.params.id, function(err,res){
+	        if(!err){
+                console.log("APP-GET-IMAGE: Obtained image.");
+                
+                response.writeHead(200, {"Content-Type": "image/png"});
+                response.write(res);
+                
+            } else {
+                if (res == "NOT FOUND"){
+                    console.log("APP-GET-IMAGE: Not found data.");
+                    
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Not found.");
+                } else {
+                    console.log("APP-GET-IMAGE: Error while saving the image.");
+                    
+                    response.writeHead(500, {"Content-Type": "text/html"});
+                    response.write("Error.");
+                }
+            }
+	        response.end();
+	    });
 	});
 	
-	app.post("/images", function(request, response) {
+    /**
+     * @swagger
+     * /images:
+     *   post:
+     *     tags:
+     *       - Images
+     *     description: Store an image 
+     *     parameters:
+     *       - name: image
+     *         in: formData
+     *         required: true
+     *         description: The image file
+     *         type: file
+     *     produces:
+     *       - text/html
+     *     responses:
+     *       201:
+     *         description: Image saved on the server
+     *       500:
+     *         description: Error saving the image
+     */
+    app.post("/images", function(request, response) {
 
+        var form = new formidable.IncomingForm().parse(request).on('file', function (name, image){
 
-	});
+              console.log("APP-POST-IMAGE: Received image.");
+
+              uploadImages.post(image, function (err, res){
+                  if(!err){
+                      console.log("APP-POST-IMAGE: Image saved.");
+
+                      response.writeHead(201, {"Content-Type": "text/html"});
+                      response.write("Image saved (" + res + ").");
+
+                  } else {
+                      console.log("APP-POST-IMAGE: Error while saving the image.");
+
+                      response.writeHead(500, {"Content-Type": "text/html"});
+                      response.write("Error.");
+                  }
+                  response.end();
+              });
+            });
+    });
 };
 
 module.exports = appRouter;
