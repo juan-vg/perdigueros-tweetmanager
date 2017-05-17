@@ -31,7 +31,7 @@ exports.localSignin = function (accountID, callback) {
                     
                     // update lastDate, token & tokenExpire
                     userAccModel.update({"_id" : new objectID(dbData[0]._id)},
-                        {$set : {"lastDate": lastDate, "token": token, "tokenExpire": tokenExpire}},
+                        {$set : {"lastAccess": lastDate, "token": token, "tokenExpire": tokenExpire}},
                         
                         function(err, res){
                             if(!err){
@@ -89,6 +89,7 @@ exports.signup = function (accountData, callback) {
                 dbUsers.surname = accountData.surname;
                 dbUsers.email = accountData.email;
                 dbUsers.registrationDate = new Date();
+                dbUsers.lastAccess = null;
                 dbUsers.validated = false;
                 dbUsers.validateHash = crypto.randomBytes(20).toString('hex');
                 dbUsers.firstLogin = true;
@@ -213,6 +214,10 @@ exports.resendEmail = function (accountID, callback) {
                             console.log("LOGIN-RESEND-EMAIL: ERROR sending email to " + dbData[0].email);
                         }
                     });
+                    
+                    error = false;
+                    data = null;
+                    callback(error, data);
                     
                 } else {
                     error = true;
