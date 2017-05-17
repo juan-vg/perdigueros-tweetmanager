@@ -11,7 +11,7 @@ exports.localSignin = function (accountID, callback) {
     var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
     
     // validate password and get user data (avoiding retrieval of password)
-    userAccModel.find({"email": accountID.email, "password": passwd, "activated": true}, {"password":0},
+    userAccModel.find({"email": accountID.email, "password": passwd, "activated": true, "loginType": "local"}, {"password":0},
     
         function(err, dbData){
             if(!err){
