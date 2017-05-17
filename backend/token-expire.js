@@ -42,7 +42,7 @@ function updateToken(token, callback){
             callback(error, data);
         }
     });
-}
+};
 
 function verifyToken(token, callback){
     
