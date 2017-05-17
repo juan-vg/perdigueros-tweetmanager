@@ -16,7 +16,7 @@ exports.getAll = function (accountID, callback){
         if(success){
             
             // get all users (avoiding retrieval of password)
-            userAccModel.find({"activated": true}, {"password":0},
+            userAccModel.find({"activated": true}, {"password":0, "token":0},
             
                 function(err, dbData){
                     
@@ -63,7 +63,7 @@ exports.get = function (accountID, callback){
                 if(success){
                     
                     // get the specified user (avoiding retrieval of password)
-                    userAccModel.find({'_id' : new objectID(accountID.userAccountId)}, {"password":0},
+                    userAccModel.find({'_id' : new objectID(accountID.userAccountId)}, {"password":0, "token":0},
                     
                         function(err, dbData){
                             
@@ -148,10 +148,10 @@ exports.put = function (accountID, passwordSet, callback){
                                         function(err, res){
                                             if(!err){
                                                 error = false;
-                                                result = null;
+                                                data = null;
                                             } else {
                                                 error = true;
-                                                result = "DB ERROR";
+                                                data = "DB ERROR";
                                             }
                                             callback(error, data);
                                         }
@@ -236,10 +236,10 @@ exports.delete = function (accountID, callback){
                                         function(err, res){
                                             if(!err){
                                                 error = false;
-                                                result = null;
+                                                data = null;
                                             } else {
                                                 error = true;
-                                                result = "DB ERROR";
+                                                data = "DB ERROR";
                                             }
                                             callback(error, data);
                                         }
