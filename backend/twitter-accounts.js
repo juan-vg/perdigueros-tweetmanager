@@ -2,6 +2,7 @@ var userModel = require("./models/user-accounts");
 var twiAccModel = require("./models/twitter-accounts");
 var accVerificator = require("./account-verifications");
 var dbVerificator = require("./db-verifications");
+var TwitterPackage = require('twitter');
 var objectID = require('mongodb').ObjectID;
 
 
@@ -140,7 +141,7 @@ exports.getAccount = function(idAccount, userToken, callback){
 //Create new account
 exports.postAccount = function(userToken, newAccount, callback){
     var error, result;  
-    console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account: ", newAccount.description);
+    console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account. Description='", newAccount.description,"'");
 
     accVerificator.getUserEmail(userToken, function(err, data){
         if(!err) {
@@ -157,30 +158,49 @@ exports.postAccount = function(userToken, newAccount, callback){
 
                     } else {
                         console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Account does not exist. Adding...");
+                        
+                        // create auth set
+                        var secret = {
+                            consumer_key: newAccount.information.consumerKey,
+                            consumer_secret: newAccount.information.consumerSecret,
+                            access_token_key: newAccount.information.accessToken,
+                            access_token_secret: newAccount.information.accessTokenSecret
+                        }
+                        var Twitter = new TwitterPackage(secret);
+                        
+                        // get twitter user name
+                        Twitter.get('account/settings', function(err, body){
+                            if(!err){
+                                
+                                // Add the account to the collection
+                                var dbTwitterAccounts = new twiAccModel();
+                                dbTwitterAccounts.information = newAccount.information;
+                                dbTwitterAccounts.description = newAccount.description;
+                                dbTwitterAccounts.email = data;
+                                dbTwitterAccounts.name = body.screen_name;
+                                dbTwitterAccounts.activated = true;
 
-                        // Add the account to the collection
-                        var dbTwitterAccounts = new twiAccModel();
-                        dbTwitterAccounts.information = newAccount.information;
-                        dbTwitterAccounts.description = newAccount.description;
-                        dbTwitterAccounts.email = data;
-                        dbTwitterAccounts.activated = true;
+                                // Insert new data into DB
+                                dbTwitterAccounts.save(function(err, res){
+                                    if (!err) {
+                                        console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: New account saved ID: ", res._id);
+                                        error = false;
+                                        result = res._id;
 
-                        // Insert new data into DB
-                        dbTwitterAccounts.save(function(err, res){
-                            console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: New account saved: ", res._id);
+                                    } else {
+                                        console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Error while saving account.");
+                                        error = true;
+                                        result = "DB ERROR";
 
-                            if (!err) {
-                                console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Last inserted account ID: ", res._id);
-                                error = false;
-                                result = res._id;
-
+                                    }
+                                    callback(error, result);
+                                });
+                                
                             } else {
-                                console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Error while saving account.");
-                                error = true;
-                                result = "DB ERROR";
-
-                            }
-                            callback(error, result);
+								error = true;
+								result = "TWITTER ERROR";
+								callback(error, result);
+							}
                         });
                     }
                 } else {
@@ -193,6 +213,10 @@ exports.postAccount = function(userToken, newAccount, callback){
             });
         } else {
             if(data == "NOT FOUND"){
+                console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: User can not be verified");
+                error = true;
+                result = "FORBIDDEN";
+            } else if(data == "TOKEN EXPIRED"){
                 console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: User can not be verified");
                 error = true;
                 result = "FORBIDDEN";

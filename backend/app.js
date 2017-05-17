@@ -670,6 +670,8 @@ var appRouter = function(app) {
 	 *         description: The account already exists.
 	 *       500:
 	 *         description: Error inserting the twitter account into the database
+	 *       503:
+	 *         description: Twitter service unavailable
 	 */
 	app.post("/twitter-accounts", function(request, response) {
 		console.log("APP-POST-ACCOUNT");
@@ -691,11 +693,19 @@ var appRouter = function(app) {
 					
 					response.writeHead(500, {"Content-Type": "text/html"});
 					response.write("Error while performing query");
+					
 				} else if (data == "FORBIDDEN") {
 					console.log("APP-POST-ACCOUNT: Forbidden");
 					
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-ACCOUNT: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
 				} else {
 					console.log("APP-POST-ACCOUNT: Already exists");
 					
@@ -779,25 +789,37 @@ var appRouter = function(app) {
 	});
 	
 	//publicar tweet
-	app.post("/tweets/publish", function(request, response) {
+	app.post("/twitter-accounts/:id/tweets/publish", function(request, response) {
 
 
 	});
 	
 	//programar tweet
-	app.post("/tweets/schedule", function(request, response) {
+	app.post("/twitter-accounts/:id/tweets/schedule", function(request, response) {
+
+
+	});
+	
+	//tweeter home (timeline)
+	app.get("/twitter-accounts/:id/tweets/home", function(request, response) {
+
+
+	});
+	
+	//mentions
+	app.get("/twitter-accounts/:id/tweets/mentions", function(request, response) {
 
 
 	});
 	
 	//tweets retuiteados
-	app.get("/tweets/retweeted", function(request, response) {
+	app.get("/twitter-accounts/:id/tweets/retweeted", function(request, response) {
 
 
 	});
 	
 	//tweets marcados favoritos
-	app.get("/tweets/favourited", function(request, response) {
+	app.get("/twitter-accounts/:id/tweets/favourited", function(request, response) {
 
 
 	});

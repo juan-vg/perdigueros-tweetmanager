@@ -6,6 +6,7 @@ var mongoSchema =  mongoose.Schema;
 //create schema
 var twitterAccountsSchema  = new mongoSchema({
     "email" : String,
+    "name" : String,
     "information" : {
         "consumerKey" : String,
         "consumerSecret" : String,
