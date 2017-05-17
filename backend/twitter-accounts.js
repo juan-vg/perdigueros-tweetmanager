@@ -197,10 +197,10 @@ exports.postAccount = function(userToken, newAccount, callback){
                                 });
                                 
                             } else {
-								error = true;
-								result = "TWITTER ERROR";
-								callback(error, result);
-							}
+                                error = true;
+                                result = "TWITTER ERROR";
+                                callback(error, result);
+                            }
                         });
                     }
                 } else {
