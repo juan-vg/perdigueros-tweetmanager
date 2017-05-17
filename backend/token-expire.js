@@ -1,4 +1,4 @@
-var usersModel = require("./models/user-accounts");
+var userAccModel = require("./models/user-accounts");
 
 exports.update = function(token, callback){
 	
@@ -9,7 +9,7 @@ exports.update = function(token, callback){
 			var tokenExpire = new Date();
             tokenExpire.setMinutes(tokenExpire.getMinutes() + 10);
 			
-			userAccModel.update({"token" : token,
+			userAccModel.update({"token" : token},
 				{$set : {"tokenExpire": tokenExpire}},
 				
 				function(err, res){
@@ -36,16 +36,16 @@ function verifyToken(token, callback){
 	
 	var error, data;
 	
-	usersModel.find({"token": token}, function(err, dbData){
+	userAccModel.find({"token": token}, function(err, dbData){
 		
 		if(!err && dbData.length > 0){
 			
 			var currDate = new Date();
 			var expireDate = new Date(dbData[0].tokenExpire);
-			var dif = parseInt((date-date2)/1000)/60;
+			var dif = parseInt((currDate-expireDate)/1000)/60;
 			
-			// check if token has expired (10 mins)
-			if(dif <= 10){
+			// check if token has expired
+			if(dif < 0){
 				error = false;
                 data = null;				
 			} else {

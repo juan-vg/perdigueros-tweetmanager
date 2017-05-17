@@ -196,6 +196,10 @@ function checkTokenForUserAccount(accountID, callback){
 
 // Retrieves the user data associated to the supplied token
 function getUser(token, callback){
+	
+	// updates token expiration date (async)
+	tokenExpire.update(token, function(err, data){});
+    
     
     var error, data;
     
