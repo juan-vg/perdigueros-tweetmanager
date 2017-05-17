@@ -7,7 +7,6 @@ var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
 var followedUsers = require('./followed-users.js');
 var userAccounts = require('./user-accounts.js');
-//TODO
 var uploadImages = require('./upload-images.js');
 var formidable = require('formidable');
 
