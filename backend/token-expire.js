@@ -1,6 +1,18 @@
 var userAccModel = require("./models/user-accounts");
 
-exports.update = function(token, callback){
+
+exports.update = function(token){
+    
+    updateToken(token, function(err, data){
+		if(!err){
+			//ignore
+		} else {
+			//ignore
+		}
+	});
+}
+
+function updateToken(token, callback){
     
     verifyToken(token, function(err, verifData){
         
@@ -30,7 +42,7 @@ exports.update = function(token, callback){
             callback(error, data);
         }
     });
-};
+}
 
 function verifyToken(token, callback){
     
@@ -63,5 +75,5 @@ function verifyToken(token, callback){
         
         callback(error, data);
     });
-};
+}
 module.exports.verifyToken = verifyToken;

@@ -198,7 +198,7 @@ function checkTokenForUserAccount(accountID, callback){
 function getUser(token, callback){
     
     // updates token expiration date (async)
-    tokenExpire.update(token, function(err, data){});
+    tokenExpire.update(token);
     
     
     var error, data;
