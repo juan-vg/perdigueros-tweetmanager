@@ -107,7 +107,7 @@ function checkTokenForTwitterAccount(accountID, callback){
                         if(data == dbData[0].email){
                             console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " owns TwitterAccount: " + accountID.twitterAccountId);
                             success = true;
-                            reason = null;
+                            reason = dbData[0].information;
                         } else {
                             console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
                             success = false;
