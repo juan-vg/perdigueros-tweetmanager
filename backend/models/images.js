@@ -4,8 +4,7 @@ var mongoSchema = mongoose.Schema;
 
 var imageSchema = new mongoSchema({
     "hash" : String,
-    "data" : Buffer,
-    "contentType" : String
+    "route" : String
 });
 
 var dbImages = mongoose.model('images',imageSchema);

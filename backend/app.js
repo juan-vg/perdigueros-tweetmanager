@@ -1416,6 +1416,30 @@ var appRouter = function(app) {
 	});
 	
 	//IMAGENES
+	 /**
+     * @swagger
+     * /images/{id}:
+     *   get:
+     *     tags:
+     *       - GET image
+     *     description: Request an image associated with the provided {id}
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The image name
+     *         type: string
+     *     produces:
+     *       - image/png
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The image associated with the provided {id}
+     *       404:
+     *         description: Unable to find the requested {id}
+     *       500:
+     *         description: Error getting the image
+     */
 	app.get("/images/:id", function(request, response) {
 	    
 	    console.log("APP-GET-IMAGE: Requesting an image...");
@@ -1424,8 +1448,8 @@ var appRouter = function(app) {
 	        if(!err){
                 console.log("APP-GET-IMAGE: Obtained image.");
                 
-                response.writeHead(200, {"Content-Type": res.contentType});
-                response.write(res.data);
+                response.writeHead(200, {"Content-Type": "image/png"});
+                response.write(res);
                 
             } else {
                 if (res == "NOT FOUND"){
@@ -1443,55 +1467,50 @@ var appRouter = function(app) {
 	        response.end();
 	    });
 	});
-////TODO quitar esto y carpeta html!!!!!
-    app.get("/prueba", function (request, response) {
-
-        fs.readFile('html/start.html', function (error, data) {
-            
-            if (error) {
-                console.log("ERROR: can not read the file.")
-                response.writeHead(500, {"Content-Type": "text/html"});
-                response.write("Error");
-            } else {
-                response.writeHead(200, {"Content-Type": "text/html"});
-                response.write(data);
-            }
-            response.end();
-        });
-    });
-    ///////////////
 	
+    /**
+     * @swagger
+     * /images:
+     *   post:
+     *     tags:
+     *       - POST image
+     *     description: Store an image 
+     *     parameters:
+     *       - name: image
+     *         in: formData
+     *         required: true
+     *         description: The image file
+     *         type: file
+     *     produces:
+     *       - text/html
+     *     responses:
+     *       201:
+     *         description: Image saved on the server
+     *       500:
+     *         description: Error saving the image
+     */
     app.post("/images", function(request, response) {
 
-        var form = new formidable.IncomingForm();
-        form.parse(request, function(error, fields, image) {
-            if (!error) {
-                console.log("APP-POST-IMAGE: Received image.");
+        var form = new formidable.IncomingForm().parse(request).on('file', function (name, image){
 
-                //TODO upload es el nombre del campo en el formulario!!!!
-                uploadImages.post(image.upload, function (err, res){
-                    if(!err){
-                        console.log("APP-POST-IMAGE: Image saved.");
+              console.log("APP-POST-IMAGE: Received image.");
 
-                        response.writeHead(200, {"Content-Type": "text/html"});
-                        response.write("Image saved (" + res + ").");
+              uploadImages.post(image, function (err, res){
+                  if(!err){
+                      console.log("APP-POST-IMAGE: Image saved.");
 
-                    } else {
-                        console.log("APP-POST-IMAGE: Error while saving the image.");
+                      response.writeHead(201, {"Content-Type": "text/html"});
+                      response.write("Image saved (" + res + ").");
 
-                        response.writeHead(500, {"Content-Type": "text/html"});
-                        response.write("Error.");
-                    }
-                    response.end();
-                });
-            } else {
-                console.log("APP-POST-IMAGE: Parse form error" );
-                
-                response.writeHead(500, {"Content-Type": "text/html"});
-                response.write("Error.");
-                response.end();
-            }
-        });
+                  } else {
+                      console.log("APP-POST-IMAGE: Error while saving the image.");
+
+                      response.writeHead(500, {"Content-Type": "text/html"});
+                      response.write("Error.");
+                  }
+                  response.end();
+              });
+            });
     });
 };
 
