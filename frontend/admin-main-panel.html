@@ -48,7 +48,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="admin-login-panel.html">Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                        <li><a href="admin-login-panel.html">Salir&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
                     </ul>
                 </li>
             </ul>
@@ -63,21 +63,22 @@
     <div class="row">
         <!-- List with users -->
         <div class="col-xs-12"  ng-app="UsersData" ng-controller="UserController">
+		{{token}}
 			<table class="table table-bordered">
 				<thead>
 					<tr>
 						<th class="text-center">Usuario</th>
 						<th class="text-center">Ultima Entrada</th>
 						<th class="text-center">Fecha de Registro</th>
-                        <th class="text-center col-md-1"">¿Eliminar?</th>
+                        <th class="text-center col-md-1">¿Eliminar?</th>
 					</tr>
 				</thead>
 				<tbody ng-repeat="i in users">
 					<tr>
-						<td class="text-center">{{i.name}}</td>
+						<td class="text-center">{{i.email}}</td>
 						<td class="text-center">{{i.last}}</td>
-						<td class="text-center">{{i.first}}</td>
-                        <td><button class="btn btn-danger center-block" ng-click="removeUser(users[i])"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
+						<td class="text-center">{{i.registrationDate}}</td>
+                        <td><button class="btn btn-danger center-block" ng-click="removeUser(i)"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
 					</tr>
 				</tbody>
 			</table>
@@ -100,5 +101,7 @@
     <script src="js/angular.min.js"></script>
     <!-- Angular js Functions -->
     <script src="js/angular_data.js"></script>
+	<!-- NgStorage library -->
+	<script src="js/ngStorage.min.js"></script>
 </body>
 </html>

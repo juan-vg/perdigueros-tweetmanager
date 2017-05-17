@@ -1,62 +1,94 @@
 // Password Data and Check 
-angular.module('PwdCheck', []).controller('PasswordController', function ($scope,$window) {
+angular.module('PwdCheck', ['ngStorage']).controller('PasswordController', function ($scope,$http,$window,$location,$localStorage) {
     $scope.pwdError =false;
     $scope.checkPwd =function() {
-      if ($scope.password !== "12345678") {
-        $scope.pwdError =true;
-      }
-      else {
-        var dir = window.location.pathname;
-        $window.location.href = dir.substring(0,dir.lastIndexOf('/'))+'/admin-main-panel.html';
-      }
+		var data = {
+			'email': 'admin@admin.com',
+			'passwd': $scope.password
+			};
+		$http.post('http://zaratech-ptm.ddns.net:8888/login/signin',data).then(successCallback, errorCallback);
+      	function successCallback(response){
+			var dir = window.location.pathname;
+			$localStorage.token = response.data.token;
+			$window.location.href = dir.substring(0,dir.lastIndexOf('/'))+'/admin-main-panel.html';
+		}
+		function errorCallback(error){
+			$scope.pwdError = true;
+			console.log("Error authentication");
+		}
     };
   });
 
 // List of Users Data
-var UsersData=angular.module('UsersData', []);
-UsersData.controller('UserController', function($scope) {
-	$scope.users =[
-  					{
-    					"name" : "alex",
-    					"last" : "29/08/2016",
-    					"first" : "29/04/2016"
-  					},
-    				{
-    					"name" : "albert",
-    					"last" : "29/08/2016",
-    					"first" : "29/04/2016"
-  					},
-  					{
-    					"name" : "andrea",
-    					"last" : "29/08/2016",
-    					"first" : "29/04/2016"
-  					},
-				];
-  // RemoveUser from the list
-	$scope.removeUser =function(name) {
-		var index = -1;		
-		var comArr = eval( $scope.users );
-		for( var i = 0; i < comArr.length; i++ ) {
-			if( comArr[i].name === name ) {
-				index = i;
-				break;
+var UsersData=angular.module('UsersData', ['ngStorage']);
+UsersData.controller('UserController', function($scope,$http,$localStorage) {
+	$http.get('http://zaratech-ptm.ddns.net:8888/users',{headers: {'token': $localStorage.token}}).then(successCallback, errorCallback);
+	function successCallback(response){
+		//Get response data
+		var users=response.data;
+		// Return a format date for the user
+		function formatDate(date) {
+			var monthNames = [
+				"Enero", "Febrero", "Marzo",
+				"Abril", "Mayo", "Junio", "Julio",
+				"Agosto", "Septiembre", "Octubre",
+				"Noviembre", "Diciembre"
+			];
+			var day = date.getDate();
+			var monthIndex = date.getMonth();
+			var year = date.getFullYear();
+			var hour = date.getHours();
+			var minutes = date.getMinutes();
+			return day + '-' + monthNames[monthIndex] + '-' + year + '  ' + hour + ':' + minutes;
+		}
+		var usersArr = eval( users );
+		var data = [];
+		for ( var i = 0; i < usersArr.length; i++ ) {
+			var user= {
+				"_id": usersArr[i]._id,
+				"email": usersArr[i].email,
+				"registrationDate" : formatDate(new Date(usersArr[i].registrationDate))
+			};
+			data.push(user);
+		}
+		// Bind User data
+		$scope.users=data;
+		
+		// RemoveUser from the list
+		$scope.removeUser =function(user) {
+			$http.delete('http://zaratech-ptm.ddns.net:8888/users/'+user._id,{headers: {'token': $localStorage.token}}).then(successCallback, errorCallback);
+			function successCallback(response){
+				var index = -1;		
+				var usersArr = eval( $scope.users );
+				for( var i = 0; i < usersArr.length; i++ ) {
+					if( usersArr[i]._id === user._id ) {
+						index = i;
+						break;
+					}
+				}
+				$scope.users.splice( index, 1 );
+			}
+			function errorCallback(error){
+				$scope.pwdError = true;
+				console.log("Error Removing Account");
 			}
 		}
-		$scope.users.splice( index, 1 );
-	};
-
+	}
+	function errorCallback(error){
+		console.log("Error getting Users list");
+	}
 });
 
 // User Iputs and Outputs from the Application Data
 UsersData.controller('UserDoorController', function($scope) {
 	$scope.users =[
   					{
-    					"name" : "alex",
+    					"email" : "alex",
     					"type" : "Salida",
     					"date" : "05/01/1998 01:00"
   					},
     				{
-    					"name" : "albert",
+    					"email" : "albert",
     					"type" : "Nuevo",
     					"date" : "15/07/1999 15:00"
   					},
@@ -68,42 +100,71 @@ UsersData.controller('UserDoorController', function($scope) {
 UsersData.controller('UserLastController', function($scope) {
 	$scope.users =[
   					{
-    					"name" : "alex",
+    					"email" : "alex",
     					"date" : "05/01/1998 01:00"
   					},
     				{
-    					"name" : "albert",
+    					"email" : "albert",
     					"date" : "15/07/1999 15:00"
   					},
 				];
 });
 
 // Accounts and Hastags Data Binding
-var ListAccounts=angular.module('ListAccounts', []);
-ListAccounts.controller('AccountController', function($scope) {
-  $scope.accounts =[
-            {
-              "account" : "@alex",
-              "user_account" : "alex",
-              "hashtags" : ["#sports"]
-            },
-            {
-              "account" : "@albert",
-              "user_account" : "albert",
-              "hashtags" : ["#music","#sports","#videogames"]
-            },
-        ];
-
-  $scope.showHashtags =function(account) {
-    $scope.user_select=account.account;
-    var index = -1;   
-    var comArr = eval( account.hashtags );
-    var result='';
-    for( var i = 0; i < comArr.length; i++ ) {
-      result=result+comArr[i]+'\n';
-    }
-    $scope.hashtags_select=result;
-  };
+var ListAccounts=angular.module('ListAccounts', ['ngStorage']);
+ListAccounts.controller('AccountController', function($scope,$http,$localStorage) {
+	// Get accounts data 
+	$http.get('http://zaratech-ptm.ddns.net:8888/twitter-accounts',{headers: {'usertoken': $localStorage.token}}).then(successCallback, errorCallback);
+	
+	//Data Get Successfull
+	function successCallback(response){
+		$scope.accounts = response.data;
+		// Show information of an account
+		$scope.showInfo =function(account) {
+			$scope.user_select=account.email;
+			$scope.account_select=account.name;
+			$scope.account_description=account.description;
+			// Get Hashtag Data from the account
+			$http.get('http://zaratech-ptm.ddns.net:8888/twitter-accounts/'+account._id+'/hashtags',{headers: {'token': $localStorage.token}}).then(successCallbackHastags, errorCallbackHastags);
+			function successCallbackHastags(hashtags){
+				var index = -1;
+				var comArr = eval( hashtags.data );
+				var result='';
+				// Format Hashtag list for the user
+				for( var i = 0; i < comArr.length; i++ ) {
+					result=result+"#"+comArr[i].hashtag+'\n';
+				}
+				$scope.hashtags_select=result;
+			}
+			function errorCallbackHastags(error){
+				console.log("Error getting hashtags");
+			}
+		};
+		
+		// RemoveUser from the list
+		$scope.removeAccount =function(account) {
+			$http.delete('http://zaratech-ptm.ddns.net:8888/twitter-accounts/'+account._id,{headers: {'usertoken': $localStorage.token}}).then(successCallback, errorCallback);
+			function successCallback(response){
+				var index = -1;		
+				var accArr = eval( $scope.accounts );
+				for( var i = 0; i < accArr.length; i++ ) {
+					if( accArr[i]._id === account._id ) {
+						index = i;
+						break;
+					}
+				}
+				$scope.accounts.splice( index, 1 );
+			}
+			function errorCallback(error){
+				$scope.pwdError = true;
+				console.log("Error Removing Account");
+			}
+		};
+	}
+	function errorCallback(error){
+		$scope.pwdError = true;
+		console.log("Error getting user accounts");
+	}
 });
 
 // Stadistics Data Binding
