@@ -332,7 +332,6 @@ exports.homeTimeline = function (accountID, callback){
 	});
 };
 
-/*
 // returns the scheduled tweets
 exports.scheduled = function (accountID, callback){
 
@@ -347,45 +346,38 @@ exports.scheduled = function (accountID, callback){
                 
                 if(success){
 					
-					// create auth set
-					var secret = {
-						consumer_key: data.consumerKey,
-						consumer_secret: data.consumerSecret,
-						access_token_key: data.accessToken,
-						access_token_secret: data.accessTokenSecret
-					}
-					var Twitter = new TwitterPackage(secret);
-					
-					Twitter.get('statuses/update', function(err, body){
-						
-						if(!err){
-							error = false
-							data= null;
-						} else {
-							console.log("TWEETS-PUBLISH: Twitter error");
+					schedTweetsModel.find({"twitterAccountId": accountID.twitterAccountId, "published": false}, 
+						function(err, dbData){
 							
-							error = true;
-							data = "TWITTER ERROR";
+							if(!err){
+								error = false;
+								data = dbData;
+							} else {
+								console.log("TWEETS-SCHEDULED: DB ERROR!!!" );
+
+								error = true;
+								data = "DB ERROR";
+							}
+							
+							callback(error, data);
 						}
-						
-						callback(error, data);
-					});
+					);
 					
 				} else {
 					if(reason == "ACCOUNT NOT FOUND"){
-                        console.log("TWEETS-SCHEDULE: Twitter account NOT FOUND");
+                        console.log("TWEETS-SCHEDULED: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
                     } else if(reason == "DB ERROR") {
-                        console.log("TWEETS-SCHEDULE: DB ERROR!!!" );
+                        console.log("TWEETS-SCHEDULED: DB ERROR!!!" );
 
                         error = true;
                         data = "DB ERROR";
                         
                     } else {
-                        console.log("TWEETS-SCHEDULE: User does not own that account");
+                        console.log("TWEETS-SCHEDULED: User does not own that account");
 
                         error = true;
                         data = "FORBIDDEN" ;
@@ -397,7 +389,7 @@ exports.scheduled = function (accountID, callback){
 			});
 			
 		} else {
-			console.log("HASHTAGS-GET-ALL: Account ID is not valid");
+			console.log("TWEETS-SCHEDULED: Account ID is not valid");
             
             error = true;
             data = "ACCOUNT ID NOT VALID";
@@ -405,7 +397,7 @@ exports.scheduled = function (accountID, callback){
 		}
 	});
 };
-
+/*
 // returns tweets containing mentions to the current twitter-account
 exports.mentions = function (accountID, callback){
 

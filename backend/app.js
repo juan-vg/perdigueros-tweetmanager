@@ -876,7 +876,7 @@ var appRouter = function(app) {
 				} else if (data == "TWITTER ERROR") {
 					console.log("APP-POST-TWEET-PUBLISH: Twitter error");
 					
-					response.writeHead(500, {"Content-Type": "text/html"});
+					response.writeHead(503, {"Content-Type": "text/html"});
 					response.write("Twitter service unavailable");
 					
 				} else {
@@ -1040,6 +1040,12 @@ var appRouter = function(app) {
 					response.writeHead(404, {"Content-Type": "text/html"});
 					response.write("Twitter account NOT found");
 					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-USER-TIMELINE: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
 				} else {
 					console.log("APP-GET-TWEET-USER-TIMELINE: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -1051,7 +1057,7 @@ var appRouter = function(app) {
 	});
 	
 	//tweeter home timeline
-		/**
+	/**
 	 * @swagger
 	 * /twitter-accounts/{id}/tweets/home-timeline:
 	 *   get:
@@ -1117,6 +1123,12 @@ var appRouter = function(app) {
 					response.writeHead(404, {"Content-Type": "text/html"});
 					response.write("Twitter account NOT found");
 					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-HOME-TIMELINE: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
 				} else {
 					console.log("APP-GET-TWEET-HOME-TIMELINE: DB ERROR!!!");
 					response.writeHead(500, {"Content-Type": "text/html"});
@@ -1128,9 +1140,86 @@ var appRouter = function(app) {
 	});
 	
 	//scheduled tweets
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/scheduled:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the scheduled-tweets for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The scheduled tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
 	app.get("/twitter-accounts/:id/tweets/scheduled", function(request, response) {
-
-
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-SCHEDULED: Retrieving scheduled tweets for account " + request.params.id);
+		
+		tweets.scheduled(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-SCHEDULED: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-SCHEDULED: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-SCHEDULED: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-SCHEDULED: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-SCHEDULED: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-SCHEDULED: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	//mentions
