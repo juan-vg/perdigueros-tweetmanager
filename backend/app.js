@@ -839,6 +839,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: Tweet published
+	 *       400:
+	 *         description: The provided {id} is not valid
 	 *       403:
 	 *         description: Given token does not have permission to the provided twitter-account's {id}
 	 *       404:
@@ -863,7 +865,13 @@ var appRouter = function(app) {
 				response.write("Published");
 				
 			} else {
-				if(data == "FORBIDDEN"){
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-USER-TIMELINE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
 					console.log("APP-POST-TWEET-PUBLISH: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
@@ -918,6 +926,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: Tweet scheduled
+	 *       400:
+	 *         description: The provided {id} is not valid 
 	 *       403:
 	 *         description: Given token does not have permission to the provided twitter-account's {id}
 	 *       500:
@@ -947,7 +957,13 @@ var appRouter = function(app) {
 				response.write("Scheduled");
 				
 			} else {
-				if(data == "FORBIDDEN"){
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-SCHEDULE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
 					console.log("APP-POST-TWEET-SCHEDULE: Forbidden!!!");
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");

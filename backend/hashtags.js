@@ -66,7 +66,7 @@ exports.getAll = function (accountID, callback){
             console.log("HASHTAGS-GET-ALL: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -135,7 +135,7 @@ exports.get = function (accountID, hashtag, callback){
             console.log("HASHTAGS-GET-ALL: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -220,7 +220,7 @@ exports.post = function (accountID, hashtag, callback){
             console.log("HASHTAGS-GET-ALL: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -366,7 +366,7 @@ exports.delete = function (accountID, hashtag, callback){
             console.log("HASHTAGS-GET-ALL: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });

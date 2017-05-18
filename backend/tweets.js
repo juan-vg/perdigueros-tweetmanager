@@ -72,7 +72,7 @@ exports.publish = function (accountID, text, callback){
             console.log("TWEETS-PUBLISH: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -144,7 +144,7 @@ exports.schedule = function (accountID, tweetData, callback){
             console.log("TWEETS-SCHEDULE: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -234,7 +234,7 @@ exports.userTimeline = function (accountID, callback){
             console.log("TWEETS-USER-TIMELINE: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -326,7 +326,7 @@ exports.homeTimeline = function (accountID, callback){
             console.log("TWEETS-HOME-TIMELINE: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -392,7 +392,7 @@ exports.scheduled = function (accountID, callback){
             console.log("TWEETS-SCHEDULED: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -484,7 +484,7 @@ exports.mentions = function (accountID, callback){
             console.log("TWEETS-MENTIONS: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -574,7 +574,7 @@ exports.retweeted = function (accountID, callback){
             console.log("TWEETS-RETWEETED: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -667,7 +667,7 @@ exports.favorited = function (accountID, callback){
             console.log("TWEETS-FAVORITED: Account ID is not valid");
             
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
