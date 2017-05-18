@@ -489,7 +489,7 @@ exports.mentions = function (accountID, callback){
 		}
 	});
 };
-/*
+
 // returns retweeted tweets published by current twitter-account
 exports.retweeted = function (accountID, callback){
 
@@ -504,39 +504,62 @@ exports.retweeted = function (accountID, callback){
                 
                 if(success){
 					
-					dbSchedTweets = new schedTweetsModel();
+					// create auth set
+					var secret = {
+						consumer_key: data.consumerKey,
+						consumer_secret: data.consumerSecret,
+						access_token_key: data.accessToken,
+						access_token_secret: data.accessTokenSecret
+					};
+					var Twitter = new TwitterPackage(secret);
 					
-					dbSchedTweets.text = tweetData.text;
-					dbSchedTweets.publishDate = tweetData.date;
-					dbSchedTweets.published = false;
-					
-					dbSchedTweets.save(function(err, res){
+					Twitter.get('statuses/retweets_of_me', function(err, body){
+						
 						if(!err){
 							error = false;
-							data = null;
+							data = [];
+							
+							for(var i=0; i<body.length; i++){
+								
+								var tweet = {
+									id: body[i].id,
+									created_at: new Date(body[i].created_at),
+									text: body[i].text,
+									in_reply_to_screen_name: body[i].in_reply_to_screen_name,
+									retweet_count: body[i].retweet_count,
+									favorite_count: body[i].favorite_count,
+									favorited_by_user: body[i].favorited,
+									retweeted_by_user: body[i].retweeted
+								};
+								
+								data.push(tweet);
+							}
+							
 						} else {
-							console.log("TWEETS-SCHEDULE: DB ERROR!!!" );
-
+							console.log("TWEETS-RETWEETED: Twitter error");
+							
 							error = true;
-							data = "DB ERROR";
+							data = "TWITTER ERROR";
 						}
+						
+						callback(error, data);
 					});
 					
 				} else {
 					if(reason == "ACCOUNT NOT FOUND"){
-                        console.log("TWEETS-SCHEDULE: Twitter account NOT FOUND");
+                        console.log("TWEETS-RETWEETED: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
                     } else if(reason == "DB ERROR") {
-                        console.log("TWEETS-SCHEDULE: DB ERROR!!!" );
+                        console.log("TWEETS-RETWEETED: DB ERROR!!!" );
 
                         error = true;
                         data = "DB ERROR";
                         
                     } else {
-                        console.log("TWEETS-SCHEDULE: User does not own that account");
+                        console.log("TWEETS-RETWEETED: User does not own that account");
 
                         error = true;
                         data = "FORBIDDEN" ;
@@ -548,7 +571,7 @@ exports.retweeted = function (accountID, callback){
 			});
 			
 		} else {
-			console.log("HASHTAGS-GET-ALL: Account ID is not valid");
+			console.log("TWEETS-RETWEETED: Account ID is not valid");
             
             error = true;
             data = "ACCOUNT ID NOT VALID";
@@ -556,7 +579,7 @@ exports.retweeted = function (accountID, callback){
 		}
 	});
 };
-
+/*
 // returns tweets favourited on current twitter-account
 exports.favorited = function (accountID, callback){
 

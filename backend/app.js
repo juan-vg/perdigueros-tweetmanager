@@ -1265,7 +1265,7 @@ var appRouter = function(app) {
 		
 		console.log("APP-GET-TWEET-MENTIONS: Retrieving tweets containing mentions to account " + request.params.id);
 		
-		tweets.scheduled(accountID, function (err, data){
+		tweets.mentions(accountID, function (err, data){
 			
 			if(!err){
 				console.log("APP-GET-TWEET-MENTIONS: OK");
@@ -1306,9 +1306,86 @@ var appRouter = function(app) {
 	});
 	
 	//tweets retuiteados
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/retweeted:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the retweeted tweets for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The retweeted tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
 	app.get("/twitter-accounts/:id/tweets/retweeted", function(request, response) {
-
-
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-RETWEETED: Retrieving retweeted tweets for account " + request.params.id);
+		
+		tweets.retweeted(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-RETWEETED: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-RETWEETED: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-RETWEETED: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-RETWEETED: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-RETWEETED: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	//tweets marcados favoritos
