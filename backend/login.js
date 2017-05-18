@@ -1,5 +1,6 @@
 var userAccModel = require("./models/user-accounts");
 var mailCreator = require("./email-creator.js");
+var adminStats = require("./admin-stats.js");
 var crypto = require('crypto');
 var objectID = require('mongodb').ObjectID;
 
@@ -28,6 +29,8 @@ exports.localSignin = function (accountID, callback) {
                     var tokenExpire = new Date();
                     tokenExpire.setMinutes(tokenExpire.getMinutes() + 10);
                     
+                    // save last access for statistics
+                    adminStats.saveLastAccess(lastDate);
                     
                     // update lastDate, token & tokenExpire
                     userAccModel.update({"_id" : new objectID(dbData[0]._id)},
@@ -111,6 +114,9 @@ exports.signup = function (accountData, callback) {
                                 console.log("LOGIN-SIGNUP: ERROR sending email to " + dbUsers.email);
                             }
                         });
+                        
+                        // save registry for statistics
+                        adminStats.saveRegistry(dbUsers.registrationDate);
                         
                         error = false;
                         data = null;
