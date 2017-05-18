@@ -11,7 +11,6 @@ function groupBy(array, callback){
     // group by year and month, and limit to 12 months
     for(var i = 0; i < array.length && number <= 11 ; i++){
         var year = array[i]._id.year;
-        console.log(year);
         if(!result[year]){
             result[year] = [];
         }
