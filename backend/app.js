@@ -11,6 +11,7 @@ var uploadImages = require('./upload-images.js');
 var formidable = require('formidable');
 var login = require('./login.js');
 var tweets = require('./tweets.js');
+var verifyCaptcha = require('./verify-captcha.js');
 
 var appRouter = function(app) {
 	
@@ -25,6 +26,7 @@ var appRouter = function(app) {
 	 * - name: "URL shortener"
      * - name: "Images"
      * - name: "Tweets"
+     * - name: "Captcha"
 	 * 
 	 * definitions:
 	 *   Twitter-accounts:
@@ -86,6 +88,9 @@ var appRouter = function(app) {
 	 *       passwd:
 	 *         type: string
 	 *         description: "The user password"
+	 *       grecaptcharesponse:
+	 *         type: string
+	 *         description: "The google captcha response"
 	 * 
 	 *   Signup:
 	 *     type: "object"
@@ -99,6 +104,9 @@ var appRouter = function(app) {
 	 *       email:
 	 *         type: string
 	 *         description: "The user email"
+	 *       grecaptcharesponse:
+	 *         type: string
+	 *         description: "The google captcha response"
 	 * 
 	 *   Validate:
 	 *     type: "object"
@@ -147,6 +155,13 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The publish date"
 	 * 
+	 *   GoogleCaptchaResponse:
+	 *     type: "object"
+	 *     properties:
+	 *       grecaptcharesponse:
+	 *         type: string
+	 *         description: "The google captcha response"
+	 * 
 	 */
 
 
@@ -174,6 +189,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: User created
+	 *       400:
+	 *         description: Captcha validation error
 	 *       409:
 	 *         description: Email address already in use
 	 *       500:
@@ -189,7 +206,7 @@ var appRouter = function(app) {
 			"email": request.body.email
 		};
 		
-		login.signup(accountData, function (err, data){
+		login.signup(accountData, request.body.grecaptcharesponse, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNUP: OK");
 						
@@ -197,7 +214,13 @@ var appRouter = function(app) {
 					response.write("Created");
 					
 				} else {
-					if(data == "ALREADY EXISTS"){
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-LOGIN-SIGNUP: Captcha validation error");
+						
+						response.writeHead(400, {"Content-Type": "text/html"});
+						response.write("Captcha validation error");
+						
+					} else if(data == "ALREADY EXISTS"){
 						console.log("APP-LOGIN-SIGNUP: Already exists");
 						
 						response.writeHead(409, {"Content-Type": "text/html"});
@@ -236,6 +259,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Login OK 
+	 *       400:
+	 *         description: Captcha validation error
 	 *       401:
 	 *         description: Incorrect login
 	 *       409:
@@ -254,7 +279,7 @@ var appRouter = function(app) {
 			"passwd": request.body.passwd
 		};
 		
-		login.localSignin(accountID, function (err, data){
+		login.localSignin(accountID, request.body.grecaptcharesponse, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNIN: OK");
 						
@@ -262,7 +287,13 @@ var appRouter = function(app) {
 					response.write(JSON.stringify(data));
 					
 				} else {
-					if (data == "MUST CHANGE PASSWD") {
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-LOGIN-SIGNIN: Captcha validation error");
+						
+						response.writeHead(400, {"Content-Type": "text/html"});
+						response.write("Captcha validation error");
+						
+					} else if (data == "MUST CHANGE PASSWD") {
 						console.log("APP-LOGIN-SIGNIN: Must change password");
 						
 						response.writeHead(459, {"Content-Type": "text/html"});
@@ -2610,6 +2641,61 @@ var appRouter = function(app) {
               });
             });
     });
+    
+    /**
+     * @swagger
+     * /verify-captcha:
+     *   post:
+     *     tags:
+     *       - Captcha
+     *     description: Verify the captcha result
+     *     parameters:
+     *       - name: captcha-response
+     *         in: body
+     *         required: true
+     *         description: The google recaptcha response
+     *         schema:
+	 *           $ref: "#/definitions/GoogleCaptchaResponse"
+     *     produces:
+     *       - application/json
+     *     responses:
+     *       200:
+     *         description: Captcha response (verified or not)
+     *       503:
+     *         description: Captcha service unavailable
+     */
+    app.post("/verify-captcha", function(request, response){
+		
+		console.log("APP-VERIFY-CAPTCHA: Verifying captcha response");
+		
+		verifyCaptcha.verify(request.body.grecaptcharesponse, request.connection.remoteAddress,
+			function(err, data){
+				
+				if(!err){
+					console.log("APP-VERIFY-CAPTCHA: Verifying captcha response");
+					
+					response.writeHead(200, {"Content-Type": "application/json"});
+					response.write(JSON.stringify({"responseCode": 0, "responseDesc": data}));
+				} else {
+					
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-VERIFY-CAPTCHA: Captcha service unavailable");
+						
+						response.writeHead(503, {"Content-Type": "text/html"});
+						response.write("Captcha service unavailable");
+						
+					} else {
+						console.log("APP-VERIFY-CAPTCHA: " + data);
+						
+						response.writeHead(200, {"Content-Type": "application/json"});
+						response.write(JSON.stringify({"responseCode": 1, "responseDesc": data}));
+					}
+				}
+				
+				response.end();
+			}
+		);
+	});
 };
 
 module.exports = appRouter;
