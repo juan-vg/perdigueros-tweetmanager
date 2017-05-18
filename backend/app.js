@@ -690,7 +690,7 @@ var appRouter = function(app) {
 	 *       500:
 	 *         description: Error inserting the twitter account into the database
 	 *       503:
-	 *         description: Twitter service unavailable
+	 *         description: Twitter service unavailable OR Wrong twitter-autentication data
 	 */
 	app.post("/twitter-accounts", function(request, response) {
 		console.log("APP-POST-ACCOUNT");
@@ -723,7 +723,7 @@ var appRouter = function(app) {
 					console.log("APP-POST-ACCOUNT: Twitter error");
 					
 					response.writeHead(503, {"Content-Type": "text/html"});
-					response.write("Twitter service unavailable");
+					response.write("Twitter service unavailable OR Wrong twitter-autentication data");
 					
 				} else {
 					console.log("APP-POST-ACCOUNT: Already exists");
@@ -733,8 +733,7 @@ var appRouter = function(app) {
 				}
 			}
 			response.end();
-		}
-	);
+		});
 	});
 	
 	//borra una cuenta
