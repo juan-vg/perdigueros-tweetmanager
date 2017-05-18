@@ -165,7 +165,7 @@ exports.postAccount = function(userToken, newAccount, callback){
                             consumer_secret: newAccount.information.consumerSecret,
                             access_token_key: newAccount.information.accessToken,
                             access_token_secret: newAccount.information.accessTokenSecret
-                        }
+                        };
                         var Twitter = new TwitterPackage(secret);
                         
                         // get twitter user name

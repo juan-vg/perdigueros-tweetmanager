@@ -23,14 +23,14 @@ exports.publish = function (accountID, text, callback){
 						consumer_secret: data.consumerSecret,
 						access_token_key: data.accessToken,
 						access_token_secret: data.accessTokenSecret
-					}
+					};
 					var Twitter = new TwitterPackage(secret);
 					
 					// publish tweet
 					Twitter.post('statuses/update', {status: text}, function(err, tweet, response){
 						
 						if(!err){
-							error = false
+							error = false;
 							data= null;
 						} else {
 							console.log("TWEETS-PUBLISH: Twitter error");
@@ -76,7 +76,7 @@ exports.publish = function (accountID, text, callback){
             callback(error, data);
 		}
 	});
-}
+};
 
 
 // schedules the publication of a tweet
@@ -147,7 +147,7 @@ exports.schedule = function (accountID, tweetData, callback){
             callback(error, data);
 		}
 	});
-}
+};
 
 // returns the user timeline (publihed tweets by the user)
 exports.userTimeline = function (accountID, callback){
@@ -169,13 +169,13 @@ exports.userTimeline = function (accountID, callback){
 						consumer_secret: data.consumerSecret,
 						access_token_key: data.accessToken,
 						access_token_secret: data.accessTokenSecret
-					}
+					};
 					var Twitter = new TwitterPackage(secret);
 					
 					Twitter.get('statuses/user_timeline', function(err, body){
 						
 						if(!err){
-							error = false
+							error = false;
 							data = [];
 							
 							for(var i=0; i<body.length; i++){
@@ -237,7 +237,7 @@ exports.userTimeline = function (accountID, callback){
             callback(error, data);
 		}
 	});
-}
+};
 
 // returns the home timeline (published tweets by followed users)
 exports.homeTimeline = function (accountID, callback){
@@ -259,13 +259,13 @@ exports.homeTimeline = function (accountID, callback){
 						consumer_secret: data.consumerSecret,
 						access_token_key: data.accessToken,
 						access_token_secret: data.accessTokenSecret
-					}
+					};
 					var Twitter = new TwitterPackage(secret);
 					
 					Twitter.get('statuses/home_timeline', function(err, body){
 						
 						if(!err){
-							error = false
+							error = false;
 							data = [];
 							
 							for(var i=0; i<body.length; i++){
@@ -329,7 +329,8 @@ exports.homeTimeline = function (accountID, callback){
             callback(error, data);
 		}
 	});
-}
+};
+
 /*
 // returns the scheduled tweets
 exports.scheduled = function (accountID, callback){
@@ -402,7 +403,7 @@ exports.scheduled = function (accountID, callback){
             callback(error, data);
 		}
 	});
-}
+};
 
 // returns tweets containing mentions to the current twitter-account
 exports.mentions = function (accountID, callback){
@@ -469,7 +470,7 @@ exports.mentions = function (accountID, callback){
             callback(error, data);
 		}
 	});
-}
+};
 
 // returns retweeted tweets published by current twitter-account
 exports.retweeted = function (accountID, callback){
@@ -536,7 +537,7 @@ exports.retweeted = function (accountID, callback){
             callback(error, data);
 		}
 	});
-}
+};
 
 // returns tweets favourited on current twitter-account
 exports.favorited = function (accountID, callback){
@@ -603,5 +604,5 @@ exports.favorited = function (accountID, callback){
             callback(error, data);
 		}
 	});
-}
+};
 */
