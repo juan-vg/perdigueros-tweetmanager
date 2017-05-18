@@ -54,7 +54,7 @@ exports.getAll = function(accountID, callback){
             console.log("FOLLOWED-USERS-GET-ALL: Account ID is not valid");
 
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -112,7 +112,7 @@ exports.get = function (accountID, user, callback){
             console.log("FOLLOWED-USERS-GET-ID: Account ID is not valid");
 
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -189,7 +189,7 @@ exports.post = function (accountID, user, callback){
             console.log("FOLLOWED-USERS-POST-ID: Account ID is not valid");
 
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
@@ -257,7 +257,7 @@ exports.delete = function (accountID, user, callback){
             console.log("FOLLOWED-USERS-DELETE-ID: Account ID is not valid");
 
             error = true;
-            data = "ACCOUNT ID NOT VALID";
+            data = "ID NOT VALID";
             callback(error, data);
         }
     });
