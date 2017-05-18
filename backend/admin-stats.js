@@ -15,7 +15,7 @@ function groupBy(array, callback){
         result[year].push({ month: array[i]._id.month, data: array[i].count});
     }
     callback(result); 
-};
+}
 
 exports.saveLastAccess = function(lastAccess){
     
@@ -31,7 +31,7 @@ exports.saveLastAccess = function(lastAccess){
 function storeLastAccessStats(lastAccess, callback){
     
     var dbLoginStats = new loginStatsModel();
-    dbLoginStats.date = lastAccess; ///?????
+    dbLoginStats.date = lastAccess; 
     
     dbLoginStats.save(function(err, res){
         if(!err) {
@@ -47,7 +47,7 @@ function storeLastAccessStats(lastAccess, callback){
             data = "DB ERROR";
         }
     });
-};
+}
 
 ////
 exports.saveRegistry = function(firstAccess){
@@ -81,7 +81,7 @@ function storeRegistryStats(firstAccess, callback){
             data = "DB ERROR";
         }
     });
-};
+}
 
 ///
 exports.saveDown = function(access){
@@ -115,7 +115,7 @@ function storeDownStats(access, callback){
             data = "DB ERROR";
         }
     });
-};
+}
 
 //
 
