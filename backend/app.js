@@ -206,7 +206,12 @@ var appRouter = function(app) {
 			"email": request.body.email
 		};
 		
-		login.signup(accountData, request.body.grecaptcharesponse, function (err, data){
+		var captchaData = {
+			gResponse: request.body.grecaptcharesponse,
+			rAddress: request.connection.remoteAddress
+		};
+		
+		login.signup(accountData, captchaData, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNUP: OK");
 						
@@ -279,7 +284,12 @@ var appRouter = function(app) {
 			"passwd": request.body.passwd
 		};
 		
-		login.localSignin(accountID, request.body.grecaptcharesponse, function (err, data){
+		var captchaData = {
+			gResponse: request.body.grecaptcharesponse,
+			rAddress: request.connection.remoteAddress
+		};
+		
+		login.localSignin(accountID, captchaData, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNIN: OK");
 						

@@ -5,11 +5,11 @@ var crypto = require('crypto');
 var objectID = require('mongodb').ObjectID;
 
 // accountID = {email, passwd}
-exports.localSignin = function (accountID, gResponse, callback) {
+exports.localSignin = function (accountID, captchaData, callback) {
     
     var error, data;
     
-    verifyCaptcha.verify(gResponse, function(err, data){
+    verifyCaptcha.verify(captchaData.gResponse, captchaData.rAddress, function(err, data){
         if(!err){
             
             var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
@@ -85,11 +85,11 @@ exports.localSignin = function (accountID, gResponse, callback) {
     });
 };
 
-exports.signup = function (accountData, gResponse, callback) {
+exports.signup = function (accountData, captchaData, callback) {
     
     var error, data;
     
-    verifyCaptcha.verify(gResponse, function(err, data){
+    verifyCaptcha.verify(captchaData.gResponse, captchaData.rAddress, function(err, data){
         
         if(!err){
             
