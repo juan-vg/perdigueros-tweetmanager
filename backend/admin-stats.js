@@ -16,7 +16,7 @@ function groupBy(array, callback){
         }
         result[year].push({ month: array[i]._id.month, data: array[i].count});
         number += array[i].count;
-    };
+    }
     callback(result); 
 }
 
