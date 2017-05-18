@@ -115,6 +115,9 @@ exports.signup = function (accountData, callback) {
                             }
                         });
                         
+                        // save registry for statistics
+                        adminStats.saveRegistry(dbUsers.registrationDate);
+                        
                         error = false;
                         data = null;
                         callback(error, data);
