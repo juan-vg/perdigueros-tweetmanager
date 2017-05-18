@@ -172,7 +172,7 @@ exports.userTimeline = function (accountID, callback){
 					}
 					var Twitter = new TwitterPackage(secret);
 					
-					Twitter.get('statuses/home_timeline', function(err, body){
+					Twitter.get('statuses/user_timeline', function(err, body){
 						
 						if(!err){
 							error = false
@@ -181,14 +181,14 @@ exports.userTimeline = function (accountID, callback){
 							for(var i=0; i<body.length; i++){
 								
 								var tweet = {
+									id: body[i].id,
 									created_at: new Date(body[i].created_at),
 									text: body[i].text,
-									in_reply_to_status_id_str: body[i].in_reply_to_status_id_str,
 									in_reply_to_screen_name: body[i].in_reply_to_screen_name,
 									retweet_count: body[i].retweet_count,
 									favorite_count: body[i].favorite_count,
-									favorited: body[i].favorited,
-									retweeted: body[i].retweeted
+									favorited_by_user: body[i].favorited,
+									retweeted_by_user: body[i].retweeted
 								};
 								
 								data.push(tweet);
@@ -230,7 +230,7 @@ exports.userTimeline = function (accountID, callback){
 			});
 			
 		} else {
-			console.log("HASHTAGS-GET-ALL: Account ID is not valid");
+			console.log("TWEETS-USER-TIMELINE: Account ID is not valid");
             
             error = true;
             data = "ACCOUNT ID NOT VALID";
@@ -238,7 +238,6 @@ exports.userTimeline = function (accountID, callback){
 		}
 	});
 }
-/*
 
 // returns the home timeline (published tweets by followed users)
 exports.homeTimeline = function (accountID, callback){
@@ -263,13 +262,32 @@ exports.homeTimeline = function (accountID, callback){
 					}
 					var Twitter = new TwitterPackage(secret);
 					
-					Twitter.get('statuses/update', function(err, body){
+					Twitter.get('statuses/home_timeline', function(err, body){
 						
 						if(!err){
 							error = false
-							data= null;
+							data = [];
+							
+							for(var i=0; i<body.length; i++){
+								
+								var tweet = {
+									id: body[i].id,
+									user_full_name: body[i].user.name,
+									user_name: body[i].user.screen_name,
+									created_at: new Date(body[i].created_at),
+									text: body[i].text,
+									in_reply_to_screen_name: body[i].in_reply_to_screen_name,
+									retweet_count: body[i].retweet_count,
+									favorite_count: body[i].favorite_count,
+									favorited_by_user: body[i].favorited,
+									retweeted_by_user: body[i].retweeted
+								};
+								
+								data.push(tweet);
+							}
+							
 						} else {
-							console.log("TWEETS-PUBLISH: Twitter error");
+							console.log("TWEETS-HOME-TIMELINE: Twitter error");
 							
 							error = true;
 							data = "TWITTER ERROR";
@@ -280,19 +298,19 @@ exports.homeTimeline = function (accountID, callback){
 					
 				} else {
 					if(reason == "ACCOUNT NOT FOUND"){
-                        console.log("TWEETS-SCHEDULE: Twitter account NOT FOUND");
+                        console.log("TWEETS-HOME-TIMELINE: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
                     } else if(reason == "DB ERROR") {
-                        console.log("TWEETS-SCHEDULE: DB ERROR!!!" );
+                        console.log("TWEETS-HOME-TIMELINE: DB ERROR!!!" );
 
                         error = true;
                         data = "DB ERROR";
                         
                     } else {
-                        console.log("TWEETS-SCHEDULE: User does not own that account");
+                        console.log("TWEETS-HOME-TIMELINE: User does not own that account");
 
                         error = true;
                         data = "FORBIDDEN" ;
@@ -304,7 +322,7 @@ exports.homeTimeline = function (accountID, callback){
 			});
 			
 		} else {
-			console.log("HASHTAGS-GET-ALL: Account ID is not valid");
+			console.log("TWEETS-HOME-TIMELINE: Account ID is not valid");
             
             error = true;
             data = "ACCOUNT ID NOT VALID";
@@ -521,7 +539,7 @@ exports.retweeted = function (accountID, callback){
 }
 
 // returns tweets favourited on current twitter-account
-exports.favourited = function (accountID, callback){
+exports.favorited = function (accountID, callback){
 
     var error, data;
     

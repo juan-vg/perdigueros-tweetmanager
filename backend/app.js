@@ -10,6 +10,7 @@ var userAccounts = require('./user-accounts.js');
 var uploadImages = require('./upload-images.js');
 var formidable = require('formidable');
 var login = require('./login.js');
+var tweets = require('./tweets.js');
 
 var appRouter = function(app) {
 	
@@ -22,7 +23,8 @@ var appRouter = function(app) {
 	 * - name: "Hashtags"
 	 * - name: "Followed"
 	 * - name: "URL shortener"
-   * - name: "Images"
+     * - name: "Images"
+     * - name: "Tweets"
 	 * 
 	 * definitions:
 	 *   Twitter-accounts:
@@ -800,8 +802,158 @@ var appRouter = function(app) {
 
 	});
 	
-	//tweeter home (timeline)
-	app.get("/twitter-accounts/:id/tweets/home", function(request, response) {
+	//tweeter user timeline
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/user-timeline:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the user-timeline-tweets (published by user) for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The user timeline tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.get("/twitter-accounts/:id/tweets/user-timeline", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-USER-TIMELINE: Retrieving user timeline for account " + request.params.id);
+		
+		tweets.userTimeline(accountID,	function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-USER-TIMELINE: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-USER-TIMELINE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-USER-TIMELINE: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-USER-TIMELINE: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else {
+					console.log("APP-GET-USER-TIMELINE: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
+	});
+	
+	//tweeter home timeline
+		/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/home-timeline:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the home-timeline-tweets (published by followed users) for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The home timeline tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 */
+	app.get("/twitter-accounts/:id/tweets/home-timeline", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-HOME-TIMELINE: Retrieving home timeline for account " + request.params.id);
+		
+		tweets.homeTimeline(accountID,	function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-HOME-TIMELINE: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-HOME-TIMELINE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-HOME-TIMELINE: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-HOME-TIMELINE: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else {
+					console.log("APP-GET-HOME-TIMELINE: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
+	});
+	
+	//scheduled tweets
+	app.get("/twitter-accounts/:id/tweets/scheduled", function(request, response) {
 
 
 	});
