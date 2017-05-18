@@ -6,17 +6,22 @@ var accVerificator = require('./account-verifications.js');
 function groupBy(array, callback){
 
     var result = {};
+    var number = 0;
     
-    for(var i = 0; i < array.length; i++){
+    // group by year and month, and limit to 12 months
+    for(var i = 0; i < array.length && number <= 11 ; i++){
         var year = array[i]._id.year;
+        console.log(year);
         if(!result[year]){
             result[year] = [];
         }
         result[year].push({ month: array[i]._id.month, data: array[i].count});
-    }
+        number += array[i].count;
+    };
     callback(result); 
 }
 
+// Save the last accesses in the system
 exports.saveLastAccess = function(lastAccess){
     
     storeLastAccessStats(lastAccess, function(err, data){
@@ -49,7 +54,7 @@ function storeLastAccessStats(lastAccess, callback){
     });
 }
 
-////
+// Save the registries in the system 
 exports.saveRegistry = function(firstAccess){
     
     storeRegistryStats(firstAccess, function(err, data){
@@ -83,7 +88,7 @@ function storeRegistryStats(firstAccess, callback){
     });
 }
 
-///
+// Save the downs in the system
 exports.saveDown = function(access){
     
     storeDownStats(access, function(err, data){
@@ -117,15 +122,14 @@ function storeDownStats(access, callback){
     });
 }
 
-//
 
 exports.get= function(accountID, callback){
     var error, data;
 
     // check if the token has access admin permissions
-//    accVerificator.verifyAdmin(accountID, function(success, reason){
-//
-//        if(success){
+    accVerificator.verifyAdmin(accountID, function(success, reason){
+
+        if(success){
             data = { 
                 "registrationDate" : {},
                 "downs" : {},
@@ -134,8 +138,7 @@ exports.get= function(accountID, callback){
             };
             error = false;
 
-            // REGISTRATION DATE
-            //TODO ultimos 12 meses
+            // REGISTRATION DATES
             regsDownsModel.aggregate([
                 {$match:{'regDown':true}},
                 {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }}, count: {$sum:1}}}
@@ -163,7 +166,7 @@ exports.get= function(accountID, callback){
                                         data.downs = res;
                                     });
 
-                                    // LAST ACCESS
+                                    // LAST ACCESSES
                                     loginStatsModel.aggregate([
                                         { $group:{'_id':{'year':{ $year: "$date" },'month':{ $month: "$date" }}, count:{ $sum: 1}}},
                                         { $sort: { _id:-1 }}
@@ -181,6 +184,7 @@ exports.get= function(accountID, callback){
 
                                             } else {
                                                 console.log("ADMIN-STATS-GET: Error getting last access.");
+                                                
                                                 error = true;
                                                 data.lastAccess = [];
                                                 callback(error,data);
@@ -188,6 +192,7 @@ exports.get= function(accountID, callback){
                                     });
                                 } else {
                                     console.log("ADMIN-STATS-GET: Error getting registration downs.");
+                                    
                                     error = true;
                                     data.downs = [];
                                     callback(error, data);
@@ -196,6 +201,7 @@ exports.get= function(accountID, callback){
 
                     } else {
                         console.log("ADMIN-STATS-GET: Error getting registration dates.");
+                        
                         error = true;
                         data.registrationDate = [];
                         callback(error, data);
@@ -205,12 +211,12 @@ exports.get= function(accountID, callback){
             // RESOURCES
             // TODO ??
 
-//        } else {
-//            error = true;
-//            data = "FORBIDDEN";
-//
-//            callback(error, data);
-//        }
-//    });
+        } else {
+            error = true;
+            data = "FORBIDDEN";
+
+            callback(error, data);
+        }
+    });
 };
 
