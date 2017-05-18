@@ -1741,6 +1741,27 @@ var appRouter = function(app) {
 
 	});
 	
+	 /**
+     * @swagger
+     * /stats/app:
+     *   get:
+     *     tags:
+     *       - Statistics 
+     *     description: Get application statistics (ADMIN)
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: Statistics of last accesses, registries and downs
+     *       403:
+     *         description: Forbidden
+     */
 	app.get("/stats/app", function(request, response) {
 
 	    console.log("APP-GET-ADMIN-STATS: Request stats.");
