@@ -746,14 +746,14 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Disable a twitter account (ADMIN)
 	 *     parameters:
-	 *       - name: id
-	 *         in: path
-	 *         required: true
-	 *         description: The twitter account ID 
 	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID 
 	 *     produces:
 	 *       - text/html
 	 *     responses:
