@@ -521,18 +521,22 @@ exports.retweeted = function (accountID, callback){
                             
                             for(var i=0; i<body.length; i++){
                                 
-                                var tweet = {
-                                    id: body[i].id,
-                                    created_at: new Date(body[i].created_at),
-                                    text: body[i].text,
-                                    in_reply_to_screen_name: body[i].in_reply_to_screen_name,
-                                    retweet_count: body[i].retweet_count,
-                                    favorite_count: body[i].favorite_count,
-                                    favorited_by_user: body[i].favorited,
-                                    retweeted_by_user: body[i].retweeted
-                                };
+                                if(body[i].favorited && body[i].favorite_count > 1 || !body[i].favorited && body[i].favorite_count > 0){
+                                    var tweet = {
+                                        id: body[i].id,
+                                        created_at: new Date(body[i].created_at),
+                                        text: body[i].text,
+                                        in_reply_to_screen_name: body[i].in_reply_to_screen_name,
+                                        retweet_count: body[i].retweet_count,
+                                        favorite_count: body[i].favorite_count,
+                                        favorited_by_user: body[i].favorited,
+                                        retweeted_by_user: body[i].retweeted
+                                    };
+                                    
+                                    data.push(tweet);
+                                }
                                 
-                                data.push(tweet);
+                                
                             }
                             
                         } else {
