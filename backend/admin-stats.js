@@ -52,7 +52,7 @@ exports.get= function(accountID, callback){
             data = { 
                     "registrationDate" : [],
                     "downs" : [],
-                    "lastAccess" : [],
+                    "lastAccess" : {},
                     "resources" : []
             };
             error = false;
@@ -73,22 +73,39 @@ exports.get= function(accountID, callback){
                       data.downs = downs;
                       
                       // LAST ACCESS
-                      loginStatsModel.find({}, function(errLogin, logins){
-                            if(!errLogin) {
-                                console.log("ADMIN-STATS-GET: Stats of the last accesses obtained.");
-                                error = false;
-                                data.lastAccess = logins;
-                                
-                                // TODO contar accesos por mes
+                      loginStatsModel.aggregate([
+                         { $group:
+                             { '_id': {'year':{ $year: "$date" },'month':{ $month: "$date" },  }, 
+                                 count:{ $sum: 1}   
+                             }
+                         },
+                         { $sort: 
+                             { _id:-1 }
+                         }
+                         ],  function(err, res) {
+                          if (!err){
+                              console.log("ADMIN-STATS-GET: Stats of the last accesses obtained.");
 
+                              // group by year
+                              for(var i = 0; i < res.length; i++){
+                                  var year = res[i]._id.year;
+                                  if(!data.lastAccess[year]){
+                                      data.lastAccess[year] = [];
+                                  }
+                                  data.lastAccess[year].push({ month: res[i]._id.month, data: res[i].count});
+                              }
+                              console.log(data.lastAccess); //TODO QUITAR
+                              
+                              error = false;
+                              callback(error, data);
 
-                            } else {
-                                console.log("ADMIN-STATS-GET: Error getting last access.");
-                                error = true;
-                                data.lastAccess = [];
-                            }  
-                            callback(error, data);
+                          } else {
+                              console.log("ADMIN-STATS-GET: Error getting last access.");
+                              error = true;
+                              callback(error,data);
+                          }
                       });
+
                   } else {
                       console.log("ADMIN-STATS-GET: Error getting registration downs.");
                       error = true;
