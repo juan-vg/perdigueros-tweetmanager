@@ -1758,6 +1758,7 @@ var appRouter = function(app) {
 	            response.writeHead(403, {"Content-Type": "text/html"});
                 response.write("Forbidden");
 	        }
+	        response.end();
 	    });
 	});
 	

@@ -1,4 +1,6 @@
-var usersModel = require("./models/user-accounts");
+var userAccModel = require("./models/user-accounts");
+var loginStatsModel = require("./models/login-stats");
+var regsDownsModel = require("./models/regs-downs-stats");
 var accVerificator = require('./account-verifications.js');
 
 //TODO estadisticas del admim (altas, bajas, ultimos accesos, recursos introducidos...)
@@ -7,6 +9,38 @@ var accVerificator = require('./account-verifications.js');
 //datos2est: {datos},
 //...
 //}
+
+exports.saveLastAccess = function(lastAccess){
+    
+    storeLastAccessStats(lastAccess, function(err, data){
+        if(!err){
+            //ignore
+        } else {
+            //ignore
+        }
+    });
+};
+
+function storeLastAccessStats(lastAccess, callback){
+    
+    var dbLoginStats = new loginStatsModel();
+    dbLoginStats.date = new Date(loginStatsModel);
+    
+    dbLoginStats.save(function(err, res){
+        if(!err) {
+
+            console.log("ADMIN-STATS-STORE-LAST-ACCESS: Stored new login.");
+
+            error = false;
+            data = null;
+        } else {
+            console.log("ADMIN-STATS-STORE-LAST-ACCESS: Error while performing query.");
+
+            error = true;
+            data = "DB ERROR";
+        }
+    });
+};
 
 exports.get= function(accountID, callback){
     var error, data;
@@ -21,50 +55,59 @@ exports.get= function(accountID, callback){
                     "lastAccess" : [],
                     "resources" : []
             };
+            error = false;
             
             // REGISTRATION DATE
-            usersModel.find({activated:true, admin:false}, {_id:0, email:1, registrationDate:1}, function(err, res){
-                if(!err) {
-                    console.log("ADMIN-STATS-GET: Registration dates obtained: ", res);
+            //TODO contar altas y bajas por mes, ultimos 12 meses
+            regsDownsModel.find({regDown : true},{ regDown:0}, function(errReg, regs){
+                if(!errReg) {
+                    console.log("ADMIN-STATS-GET: Stats of the registration dates obtained.");
                     error = false;
-                    data.registrationDate = res;
+                    data.registrationDate = regs;
+                  
+                    // DOWNS
+                  regsDownsModel.find({regDown : false},{ regDown:0}, function(errDown, downs){
+                  if(!errDown) {
+                      console.log("ADMIN-STATS-GET: Stats of the registry downs obtained.");
+                      error = false;
+                      data.downs = downs;
+                      
+                      // LAST ACCESS
+                      loginStatsModel.find({}, function(errLogin, logins){
+                            if(!errLogin) {
+                                console.log("ADMIN-STATS-GET: Stats of the last accesses obtained.");
+                                error = false;
+                                data.lastAccess = logins;
+                                
+                                // TODO contar accesos por mes
+
+
+                            } else {
+                                console.log("ADMIN-STATS-GET: Error getting last access.");
+                                error = true;
+                                data.lastAccess = [];
+                            }  
+                            callback(error, data);
+                      });
+                  } else {
+                      console.log("ADMIN-STATS-GET: Error getting registration downs.");
+                      error = true;
+                      data.downs = [];
+                      callback(error, data);
+                  } 
+              });                   
+                    
                 } else {
                     console.log("ADMIN-STATS-GET: Error getting registration dates.");
                     error = true;
                     data.registrationDate = [];
-                }   
+                    callback(error, data);
+                }  
             });
             
-            // DOWNS
-            usersModel.find({activated:false, admin:false}, {_id:0, email:1}, function(err, res){
-                if(!err) {
-                    console.log("ADMIN-STATS-GET: Registry downs obtained: ", res);
-                    error = false;
-                    data.downs = res;
-                } else {
-                    console.log("ADMIN-STATS-GET: Error getting registration downs.");
-                    error = true;
-                    data.downs = [];
-                }   
-            });
-
-            // LAST ACCESS
-            usersModel.find({activated:true, admin:false}, {_id:0, email:1, lastAccess:1}, function(err, res){
-                  if(!err) {
-                      console.log("ADMIN-STATS-GET: Last access obtained: ", res);
-                      error = false;
-                      data.lastAccess = res;
-                  } else {
-                      console.log("ADMIN-STATS-GET: Error getting last access.");
-                      error = true;
-                      data.lastAccess = [];
-                  }   
-            });
-
             // RESOURCES
             // TODO ??
-            
-            callback(error, data);
+
 //        } else {
 //            error = true;
 //            data = "FORBIDDEN";
