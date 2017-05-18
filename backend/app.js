@@ -545,7 +545,7 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Get information of all twitter accounts (ADMIN)
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -563,7 +563,7 @@ var appRouter = function(app) {
 	app.get("/twitter-accounts", function(request, response) {
 		console.log("APP-GET-ALL-ACCOUNTS");
 		
-		twitterAccounts.getAll(request.headers.usertoken, function (err, data){
+		twitterAccounts.getAll(request.headers.token, function (err, data){
 				if(!err){	
 					console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
 						
@@ -596,7 +596,7 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Get information of a single account (ADMIN)
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -622,7 +622,7 @@ var appRouter = function(app) {
 	app.get("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-GET-ACCOUNTS-ID");
 		
-		twitterAccounts.getAccount(request.params.id, request.headers.usertoken, function (err, data){
+		twitterAccounts.getAccount(request.params.id, request.headers.token, function (err, data){
 				if(!err){
 					console.log("APP-GET-ACCOUNTS-ID: Account found OK");
 					
@@ -667,7 +667,7 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Create a new twitter account
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -700,7 +700,7 @@ var appRouter = function(app) {
 				"information": request.body.information
 		};
 		
-		twitterAccounts.postAccount(request.headers.usertoken, newAccount, function (err, data){
+		twitterAccounts.postAccount(request.headers.token, newAccount, function (err, data){
 			if(!err){
 				console.log("APP-POST-ACCOUNT: OK");
 				
@@ -750,7 +750,7 @@ var appRouter = function(app) {
 	 *         in: path
 	 *         required: true
 	 *         description: The twitter account ID 
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -771,7 +771,7 @@ var appRouter = function(app) {
 	app.delete("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-DEL-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
 		
-		twitterAccounts.deleteAccount(request.headers.usertoken, request.params.id,
+		twitterAccounts.deleteAccount(request.headers.token, request.params.id,
 			function (err, res){
 				if(!err){
 					console.log("APP-DEL-ACCOUNTS-ID: Delete OK");
@@ -817,9 +817,9 @@ var appRouter = function(app) {
 	 *   post:
 	 *     tags:
 	 *       - Tweets
-	 *     description: Create a new twitter account
+	 *     description: Publish a new tweet (ADMIN)
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -855,7 +855,7 @@ var appRouter = function(app) {
 		
 		console.log("APP-POST-TWEET-PUBLISH: Publishing tweet for account: " + accountID.twitterAccountId);
 		
-		tweets.post(accountID, request.body.text, function (err, data){
+		tweets.publish(accountID, request.body.text, function (err, data){
 			
 			if(!err){
 				console.log("APP-POST-TWEET-PUBLISH: OK");
@@ -896,9 +896,9 @@ var appRouter = function(app) {
 	 *   post:
 	 *     tags:
 	 *       - Tweets
-	 *     description: Create a new twitter account
+	 *     description: Create a new scheduled tweet (ADMIN)
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -934,12 +934,12 @@ var appRouter = function(app) {
 		
 		var tweetData = {
 			text: request.body.text,
-			date: new Date(request.body.date);
+			date: new Date(request.body.date)
 		};
 		
 		console.log("APP-POST-TWEET-PUBLISH: Scheduling tweet for account: " + accountID.twitterAccountId);
 		
-		tweets.post(accountID, tweetData, function (err, data){
+		tweets.schedule(accountID, tweetData, function (err, data){
 			
 			if(!err){
 				console.log("APP-POST-TWEET-SCHEDULE: OK");
