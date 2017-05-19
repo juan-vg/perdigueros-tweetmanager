@@ -1,20 +1,26 @@
 // Password Data and Check 
-angular.module('PwdCheck', ['ngStorage']).controller('PasswordController', function ($scope,$http,$window,$location,$localStorage) {
+var PwdCheck=angular.module('PwdCheck', ['ngStorage','vcRecaptcha']);
+PwdCheck.controller('PasswordController', function ($scope,$http,$window,$location,$localStorage,vcRecaptchaService) {
     $scope.pwdError =false;
     $scope.checkPwd =function() {
-		var data = {
-			'email': 'admin@admin.com',
-			'passwd': $scope.password
+		if (vcRecaptchaService.getResponse() === "") { 
+			alert("Please resolve the captcha and submit!")
+		} else {
+			var data = {
+				'email': 'admin@admin.com',
+				'passwd': $scope.password,
+				'g-recaptcha-response': vcRecaptchaService.getResponse()
 			};
-		$http.post('http://zaratech-ptm.ddns.net:8888/login/signin',data).then(successCallback, errorCallback);
-      	function successCallback(response){
-			var dir = window.location.pathname;
-			$localStorage.token = response.data.token;
-			$window.location.href = dir.substring(0,dir.lastIndexOf('/'))+'/admin-main-panel.html';
-		}
-		function errorCallback(error){
-			$scope.pwdError = true;
-			console.log("Error authentication");
+			$http.post('http://zaratech-ptm.ddns.net:8888/login/signin',data).then(successCallback, errorCallback);
+			function successCallback(response){
+				var dir = window.location.pathname;
+				$localStorage.token = response.data.token;
+				$window.location.href = dir.substring(0,dir.lastIndexOf('/'))+'/admin-main-panel.html';
+			}
+			function errorCallback(error){
+				$scope.pwdError = true;
+				console.log("Error authentication");
+			}
 		}
     };
   });
@@ -79,42 +85,11 @@ UsersData.controller('UserController', function($scope,$http,$localStorage) {
 	}
 });
 
-// User Iputs and Outputs from the Application Data
-UsersData.controller('UserDoorController', function($scope) {
-	$scope.users =[
-  					{
-    					"email" : "alex",
-    					"type" : "Salida",
-    					"date" : "05/01/1998 01:00"
-  					},
-    				{
-    					"email" : "albert",
-    					"type" : "Nuevo",
-    					"date" : "15/07/1999 15:00"
-  					},
-				];
-
-});
-
-// User Last Connection Time Data
-UsersData.controller('UserLastController', function($scope) {
-	$scope.users =[
-  					{
-    					"email" : "alex",
-    					"date" : "05/01/1998 01:00"
-  					},
-    				{
-    					"email" : "albert",
-    					"date" : "15/07/1999 15:00"
-  					},
-				];
-});
-
 // Accounts and Hastags Data Binding
 var ListAccounts=angular.module('ListAccounts', ['ngStorage']);
 ListAccounts.controller('AccountController', function($scope,$http,$localStorage) {
 	// Get accounts data 
-	$http.get('http://zaratech-ptm.ddns.net:8888/twitter-accounts',{headers: {'usertoken': $localStorage.token}}).then(successCallback, errorCallback);
+	$http.get('http://zaratech-ptm.ddns.net:8888/twitter-accounts',{headers: {'token': $localStorage.token}}).then(successCallback, errorCallback);
 	
 	//Data Get Successfull
 	function successCallback(response){
@@ -140,8 +115,7 @@ ListAccounts.controller('AccountController', function($scope,$http,$localStorage
 				console.log("Error getting hashtags");
 			}
 		};
-		
-		// RemoveUser from the list
+		// RemoveAccount from the list
 		$scope.removeAccount =function(account) {
 			$http.delete('http://zaratech-ptm.ddns.net:8888/twitter-accounts/'+account._id,{headers: {'usertoken': $localStorage.token}}).then(successCallback, errorCallback);
 			function successCallback(response){
@@ -167,9 +141,130 @@ ListAccounts.controller('AccountController', function($scope,$http,$localStorage
 	}
 });
 
+// Stadistics Data
+var StadisticsData =angular.module('StadisticsData', ['ngStorage','chart.js']);
+StadisticsData.factory('DateService', function() {
+	return {
+		getMonthName: function(date) {
+			var monthNames = [
+				"Enero", "Febrero", "Marzo",
+				"Abril", "Mayo", "Junio", "Julio",
+				"Agosto", "Septiembre", "Octubre",
+				"Noviembre", "Diciembre"
+			];
+			return monthNames[date];
+		}
+	}
+})
+// User Iputs and Outputs from the Application Data
+StadisticsData.controller('UserDoorController', function($scope,$http,$localStorage,DateService) {
+	$scope.token=$localStorage.token;
+	$http.get('http://zaratech-ptm.ddns.net:8888/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackHastags, errorCallbackHastags);
+	function successCallbackHastags(stats){
+		var index = -1;
+		var registrationData= stats.data.registrationDate;
+		var downsData= stats.data.downs;
+		var label=[];
+		var data=[];
+		
+		for( var key in registrationData) {
+			var year = key;
+			var registrationDataYear=registrationData[key];
+			for (var i = 0; i < registrationDataYear.length; i++) {
+				var month= DateService.getMonthName(registrationDataYear[i].month-1);
+				var date = new Date(month+", "+year);
+				label.push(date);
+				data.push(registrationDataYear[i].data);
+			}
+		}
+		$scope.labels = label;
+		$scope.data = data;
+		data=[];
+		label=[];
+		for( var key in downsData) {
+			var year = key;
+			var downsDataYear=downsData[key];
+			for (var i = 0; i < downsDataYear.length; i++) {
+				var month= DateService.getMonthName(downsDataYear[i].month-1);
+				var date = new Date();
+				label.push(date);
+				data.push(downsDataYear[i].data);
+			}
+		}
+		$scope.labels2 = label;
+		$scope.data2 = data;
+		$scope.options = {
+		scales: {
+			xAxes: [{
+				type: "time",
+				time: {
+					unit: 'month',
+					round: 'month',
+					displayFormats: {
+						year: 'MMM D'
+					}
+			}
+		}],
+			yAxes: [{
+				ticks: {
+				beginAtZero: true
+				}
+			}]
+		}
+	}
+	}
+	function errorCallbackHastags(error){
+		console.log("Error getting stats");
+	}
+});
+
+// User Last Connection Time Data
+StadisticsData.controller('AccessDataController', function($scope,$http,$localStorage,DateService) {
+	$http.get('http://zaratech-ptm.ddns.net:8888/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackHastags, errorCallbackHastags);
+	function successCallbackHastags(stats){
+		var index = -1;
+		var accessData= stats.data.lastAccess;
+		var label=[];
+		var data=[];
+		// Format Hashtag list for the user
+		for( var key in accessData) {
+			var year = key;
+			var accessDataYear=accessData[key];
+			for (var i = 0; i < accessDataYear.length; i++) {
+				var month= DateService.getMonthName(accessDataYear[i].month-1);
+				var date = new Date(month+", "+year);
+				label.push(date);
+				data.push(accessDataYear[i].data);
+			}
+		}
+		$scope.labels = label;
+		$scope.data = data;
+		$scope.options = {
+		scales: {
+			xAxes: [{
+				type: "time",
+				time: {
+					unit: 'month',
+					displayFormats: {
+						day: 'MMM D'
+					}
+				}
+			}],
+			yAxes: [{
+				ticks: {
+				beginAtZero: true
+				}
+			}]
+		}
+	}
+	}
+	function errorCallbackHastags(error){
+		console.log("Error getting stats");
+	}
+});
+
 // Stadistics Data Binding
-var StadisticsData =angular.module('StadisticsData', ['chart.js']);
-StadisticsData.controller('StadisticsController', function($scope) {
+StadisticsData.controller('StadisticsController', function($scope,$localStorage) {
   // Map Information Bind
   $scope.location=[
             {
@@ -216,7 +311,7 @@ StadisticsData.controller('StadisticsController', function($scope) {
               "number" : 120
             },
             {
-              "day" : "05/14/2017",
+              "day" : "05/16/2017",
               "number" : 145
             }
         ];
@@ -225,8 +320,9 @@ StadisticsData.controller('StadisticsController', function($scope) {
   var label=[];
   var data=[];
   for ( var i = 0; i < tweetsArr.length; i++ ) {
-    label.push(tweetsArr[i].day);
-    data.push(tweetsArr[i].number);
+		var date = new Date(tweetsArr[i].day);
+		label.push(date);
+		data.push(tweetsArr[i].number);
   };
   $scope.labels = label;
   $scope.data = data;

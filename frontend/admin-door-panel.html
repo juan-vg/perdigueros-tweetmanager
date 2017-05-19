@@ -42,7 +42,7 @@
             	<!-- Accounts link -->
                 <li><a href="admin-accounts-panel.html"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Cuentas de Twitter</a></li>
                 <!-- Users link -->
-                <li><a href="admin-main-panel.html"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Usuarios</a></li>
+                <li><a href="admin-main-panel.html"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Usuarios</a></li>
                 <!-- Right list with logout button-->
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -62,28 +62,20 @@
 <div class="container">
     <div class="row">
         <!-- List with users -->
-        <div ng-app="UsersData" ng-controller="UserDoorController">
+        <div ng-app="StadisticsData" ng-controller="UserDoorController">
 			<ul class="nav nav-pills center-pills">
   				<li class="active"><a href="admin-door-panel.html">Altas y Bajas</a></li>
   				<li><a href="admin-last-panel.html">Entradas</a></li>
   				<li><a href="admin-activity-panel.html">Actividad</a></li>
 			</ul>
-			<table class="table table-bordered">
-				<thead>
-					<tr>
-						<th class="text-center">Usuario</th>
-						<th class="text-center">Tipo</th>
-						<th class="text-center">Fecha</th>
-					</tr>
-				</thead>
-				<tbody ng-repeat="i in users">
-					<tr>
-						<td class="text-center">{{i.email}}</td>
-						<td class="text-center">{{i.type}}</td>
-						<td class="text-center">{{i.date}}</td>
-					</tr>
-				</tbody>
-			</table>
+			<h2 align="center">Altas por mes</h2>
+			<canvas id="in" class="chart chart-bar"
+                        chart-data="data" chart-labels="labels" chart-options="options">
+            </canvas>
+			<h2 align="center">Bajas por mes</h2>
+			<canvas id="door" class="chart chart-bar"
+                        chart-data="data2" chart-labels="labels2" chart-options="options">
+            </canvas>
         </div>
     </div>
 </div>
@@ -103,5 +95,10 @@
     <script src="js/angular.min.js"></script>
     <!-- Angular js Functions -->
     <script src="js/angular_data.js"></script>
+	<!-- Chart js library required -->
+	<script src="js/Chart.bundle.min.js"></script>
+	<script src="js/angular-chart.min.js"></script>
+	<!-- NgStorage library -->
+	<script src="js/ngStorage.min.js"></script>
 </body>
 </html>
