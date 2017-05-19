@@ -89,7 +89,7 @@ var appRouter = function(app) {
 	 *       passwd:
 	 *         type: string
 	 *         description: "The user password"
-	 *       grecaptcharesponse:
+	 *       "g-recaptcha-response":
 	 *         type: string
 	 *         description: "The google captcha response"
 	 * 
@@ -105,7 +105,7 @@ var appRouter = function(app) {
 	 *       email:
 	 *         type: string
 	 *         description: "The user email"
-	 *       grecaptcharesponse:
+	 *       "g-recaptcha-response":
 	 *         type: string
 	 *         description: "The google captcha response"
 	 * 
@@ -159,7 +159,7 @@ var appRouter = function(app) {
 	 *   GoogleCaptchaResponse:
 	 *     type: "object"
 	 *     properties:
-	 *       grecaptcharesponse:
+	 *       "g-recaptcha-response":
 	 *         type: string
 	 *         description: "The google captcha response"
 	 * 
@@ -208,7 +208,7 @@ var appRouter = function(app) {
 		};
 		
 		var captchaData = {
-			gResponse: request.body.grecaptcharesponse,
+			gResponse: request.body['g-recaptcha-response'],
 			rAddress: request.connection.remoteAddress
 		};
 		
@@ -286,7 +286,7 @@ var appRouter = function(app) {
 		};
 		
 		var captchaData = {
-			gResponse: request.body.grecaptcharesponse,
+			gResponse: request.body['g-recaptcha-response'],
 			rAddress: request.connection.remoteAddress
 		};
 		
@@ -2716,7 +2716,7 @@ var appRouter = function(app) {
 		
 		console.log("APP-VERIFY-CAPTCHA: Verifying captcha response");
 		
-		verifyCaptcha.verify(request.body.grecaptcharesponse, request.connection.remoteAddress,
+		verifyCaptcha.verify(request.body['g-recaptcha-response'], request.connection.remoteAddress,
 			function(err, data){
 				
 				if(!err){
