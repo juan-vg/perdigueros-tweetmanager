@@ -2,6 +2,8 @@ var fs = require("fs"),
 	querystring = require("querystring"),
 	util = require("util"),
 	url = require("url");
+var schedule = require('node-schedule');
+var scheduler = require('./scheduler.js');
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
@@ -13,6 +15,11 @@ var login = require('./login.js');
 var adminStats = require('./admin-stats.js');
 var tweets = require('./tweets.js');
 var verifyCaptcha = require('./verify-captcha.js');
+
+// scheduler every minute (second=5)
+var scheduling = schedule.scheduleJob('5 * * * * *', function(){
+  scheduler.update();
+});
 
 var appRouter = function(app) {
 	
