@@ -177,7 +177,7 @@ function upsStats(data, callback){
                 // group by year
                 groupBy(regs, function(res){ 
                     error = false;
-                    data.registrationDate = res;
+                    data.ups = res;
                     callback(error);
                 });
                 
@@ -185,7 +185,7 @@ function upsStats(data, callback){
                 console.log("ADMIN-STATS-UPS: Error getting registration dates.");
                 
                 error = true;
-                data.registrationDate = [];
+                data.ups = [];
                 callback(error);
             }
             
@@ -259,7 +259,7 @@ function resourcesByCountry(results, callback){
 	var error, result = [];
 	
 	tweetStatsModel.aggregate([
-        { $group:{_id:{'country' : "$country"}, count:{ $sum: 1}}},
+        { $group:{_id:{'country' : "$country"}, count:{ $sum: 1}}}
         ],  function(err, data) {
             if (!err){
                 console.log("ADMIN-STATS-ResByCOUNTRY: Stats obtained");
@@ -335,8 +335,7 @@ function resourcesByDay(results, callback){
 					}
 				}
 			}
-			
-			
+
 			results.byDay = result;
 			callback(error);
 			
@@ -351,8 +350,40 @@ function resourcesByDay(results, callback){
 }
 
 function resourcesByUser(results, callback){
-	var error;
 	
+	var error, result = [];
+	
+	tweetStatsModel.aggregate([
+        { $group:{_id:{'userId' : "$userId"}, count:{ $sum: 1}}},
+        {$sort:{count:-1}},
+        {$limit: 10}
+        ],  function(err, data) {
+			
+			if(!err){
+				console.log("ADMIN-STATS-ResByUSER: Stats obtained");
+                  
+                error = false;
+                
+                for(var i=0; i<data.length; i++){
+					
+					var entry = {
+						userId: data[i]._id.userId,
+						count: data[i].count
+					};
+					result.push(entry);
+				}
+                
+				results.byCountry = result;
+				callback(error);
+				
+			} else {
+				console.log("ADMIN-STATS-ResByUSER: Error");
+					
+				error = true;
+				results.byUser = [];
+				callback(error);
+			}
+	});
 	
 }
 
@@ -366,7 +397,7 @@ function resourcesStats(data, callback){
 		byUser: {}
 	};
     
-    var count = Object.keys(results).length;
+    var count = Object.keys(results).length-1;
             
 	var callbackFunc = function(err){
 		
@@ -404,7 +435,7 @@ exports.get= function(accountID, callback){
             };
             error = false;
 
-            var count = Object.keys(data).length;
+            var count = Object.keys(data).length-1;
             
             var callbackFunc = function(err){
                 

@@ -232,3 +232,4 @@ function getUser(token, callback){
         }
     );
 }
+module.exports.getUser = getUser;

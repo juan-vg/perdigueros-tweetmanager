@@ -33,22 +33,27 @@ exports.publish = function (accountID, text, ip, callback){
                         
                         if(!err){
 							
+							// save stat
 							geoLocator.location(ip, function(err, resData){
+								
+								var country;
+								
 								if(!err){
-									var tweetData = {
-										date: new Date(),
-										country: resData,
-										accountId: accountID.twitterAccountId
-									};
-									adminStats.saveTweet(tweetData);
+									country = resData;
 								} else {
-									var tweetData = {
-										date: new Date(),
-										country: "undefined",
-										accountId: accountID.twitterAccountId
-									};
-									adminStats.saveTweet(tweetData);
+									country = "undefined";
 								}
+								
+								accVerificator.getUser(accountID.token, function(err, data){
+									if(!err){
+										var tweetData = {
+											date: new Date(),
+											country: country,
+											accountId: data._id
+										};
+										adminStats.saveTweet(tweetData);
+									}
+								});
 							});
 
                             error = false;
@@ -127,21 +132,25 @@ exports.schedule = function (accountID, tweetData, ip, callback){
                         if(!err){
 							
 							geoLocator.location(ip, function(err, resData){
+								
+								var country;
+								
 								if(!err){
-									var tweetData = {
-										date: tweetData.date,
-										country: resData,
-										accountId: accountID.twitterAccountId
-									};
-									adminStats.saveTweet(tweetData);
+									country = resData;
 								} else {
-									var tweetData = {
-										date: tweetData.date,
-										country: "undefined",
-										accountId: accountID.twitterAccountId
-									};
-									adminStats.saveTweet(tweetData);
+									country = "undefined";
 								}
+								
+								accVerificator.getUser(accountID.token, function(err, data){
+									if(!err){
+										var tweetData = {
+											date: tweetData.date,
+											country: country,
+											userId: data._id
+										};
+										adminStats.saveTweet(tweetData);
+									}
+								});
 							});
 							
                             error = false;
