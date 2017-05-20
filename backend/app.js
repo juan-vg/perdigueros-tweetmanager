@@ -905,7 +905,10 @@ var appRouter = function(app) {
 		
 		console.log("APP-POST-TWEET-PUBLISH: Publishing tweet for account: " + accountID.twitterAccountId);
 		
-		tweets.publish(accountID, request.body.text, function (err, data){
+		var text = request.body.text;
+		var ip = request.connection.remoteAddress;
+		
+		tweets.publish(accountID, text, ip, function (err, data){
 			
 			if(!err){
 				console.log("APP-POST-TWEET-PUBLISH: OK");
@@ -995,9 +998,11 @@ var appRouter = function(app) {
 			date: new Date(request.body.date)
 		};
 		
+		var ip = request.connection.remoteAddress;
+		
 		console.log("APP-POST-TWEET-PUBLISH: Scheduling tweet for account: " + accountID.twitterAccountId);
 		
-		tweets.schedule(accountID, tweetData, function (err, data){
+		tweets.schedule(accountID, tweetData, ip, function (err, data){
 			
 			if(!err){
 				console.log("APP-POST-TWEET-SCHEDULE: OK");

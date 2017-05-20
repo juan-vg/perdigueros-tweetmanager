@@ -1,10 +1,12 @@
 var schedTweetsModel = require("./models/scheduled-tweets");
 var accVerificator = require("./account-verifications");
 var dbVerificator = require("./db-verifications");
+var adminStats = require("./admin-stats.js");
+var geoLocator = require("./geo-location.js");
 var TwitterPackage = require('twitter');
 var objectID = require('mongodb').ObjectID;
 
-exports.publish = function (accountID, text, callback){
+exports.publish = function (accountID, text, ip, callback){
 
     var error, data;
     
@@ -30,6 +32,30 @@ exports.publish = function (accountID, text, callback){
                     Twitter.post('statuses/update', {status: text}, function(err, tweet, response){
                         
                         if(!err){
+                            
+                            // save stat
+                            geoLocator.location(ip, function(err, resData){
+                                
+                                var country;
+                                
+                                if(!err){
+                                    country = resData;
+                                } else {
+                                    country = "undefined";
+                                }
+                                
+                                accVerificator.getUser(accountID.token, function(err, data){
+                                    if(!err){
+                                        var tweetData = {
+                                            date: new Date(),
+                                            country: country,
+                                            accountId: data._id
+                                        };
+                                        adminStats.saveTweet(tweetData);
+                                    }
+                                });
+                            });
+
                             error = false;
                             data= null;
                         } else {
@@ -81,7 +107,7 @@ exports.publish = function (accountID, text, callback){
 
 // schedules the publication of a tweet
 // tweetData = {text, date}
-exports.schedule = function (accountID, tweetData, callback){
+exports.schedule = function (accountID, tweetData, ip, callback){
 
     var error, data;
     
@@ -104,6 +130,29 @@ exports.schedule = function (accountID, tweetData, callback){
                     
                     dbSchedTweets.save(function(err, res){
                         if(!err){
+                            
+                            geoLocator.location(ip, function(err, resData){
+                                
+                                var country;
+                                
+                                if(!err){
+                                    country = resData;
+                                } else {
+                                    country = "undefined";
+                                }
+                                
+                                accVerificator.getUser(accountID.token, function(err, data){
+                                    if(!err){
+                                        var tweetData = {
+                                            date: tweetData.date,
+                                            country: country,
+                                            userId: data._id
+                                        };
+                                        adminStats.saveTweet(tweetData);
+                                    }
+                                });
+                            });
+                            
                             error = false;
                             data = null;
                         } else {
