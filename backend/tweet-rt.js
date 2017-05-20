@@ -1,5 +1,5 @@
 var TwitterPackage = require('twitter');
-var WebSocket = require('ws');
+var WebSocketServer = require('ws');
 var twiAccModel = require("./models/twitter-accounts");
 var hashtagsModel = require("./models/hashtags");
 var follUsModel = require("./models/followed-users");
@@ -8,7 +8,7 @@ var dbVerificator = require("./db-verifications.js");
 var mongoose = require("mongoose");
 var objectID = require('mongodb').ObjectID;
 
-const wss = new WebSocket.Server({ port: 8889 }, function(err){
+const wss = new WebSocketServer.Server({ port: 8889 }, function(err){
     if(!err){
         console.log("Servidor escuchando peticiones en el puerto 8889");
     }
@@ -192,7 +192,7 @@ wss.on('connection', function connection(ws, req) {
             var twitterAccountId = clients[index].twitterAccountId;
             
             // if it is a validation message
-            if(message.search("token:") == 0 && message.length > 6){
+            if(message.search("token:") === 0 && message.length > 6){
                 
                 var token = message.substr(6);
                 console.log("validating token " + token);

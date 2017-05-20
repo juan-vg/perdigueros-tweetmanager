@@ -160,7 +160,6 @@ exports.post = function (accountID, user, callback){
                                 // get twitter user id
                                 Twitter.get('users/lookup', {screen_name: user.replace("@","")}, function(err, body){
                                     if(!err){
-                                        body.id_str
                                         
                                         // Everything ok
                                         var dbFollUsers = new follUsModel();
