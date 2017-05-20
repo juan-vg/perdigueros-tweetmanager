@@ -1,7 +1,7 @@
 var userAccModel = require("./models/user-accounts");
 var loginStatsModel = require("./models/login-stats");
 var regsDownsModel = require("./models/regs-downs-stats");
-var tweetStatsModel = require("./models/tweet-stats");;
+var tweetStatsModel = require("./models/tweet-stats");
 var accVerificator = require('./account-verifications.js');
 
 // STATS STORE
@@ -253,11 +253,138 @@ function lastAccessStats(data, callback){
     );
 }
 
+
+function resourcesByCountry(results, callback){
+	
+	var error, result = [];
+	
+	tweetStatsModel.aggregate([
+        { $group:{_id:{'country' : "$country"}, count:{ $sum: 1}}},
+        ],  function(err, data) {
+            if (!err){
+                console.log("ADMIN-STATS-ResByCOUNTRY: Stats obtained");
+                  
+                error = false;
+                
+                for(var i=0; i<data.length; i++){
+					
+					var entry = {
+						country: data[i]._id.country,
+						count: data[i].count
+					};
+					result.push(entry);
+				}
+                
+				results.byCountry = result;
+				callback(error);
+                
+            } else {
+                console.log("ADMIN-STATS-ResByCOUNTRY: Error");
+                
+                error = true;
+                results.byCountry = [];
+                callback(error);
+            }
+        }
+    );
+}
+
+function resourcesByDay(results, callback){
+	
+	const dayInMinutes = 24 * 60;
+	var error;
+	
+	var currDate = new Date();
+	var pastDate = new Date();
+    pastDate.setMinutes(pastDate.getMinutes() - 15*dayInMinutes);
+    
+    tweetStatsModel.find({"date": {$lte: currDate, $gte: pastDate}}, function(err, data){
+		if(!err){
+			console.log("ADMIN-STATS-ResByDAY: Stats obtained");
+			
+			error = false;
+			
+			var resources = [], result = [];
+			
+			//count
+			for(var i=0; i<data.length; i++){
+				var date = new Date(data[i].date);
+				if(resources[date.getMonth()+1] && resources[date.getMonth()+1][date.getDate()]){
+					resources[date.getMonth()+1][date.getDate()]++;
+				} else if(resources[date.getMonth()+1]){
+					resources[date.getMonth()+1][date.getDate()] = 1;
+				} else {
+					resources[date.getMonth()+1] = [];
+					resources[date.getMonth()+1][date.getDate()] = 1;
+				}
+			}
+			
+			//discard null results & parse to {key:value} format
+			for(var month=1; month<resources.length; month++){
+				if(resources[month]){
+					for(var day=1; day<resources[month].length; day++){
+						if(resources[month][day]){
+							
+							var entry = {
+								month: month,
+								day: day,
+								count: resources[month][day]
+							};
+							result.push(entry);
+						}
+					}
+				}
+			}
+			
+			
+			results.byDay = result;
+			callback(error);
+			
+		} else {
+			console.log("ADMIN-STATS-ResByDAY: Error");
+                
+			error = true;
+			results.byDay = [];
+			callback(error);
+		}
+	});
+}
+
+function resourcesByUser(results, callback){
+	var error;
+	
+	
+}
+
 function resourcesStats(data, callback){
     
     var error;
     
+    var results = {
+		byCountry: {},
+		byDay: {},
+		byUser: {}
+	};
     
+    var count = Object.keys(results).length;
+            
+	var callbackFunc = function(err){
+		
+		if(err){
+			error = true;
+		}
+		
+		if(count == 0){
+			data.resources = results;
+			callback(error);
+		} else {
+			count--;
+		}
+	};
+	
+	resourcesByCountry(results, callbackFunc);
+	resourcesByDay(results, callbackFunc);
+	resourcesByUser(results, callbackFunc);
 }
 
 
