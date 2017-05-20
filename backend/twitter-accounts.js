@@ -29,7 +29,7 @@ exports.getAll = function(userToken, callback){
                 query = {'email': data, "activated": true};
             }
             
-            twiAccModel.find(query, function(err, res){
+            twiAccModel.find(query, {information:0}, function(err, res){
                 if(!err){
                     console.log("TWITTER-ACCOUNTS-GET-ALL: Obtained User: ", data);
                     console.log("TWITTER-ACCOUNTS-GET-ALL: Accounts in database: ", res.length);
@@ -88,8 +88,7 @@ exports.getAccount = function(idAccount, userToken, callback){
                 if(success){
                     
                     // Find twitter account
-                    twiAccModel.find({"_id": new objectID(idAccount), "activated": true}, function(err, res){
-                        //console.log("TWITTER-ACCOUNTS-GET-ID: Checking database...");
+                    twiAccModel.find({"_id": new objectID(idAccount), "activated": true}, {information:0}, function(err, res){
 
                         if(!err){
                             console.log("TWITTER-ACCOUNTS-GET-ID: Account: ", res._id);

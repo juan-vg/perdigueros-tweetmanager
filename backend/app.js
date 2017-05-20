@@ -2,6 +2,8 @@ var fs = require("fs"),
 	querystring = require("querystring"),
 	util = require("util"),
 	url = require("url");
+var schedule = require('node-schedule');
+var scheduler = require('./scheduler.js');
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
@@ -12,6 +14,12 @@ var formidable = require('formidable');
 var login = require('./login.js');
 var adminStats = require('./admin-stats.js');
 var tweets = require('./tweets.js');
+var verifyCaptcha = require('./verify-captcha.js');
+
+// scheduler every minute (second=5)
+var scheduling = schedule.scheduleJob('5 * * * * *', function(){
+  scheduler.update();
+});
 
 var appRouter = function(app) {
 	
@@ -26,6 +34,7 @@ var appRouter = function(app) {
 	 * - name: "URL shortener"
      * - name: "Images"
      * - name: "Tweets"
+     * - name: "Captcha"
 	 * 
 	 * definitions:
 	 *   Twitter-accounts:
@@ -87,6 +96,9 @@ var appRouter = function(app) {
 	 *       passwd:
 	 *         type: string
 	 *         description: "The user password"
+	 *       "g-recaptcha-response":
+	 *         type: string
+	 *         description: "The google captcha response"
 	 * 
 	 *   Signup:
 	 *     type: "object"
@@ -100,6 +112,9 @@ var appRouter = function(app) {
 	 *       email:
 	 *         type: string
 	 *         description: "The user email"
+	 *       "g-recaptcha-response":
+	 *         type: string
+	 *         description: "The google captcha response"
 	 * 
 	 *   Validate:
 	 *     type: "object"
@@ -148,6 +163,13 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The publish date"
 	 * 
+	 *   GoogleCaptchaResponse:
+	 *     type: "object"
+	 *     properties:
+	 *       "g-recaptcha-response":
+	 *         type: string
+	 *         description: "The google captcha response"
+	 * 
 	 */
 
 
@@ -175,6 +197,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: User created
+	 *       400:
+	 *         description: Captcha validation error
 	 *       409:
 	 *         description: Email address already in use
 	 *       500:
@@ -190,7 +214,12 @@ var appRouter = function(app) {
 			"email": request.body.email
 		};
 		
-		login.signup(accountData, function (err, data){
+		var captchaData = {
+			gResponse: request.body['g-recaptcha-response'],
+			rAddress: request.connection.remoteAddress
+		};
+		
+		login.signup(accountData, captchaData, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNUP: OK");
 						
@@ -198,7 +227,13 @@ var appRouter = function(app) {
 					response.write("Created");
 					
 				} else {
-					if(data == "ALREADY EXISTS"){
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-LOGIN-SIGNUP: Captcha validation error");
+						
+						response.writeHead(400, {"Content-Type": "text/html"});
+						response.write("Captcha validation error");
+						
+					} else if(data == "ALREADY EXISTS"){
 						console.log("APP-LOGIN-SIGNUP: Already exists");
 						
 						response.writeHead(409, {"Content-Type": "text/html"});
@@ -237,6 +272,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Login OK 
+	 *       400:
+	 *         description: Captcha validation error
 	 *       401:
 	 *         description: Incorrect login
 	 *       409:
@@ -255,7 +292,12 @@ var appRouter = function(app) {
 			"passwd": request.body.passwd
 		};
 		
-		login.localSignin(accountID, function (err, data){
+		var captchaData = {
+			gResponse: request.body['g-recaptcha-response'],
+			rAddress: request.connection.remoteAddress
+		};
+		
+		login.localSignin(accountID, captchaData, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNIN: OK");
 						
@@ -263,7 +305,13 @@ var appRouter = function(app) {
 					response.write(JSON.stringify(data));
 					
 				} else {
-					if (data == "MUST CHANGE PASSWD") {
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-LOGIN-SIGNIN: Captcha validation error");
+						
+						response.writeHead(400, {"Content-Type": "text/html"});
+						response.write("Captcha validation error");
+						
+					} else if (data == "MUST CHANGE PASSWD") {
 						console.log("APP-LOGIN-SIGNIN: Must change password");
 						
 						response.writeHead(459, {"Content-Type": "text/html"});
@@ -691,7 +739,7 @@ var appRouter = function(app) {
 	 *       500:
 	 *         description: Error inserting the twitter account into the database
 	 *       503:
-	 *         description: Twitter service unavailable
+	 *         description: Twitter service unavailable OR Wrong twitter-autentication data
 	 */
 	app.post("/twitter-accounts", function(request, response) {
 		console.log("APP-POST-ACCOUNT");
@@ -724,7 +772,7 @@ var appRouter = function(app) {
 					console.log("APP-POST-ACCOUNT: Twitter error");
 					
 					response.writeHead(503, {"Content-Type": "text/html"});
-					response.write("Twitter service unavailable");
+					response.write("Twitter service unavailable OR Wrong twitter-autentication data");
 					
 				} else {
 					console.log("APP-POST-ACCOUNT: Already exists");
@@ -734,8 +782,7 @@ var appRouter = function(app) {
 				}
 			}
 			response.end();
-		}
-	);
+		});
 	});
 	
 	//borra una cuenta
@@ -1488,6 +1535,7 @@ var appRouter = function(app) {
 		});
 	});
 	
+	
 	//HASHTAGS
 	
 	/**
@@ -1996,6 +2044,8 @@ var appRouter = function(app) {
      *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
      *       500:
      *         description: DB error
+     *       503:
+     *         description: Twitter service unavailable
      */
 	app.post("/twitter-accounts/:id/followed-users", function(request, response) {
 	    var accountID = {
@@ -2026,7 +2076,13 @@ var appRouter = function(app) {
                     response.writeHead(409, {"Content-Type": "text/html"});
                     response.write("Followed user already exists for the provided twitter account");    
                     
-                } else {
+                } else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-ACCOUNT: Twitter service unavailable");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
                     console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
                     
                     response.writeHead(500, {"Content-Type": "text/html"});
@@ -2648,6 +2704,61 @@ var appRouter = function(app) {
               });
             });
     });
+    
+    /**
+     * @swagger
+     * /verify-captcha:
+     *   post:
+     *     tags:
+     *       - Captcha
+     *     description: Verify the captcha result
+     *     parameters:
+     *       - name: captcha-response
+     *         in: body
+     *         required: true
+     *         description: The google recaptcha response
+     *         schema:
+	 *           $ref: "#/definitions/GoogleCaptchaResponse"
+     *     produces:
+     *       - application/json
+     *     responses:
+     *       200:
+     *         description: Captcha response (verified or not)
+     *       503:
+     *         description: Captcha service unavailable
+     */
+    app.post("/verify-captcha", function(request, response){
+		
+		console.log("APP-VERIFY-CAPTCHA: Verifying captcha response");
+		
+		verifyCaptcha.verify(request.body['g-recaptcha-response'], request.connection.remoteAddress,
+			function(err, data){
+				
+				if(!err){
+					console.log("APP-VERIFY-CAPTCHA: OK");
+					
+					response.writeHead(200, {"Content-Type": "application/json"});
+					response.write(JSON.stringify({"responseCode": 0, "responseDesc": data}));
+				} else {
+					
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-VERIFY-CAPTCHA: Captcha service unavailable");
+						
+						response.writeHead(503, {"Content-Type": "text/html"});
+						response.write("Captcha service unavailable");
+						
+					} else {
+						console.log("APP-VERIFY-CAPTCHA: " + data);
+						
+						response.writeHead(200, {"Content-Type": "application/json"});
+						response.write(JSON.stringify({"responseCode": 1, "responseDesc": data}));
+					}
+				}
+				
+				response.end();
+			}
+		);
+	});
 };
 
 module.exports = appRouter;
