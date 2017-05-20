@@ -143,8 +143,10 @@ ListAccounts.controller('AccountController', function($scope,$http,$localStorage
 
 // Stadistics Data
 var StadisticsData =angular.module('StadisticsData', ['ngStorage','chart.js']);
+// Support Functions for parsing dates
 StadisticsData.factory('DateService', function() {
 	return {
+		// Return String Name month corresponding to a number
 		getMonthName: function(date) {
 			var monthNames = [
 				"Enero", "Febrero", "Marzo",
@@ -153,58 +155,84 @@ StadisticsData.factory('DateService', function() {
 				"Noviembre", "Diciembre"
 			];
 			return monthNames[date];
+		},
+		// Return an array with last 12 month dates of date. [month, year, data1,data2]
+		getArrayLastTwelve: function(date) {
+			var arr = [];
+			var month=date.getMonth();
+			var year=date.getFullYear();
+			for (var i = 12; i > 0; i--) {
+				arr[i-1]=[month,year,0,0];
+				month--;
+				if(month<0) {
+					month=11;
+					year--;
+				}
+			};
+			return arr;
 		}
-	}
+	};
 })
 // User Iputs and Outputs from the Application Data
 StadisticsData.controller('UserDoorController', function($scope,$http,$localStorage,DateService) {
 	$scope.token=$localStorage.token;
-	$http.get('http://zaratech-ptm.ddns.net:8888/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackHastags, errorCallbackHastags);
-	function successCallbackHastags(stats){
-		var index = -1;
-		var registrationData= stats.data.registrationDate;
-		var downsData= stats.data.downs;
+	// Get data Stadistics from the server
+	$http.get('http://zaratech-ptm.ddns.net:8888/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackStats, errorCallbackStats);
+	function successCallbackStats(stats){ 
+		var registrationData= stats.data.ups;	// Registration Data
+		var downsData= stats.data.downs;					// Downs Data
 		var label=[];
 		var data=[];
-		
+		var date_now=new Date();
+		// Fill last twelve dates with Downs and Registration Stadistics
+		var lastTwelve = DateService.getArrayLastTwelve(date_now);
 		for( var key in registrationData) {
 			var year = key;
-			var registrationDataYear=registrationData[key];
-			for (var i = 0; i < registrationDataYear.length; i++) {
-				var month= DateService.getMonthName(registrationDataYear[i].month-1);
-				var date = new Date(month+", "+year);
-				label.push(date);
-				data.push(registrationDataYear[i].data);
+			// Search last twelve months
+			if (year == lastTwelve[0][1] || year == lastTwelve[11][1]) {
+				var registrationDataYear=registrationData[key];
+				for (var i = 0; i < registrationDataYear.length; i++) {
+					var month= registrationDataYear[i].month-1;
+					for (var j = 0; j < lastTwelve.length; j++) {
+						if (month == lastTwelve[j][0]) {
+							// Fill registrationdata
+							lastTwelve[j][2]=registrationDataYear[i].data;
+						}
+					}
+				}
 			}
 		}
-		$scope.labels = label;
-		$scope.data = data;
-		data=[];
-		label=[];
 		for( var key in downsData) {
 			var year = key;
-			var downsDataYear=downsData[key];
-			for (var i = 0; i < downsDataYear.length; i++) {
-				var month= DateService.getMonthName(downsDataYear[i].month-1);
-				var date = new Date();
-				label.push(date);
-				data.push(downsDataYear[i].data);
+			// Search last twelve months
+			if (year == lastTwelve[0][1] || year == lastTwelve[11][1]) {
+				var downsDataYear=downsData[key];
+				for (var i = 0; i < downsDataYear.length; i++) {
+					var month= downsDataYear[i].month-1;
+					for (var j = 0; j < lastTwelve.length; j++) {
+						if (month == lastTwelve[j][0]) {
+							// Fill downdata
+							lastTwelve[j][3]=downsDataYear[i].data;
+						}
+					}
+				}
 			}
 		}
-		$scope.labels2 = label;
-		$scope.data2 = data;
+		data1=[];	// Registration
+		data2=[];	// Down
+		// Fill label and data of the chart
+		for (var i = 0; i < lastTwelve.length; i++) {
+			var month= DateService.getMonthName(lastTwelve[i][0]);
+			var date = month+", "+lastTwelve[i][1];
+			label.push(date);
+			data1.push(lastTwelve[i][2]);
+			data2.push(lastTwelve[i][3]);
+		}
+		$scope.labels = label;
+		$scope.data = [data1,data2];
+		$scope.series = ['Altas', 'Bajas'];
 		$scope.options = {
 		scales: {
-			xAxes: [{
-				type: "time",
-				time: {
-					unit: 'month',
-					round: 'month',
-					displayFormats: {
-						year: 'MMM D'
-					}
-			}
-		}],
 			yAxes: [{
 				ticks: {
 				beginAtZero: true
@@ -213,43 +241,49 @@ StadisticsData.controller('UserDoorController', function($scope,$http,$localStor
 		}
 	}
 	}
-	function errorCallbackHastags(error){
+	function errorCallbackStats(error){
 		console.log("Error getting stats");
 	}
 });
 
+
 // User Last Connection Time Data
 StadisticsData.controller('AccessDataController', function($scope,$http,$localStorage,DateService) {
-	$http.get('http://zaratech-ptm.ddns.net:8888/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackHastags, errorCallbackHastags);
-	function successCallbackHastags(stats){
-		var index = -1;
+	// Get last connection data stadistics from the server
+	$http.get('http://zaratech-ptm.ddns.net:8888/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackStats, errorCallbackStats);
+	function successCallbackStats(stats){
 		var accessData= stats.data.lastAccess;
 		var label=[];
 		var data=[];
-		// Format Hashtag list for the user
+		var date_now=new Date();
+		// // Fill last twelve dates with Access Stadistics
+		var lastTwelve = DateService.getArrayLastTwelve(date_now);
 		for( var key in accessData) {
 			var year = key;
-			var accessDataYear=accessData[key];
-			for (var i = 0; i < accessDataYear.length; i++) {
-				var month= DateService.getMonthName(accessDataYear[i].month-1);
-				var date = new Date(month+", "+year);
-				label.push(date);
-				data.push(accessDataYear[i].data);
+			// Search last 12 months
+			if (year == lastTwelve[0][1] || year == lastTwelve[11][1]) {
+				var accessDataYear=accessData[key];
+				for (var i = 0; i < accessDataYear.length; i++) {
+					var month= accessDataYear[i].month-1;
+					for (var j = 0; j < lastTwelve.length; j++) {
+						if (month == lastTwelve[j][0]) {
+							lastTwelve[j][2]=accessDataYear[i].data;
+						}
+					}
+				}
 			}
+		}
+		// Fill chart data with the last 12 month
+		for (var i = 0; i < lastTwelve.length; i++) {
+			var month= DateService.getMonthName(lastTwelve[i][0]);
+			var date = month+", "+lastTwelve[i][1];
+			label.push(date);
+			data.push(lastTwelve[i][2]);
 		}
 		$scope.labels = label;
 		$scope.data = data;
 		$scope.options = {
 		scales: {
-			xAxes: [{
-				type: "time",
-				time: {
-					unit: 'month',
-					displayFormats: {
-						day: 'MMM D'
-					}
-				}
-			}],
 			yAxes: [{
 				ticks: {
 				beginAtZero: true
@@ -258,7 +292,7 @@ StadisticsData.controller('AccessDataController', function($scope,$http,$localSt
 		}
 	}
 	}
-	function errorCallbackHastags(error){
+	function errorCallbackStats(error){
 		console.log("Error getting stats");
 	}
 });
