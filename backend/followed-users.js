@@ -147,49 +147,49 @@ exports.post = function (accountID, user, callback){
                                 data = "ALREADY EXISTS";
                                 callback(error, data);
                             } else {
-								
-								// create auth set
-								var secret = {
-									consumer_key: result.consumerKey,
-									consumer_secret: result.consumerSecret,
-									access_token_key: result.accessToken,
-									access_token_secret: result.accessTokenSecret
-								};
-								var Twitter = new TwitterPackage(secret);
-								
-								// get twitter user id
-								Twitter.get('users/lookup', {screen_name: user.replace("@","")}, function(err, body){
-									if(!err){
-										body.id_str
-										
-										// Everything ok
-										var dbFollUsers = new follUsModel();
-										dbFollUsers.twitterAccountId = accountID.twitterAccountId;
-										dbFollUsers.user = user;
-										dbFollUsers.userId = body[0].id_str;
+                                
+                                // create auth set
+                                var secret = {
+                                    consumer_key: result.consumerKey,
+                                    consumer_secret: result.consumerSecret,
+                                    access_token_key: result.accessToken,
+                                    access_token_secret: result.accessTokenSecret
+                                };
+                                var Twitter = new TwitterPackage(secret);
+                                
+                                // get twitter user id
+                                Twitter.get('users/lookup', {screen_name: user.replace("@","")}, function(err, body){
+                                    if(!err){
+                                        body.id_str
+                                        
+                                        // Everything ok
+                                        var dbFollUsers = new follUsModel();
+                                        dbFollUsers.twitterAccountId = accountID.twitterAccountId;
+                                        dbFollUsers.user = user;
+                                        dbFollUsers.userId = body[0].id_str;
 
-										// Save new followed user
-										dbFollUsers.save(function(err, result) {
-											if(!err){
+                                        // Save new followed user
+                                        dbFollUsers.save(function(err, result) {
+                                            if(!err){
 
-												console.log("FOLLOWED-USERS-POST-ID: Created new followed user");
+                                                console.log("FOLLOWED-USERS-POST-ID: Created new followed user");
 
-												error = false;
-												data = null;
-											} else {
-												console.log("FOLLOWED-USERS-POST-ID: Error while performing query.");
+                                                error = false;
+                                                data = null;
+                                            } else {
+                                                console.log("FOLLOWED-USERS-POST-ID: Error while performing query.");
 
-												error = true;
-												data = "DB ERROR";
-											}
-											callback(error, data);
-										});
-									} else {
-										error = true;
-										data = "TWITTER ERROR";
-										callback(error, data);
-									}
-								}); 
+                                                error = true;
+                                                data = "DB ERROR";
+                                            }
+                                            callback(error, data);
+                                        });
+                                    } else {
+                                        error = true;
+                                        data = "TWITTER ERROR";
+                                        callback(error, data);
+                                    }
+                                }); 
                             }
                         } else {
                             console.log("FOLLOWED-USERS-POST-ID: Error while performing query.");
