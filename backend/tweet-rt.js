@@ -23,8 +23,8 @@ var numClients = 0;
 
 
 function streamFunc(index, callback){
-	
-	var error, tweet;
+    
+    var error, tweet;
     
     var twitterAccountId = clients[index].twitterAccountId;
     
@@ -72,13 +72,13 @@ function streamFunc(index, callback){
                                 }
 
                                 stream.on('data', function(event) {
-									tweet = {
-										created_at: event.created_at,
-										full_name: event.user.name,
-										name: event.user.screen_name,
-										text: event.text
-									};
-									error = false;
+                                    tweet = {
+                                        created_at: event.created_at,
+                                        full_name: event.user.name,
+                                        name: event.user.screen_name,
+                                        text: event.text
+                                    };
+                                    error = false;
                                     callback(error, tweet);
                                 });
 
@@ -95,15 +95,15 @@ function streamFunc(index, callback){
                         } else {
                             console.log("EMPTY HASHTAG LIST");
                             tweet = "EMPTY LIST ERROR";
-							error = true;
-							callback(error, tweet);
+                            error = true;
+                            callback(error, tweet);
                         }
                         
                     } else {
                         console.log("H DB ERROR");
                         tweet = "DB ERROR";
-						error = true;
-						callback(error, tweet);
+                        error = true;
+                        callback(error, tweet);
                     }
                 });
                 
@@ -133,12 +133,12 @@ function streamFunc(index, callback){
 
                                 stream.on('data', function(event) {
                                     tweet = {
-										created_at: event.created_at,
-										full_name: event.user.name,
-										name: event.user.screen_name,
-										text: event.text
-									};
-									error = false;
+                                        created_at: event.created_at,
+                                        full_name: event.user.name,
+                                        name: event.user.screen_name,
+                                        text: event.text
+                                    };
+                                    error = false;
                                     callback(error, tweet);
                                 });
 
@@ -156,16 +156,16 @@ function streamFunc(index, callback){
                             console.log("EMPTY FOLLOWED LIST");
                             
                             tweet = "EMPTY LIST ERROR";
-							error = true;
-							callback(error, tweet);
+                            error = true;
+                            callback(error, tweet);
                         }
                         
                     } else {
                         console.log("FU DB ERROR");
                         
                         tweet = "DB ERROR";
-						error = true;
-						callback(error, tweet);
+                        error = true;
+                        callback(error, tweet);
                     }
                 });
             }
@@ -174,8 +174,8 @@ function streamFunc(index, callback){
             console.log("TA DB ERROR");
             
             tweet = "DB ERROR";
-			error = true;
-			callback(error, tweet);
+            error = true;
+            callback(error, tweet);
         }
     });
 }
@@ -254,9 +254,9 @@ wss.on('connection', function connection(ws, req) {
                                     if(!err){
                                         ws.send(JSON.stringify(tweet));
                                     } else {
-										ws.send(tweet);
-										ws.close();
-									}
+                                        ws.send(tweet);
+                                        ws.close();
+                                    }
                                 });
                                 
                             } else {
