@@ -2,6 +2,8 @@ var fs = require("fs"),
 	querystring = require("querystring"),
 	util = require("util"),
 	url = require("url");
+var schedule = require('node-schedule');
+var scheduler = require('./scheduler.js');
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
@@ -13,6 +15,11 @@ var login = require('./login.js');
 var adminStats = require('./admin-stats.js');
 var tweets = require('./tweets.js');
 var verifyCaptcha = require('./verify-captcha.js');
+
+// scheduler every minute (second=5)
+var scheduling = schedule.scheduleJob('5 * * * * *', function(){
+  scheduler.update();
+});
 
 var appRouter = function(app) {
 	
@@ -732,7 +739,7 @@ var appRouter = function(app) {
 	 *       500:
 	 *         description: Error inserting the twitter account into the database
 	 *       503:
-	 *         description: Twitter service unavailable
+	 *         description: Twitter service unavailable OR Wrong twitter-autentication data
 	 */
 	app.post("/twitter-accounts", function(request, response) {
 		console.log("APP-POST-ACCOUNT");
@@ -765,7 +772,7 @@ var appRouter = function(app) {
 					console.log("APP-POST-ACCOUNT: Twitter error");
 					
 					response.writeHead(503, {"Content-Type": "text/html"});
-					response.write("Twitter service unavailable");
+					response.write("Twitter service unavailable OR Wrong twitter-autentication data");
 					
 				} else {
 					console.log("APP-POST-ACCOUNT: Already exists");
@@ -775,8 +782,7 @@ var appRouter = function(app) {
 				}
 			}
 			response.end();
-		}
-	);
+		});
 	});
 	
 	//borra una cuenta
@@ -1529,6 +1535,7 @@ var appRouter = function(app) {
 		});
 	});
 	
+	
 	//HASHTAGS
 	
 	/**
@@ -2037,6 +2044,8 @@ var appRouter = function(app) {
      *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
      *       500:
      *         description: DB error
+     *       503:
+     *         description: Twitter service unavailable
      */
 	app.post("/twitter-accounts/:id/followed-users", function(request, response) {
 	    var accountID = {
@@ -2067,7 +2076,13 @@ var appRouter = function(app) {
                     response.writeHead(409, {"Content-Type": "text/html"});
                     response.write("Followed user already exists for the provided twitter account");    
                     
-                } else {
+                } else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-ACCOUNT: Twitter service unavailable");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
                     console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
                     
                     response.writeHead(500, {"Content-Type": "text/html"});
