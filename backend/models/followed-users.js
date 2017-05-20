@@ -4,7 +4,8 @@ var mongoSchema = mongoose.Schema;
 
 var followedUsersSchema = new mongoSchema({
     "twitterAccountId" : String,
-    "user" : String
+    "user" : String,
+    "userId" : String
 });
 
 var dbFollowedUsers = mongoose.model('followedusers',followedUsersSchema);

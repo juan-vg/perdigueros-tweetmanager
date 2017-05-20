@@ -1535,6 +1535,26 @@ var appRouter = function(app) {
 		});
 	});
 	
+	app.get("/twitter-accounts/:id/tweets/stream", function(request, response) {
+		var tweetTest = require('./tweet-test.js');
+		
+		response.writeHead(200, {"Content-Type": "application/json"});
+		
+		tweetTest.stream(function(data){
+			
+			console.log("Data=", data);
+			
+			if(data!="ERROR"){
+				response.write(data+"\n");
+				response.write("--------------------\n");
+				
+			} else {
+				response.end();
+			}
+			
+		});
+	});
+	
 	//HASHTAGS
 	
 	/**
@@ -2043,6 +2063,8 @@ var appRouter = function(app) {
      *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
      *       500:
      *         description: DB error
+     *       503:
+     *         description: Twitter service unavailable
      */
 	app.post("/twitter-accounts/:id/followed-users", function(request, response) {
 	    var accountID = {
@@ -2073,7 +2095,13 @@ var appRouter = function(app) {
                     response.writeHead(409, {"Content-Type": "text/html"});
                     response.write("Followed user already exists for the provided twitter account");    
                     
-                } else {
+                } else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-ACCOUNT: Twitter service unavailable");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
                     console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
                     
                     response.writeHead(500, {"Content-Type": "text/html"});

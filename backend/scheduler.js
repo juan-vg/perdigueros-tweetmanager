@@ -14,7 +14,7 @@ exports.update = function(){
             //console.log("SCHEDULER-ERROR: " + data);
         }
     });
-}
+};
 
 function scheduler(callback){
 
