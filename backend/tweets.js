@@ -32,29 +32,29 @@ exports.publish = function (accountID, text, ip, callback){
                     Twitter.post('statuses/update', {status: text}, function(err, tweet, response){
                         
                         if(!err){
-							
-							// save stat
-							geoLocator.location(ip, function(err, resData){
-								
-								var country;
-								
-								if(!err){
-									country = resData;
-								} else {
-									country = "undefined";
-								}
-								
-								accVerificator.getUser(accountID.token, function(err, data){
-									if(!err){
-										var tweetData = {
-											date: new Date(),
-											country: country,
-											accountId: data._id
-										};
-										adminStats.saveTweet(tweetData);
-									}
-								});
-							});
+                            
+                            // save stat
+                            geoLocator.location(ip, function(err, resData){
+                                
+                                var country;
+                                
+                                if(!err){
+                                    country = resData;
+                                } else {
+                                    country = "undefined";
+                                }
+                                
+                                accVerificator.getUser(accountID.token, function(err, data){
+                                    if(!err){
+                                        var tweetData = {
+                                            date: new Date(),
+                                            country: country,
+                                            accountId: data._id
+                                        };
+                                        adminStats.saveTweet(tweetData);
+                                    }
+                                });
+                            });
 
                             error = false;
                             data= null;
@@ -130,29 +130,29 @@ exports.schedule = function (accountID, tweetData, ip, callback){
                     
                     dbSchedTweets.save(function(err, res){
                         if(!err){
-							
-							geoLocator.location(ip, function(err, resData){
-								
-								var country;
-								
-								if(!err){
-									country = resData;
-								} else {
-									country = "undefined";
-								}
-								
-								accVerificator.getUser(accountID.token, function(err, data){
-									if(!err){
-										var tweetData = {
-											date: tweetData.date,
-											country: country,
-											userId: data._id
-										};
-										adminStats.saveTweet(tweetData);
-									}
-								});
-							});
-							
+                            
+                            geoLocator.location(ip, function(err, resData){
+                                
+                                var country;
+                                
+                                if(!err){
+                                    country = resData;
+                                } else {
+                                    country = "undefined";
+                                }
+                                
+                                accVerificator.getUser(accountID.token, function(err, data){
+                                    if(!err){
+                                        var tweetData = {
+                                            date: tweetData.date,
+                                            country: country,
+                                            userId: data._id
+                                        };
+                                        adminStats.saveTweet(tweetData);
+                                    }
+                                });
+                            });
+                            
                             error = false;
                             data = null;
                         } else {
