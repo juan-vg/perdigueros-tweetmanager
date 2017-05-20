@@ -1535,25 +1535,6 @@ var appRouter = function(app) {
 		});
 	});
 	
-	app.get("/twitter-accounts/:id/tweets/stream", function(request, response) {
-		var tweetTest = require('./tweet-test.js');
-		
-		response.writeHead(200, {"Content-Type": "application/json"});
-		
-		tweetTest.stream(function(data){
-			
-			console.log("Data=", data);
-			
-			if(data!="ERROR"){
-				response.write(data+"\n");
-				response.write("--------------------\n");
-				
-			} else {
-				response.end();
-			}
-			
-		});
-	});
 	
 	//HASHTAGS
 	
