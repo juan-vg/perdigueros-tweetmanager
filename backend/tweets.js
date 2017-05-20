@@ -1,10 +1,12 @@
 var schedTweetsModel = require("./models/scheduled-tweets");
 var accVerificator = require("./account-verifications");
 var dbVerificator = require("./db-verifications");
+var adminStats = require("./admin-stats.js");
+var geoLocator = require("./geo-location.js");
 var TwitterPackage = require('twitter');
 var objectID = require('mongodb').ObjectID;
 
-exports.publish = function (accountID, text, callback){
+exports.publish = function (accountID, text, ip, callback){
 
     var error, data;
     
@@ -30,6 +32,25 @@ exports.publish = function (accountID, text, callback){
                     Twitter.post('statuses/update', {status: text}, function(err, tweet, response){
                         
                         if(!err){
+							
+							geoLocator.location(ip, function(err, resData){
+								if(!err){
+									var tweetData = {
+										date: new Date(),
+										country: resData,
+										accountId: accountID.twitterAccountId
+									};
+									adminStats.saveTweet(tweetData);
+								} else {
+									var tweetData = {
+										date: new Date(),
+										country: "undefined",
+										accountId: accountID.twitterAccountId
+									};
+									adminStats.saveTweet(tweetData);
+								}
+							});
+
                             error = false;
                             data= null;
                         } else {
@@ -81,7 +102,7 @@ exports.publish = function (accountID, text, callback){
 
 // schedules the publication of a tweet
 // tweetData = {text, date}
-exports.schedule = function (accountID, tweetData, callback){
+exports.schedule = function (accountID, tweetData, ip, callback){
 
     var error, data;
     
@@ -104,6 +125,25 @@ exports.schedule = function (accountID, tweetData, callback){
                     
                     dbSchedTweets.save(function(err, res){
                         if(!err){
+							
+							geoLocator.location(ip, function(err, resData){
+								if(!err){
+									var tweetData = {
+										date: tweetData.date,
+										country: resData,
+										accountId: accountID.twitterAccountId
+									};
+									adminStats.saveTweet(tweetData);
+								} else {
+									var tweetData = {
+										date: tweetData.date,
+										country: "undefined",
+										accountId: accountID.twitterAccountId
+									};
+									adminStats.saveTweet(tweetData);
+								}
+							});
+							
                             error = false;
                             data = null;
                         } else {

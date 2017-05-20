@@ -1,6 +1,7 @@
 var userAccModel = require("./models/user-accounts");
 var loginStatsModel = require("./models/login-stats");
 var regsDownsModel = require("./models/regs-downs-stats");
+var tweetStatsModel = require("./models/tweet-stats");;
 var accVerificator = require('./account-verifications.js');
 
 function groupBy(array, callback){
@@ -114,6 +115,41 @@ function storeDownStats(access, callback){
             data = null;
         } else {
             console.log("ADMIN-STATS-STORE-DOWN: Error while performing query.");
+
+            error = true;
+            data = "DB ERROR";
+        }
+    });
+}
+
+// Save the last accesses in the system
+exports.saveTweet = function(tweetData){
+    
+    storeTweetStats(tweetData, function(err, data){
+        if(!err){
+            //ignore
+        } else {
+            //ignore
+        }
+    });
+};
+
+function storeTweetStats(tweetData, callback){
+    
+    var dbTweetStats = new tweetStatsModel();
+    dbTweetStats.date = tweetData.date;
+    dbTweetStats.country = tweetData.country; 
+    dbTweetStats.userId = tweetData.userId; 
+    
+    dbTweetStats.save(function(err, res){
+        if(!err) {
+
+            console.log("ADMIN-STATS-STORE-TWEET: Stored new tweet.");
+
+            error = false;
+            data = null;
+        } else {
+            console.log("ADMIN-STATS-STORE-TWEET: Error while performing query.");
 
             error = true;
             data = "DB ERROR";
