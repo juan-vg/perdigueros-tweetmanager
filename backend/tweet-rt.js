@@ -23,6 +23,8 @@ var numClients = 0;
 
 
 function streamFunc(index, callback){
+	
+	var error, tweet;
     
     var twitterAccountId = clients[index].twitterAccountId;
     
@@ -36,6 +38,7 @@ function streamFunc(index, callback){
                 access_token_key: dbData[0].information.accessToken,
                 access_token_secret: dbData[0].information.accessTokenSecret
             };
+            
             var Twitter = new TwitterPackage(secret);
             
             if(clients[index].streamFunc == "hashtags"){
@@ -56,12 +59,12 @@ function streamFunc(index, callback){
                             list.push(hashtag);
                         }
                         
-                        var query = {track: list.join(",")};
+                        var query = list.join(",");
                         
-                        if(query.track && query.track.length > 0){
+                        if(query && query.length > 0){
                             
                             // create stream
-                            Twitter.stream('statuses/filter', query, function(stream) {
+                            Twitter.stream('statuses/filter', {track: query}, function(stream) {
                             
                                 // save stream handler
                                 if(!clients[index].stream){
@@ -69,24 +72,38 @@ function streamFunc(index, callback){
                                 }
 
                                 stream.on('data', function(event) {
-                                    callback(event.text);
+									tweet = {
+										created_at: event.created_at,
+										full_name: event.user.name,
+										name: event.user.screen_name,
+										text: event.text
+									};
+									error = false;
+                                    callback(error, tweet);
                                 });
 
                                 stream.on('error', function(error) {
-                                    console.log("TWITTER ERROR");
-                                    callback("TWITTER ERROR");
+                                    console.log("TWITTER ERROR : " + error);
+                                    
+                                    tweet = "TWITTER ERROR";
+                                    error = true;
+                                    callback(error, tweet);
                                 });
 
                             });
                             
                         } else {
                             console.log("EMPTY HASHTAG LIST");
-                            callback("EMPTY LIST ERROR");
+                            tweet = "EMPTY LIST ERROR";
+							error = true;
+							callback(error, tweet);
                         }
                         
                     } else {
                         console.log("H DB ERROR");
-                        callback("DB ERROR");
+                        tweet = "DB ERROR";
+						error = true;
+						callback(error, tweet);
                     }
                 });
                 
@@ -103,11 +120,11 @@ function streamFunc(index, callback){
                             list.push(userId);
                         }
                         
-                        var query = {follow: list.join(",")};
+                        var query = list.join(",");
                         
-                        if(query.follow && query.follow.length > 0){
+                        if(query && query.length > 0){
                             // create stream
-                            Twitter.stream('statuses/filter', query, function(stream) {
+                            Twitter.stream('statuses/filter', {follow: query}, function(stream) {
                             
                                 // save stream handler
                                 if(!clients[index].stream){
@@ -115,31 +132,50 @@ function streamFunc(index, callback){
                                 }
 
                                 stream.on('data', function(event) {
-                                    callback(event.text);
+                                    tweet = {
+										created_at: event.created_at,
+										full_name: event.user.name,
+										name: event.user.screen_name,
+										text: event.text
+									};
+									error = false;
+                                    callback(error, tweet);
                                 });
 
                                 stream.on('error', function(error) {
-                                    console.log("TWITTER ERROR");
-                                    callback("TWITTER ERROR");
+                                    console.log("TWITTER ERROR " + error);
+                                    
+                                    tweet = "TWITTER ERROR";
+                                    error = true;
+                                    callback(error, tweet);
                                 });
 
                             });
                             
                         } else {
                             console.log("EMPTY FOLLOWED LIST");
-                            callback("EMPTY LIST ERROR");
+                            
+                            tweet = "EMPTY LIST ERROR";
+							error = true;
+							callback(error, tweet);
                         }
                         
                     } else {
                         console.log("FU DB ERROR");
-                        callback("DB ERROR");
+                        
+                        tweet = "DB ERROR";
+						error = true;
+						callback(error, tweet);
                     }
                 });
             }
             
         } else {
             console.log("TA DB ERROR");
-            callback("DB ERROR");
+            
+            tweet = "DB ERROR";
+			error = true;
+			callback(error, tweet);
         }
     });
 }
@@ -213,13 +249,14 @@ wss.on('connection', function connection(ws, req) {
                                 
                                 clients[index].validated = true;
                                 
-                                streamFunc(index, function(text){
+                                streamFunc(index, function(err, tweet){
                                         
-                                    ws.send(text);
-                                        
-                                    if(text.search("ERROR")){
-                                        ws.close();
-                                    }
+                                    if(!err){
+                                        ws.send(JSON.stringify(tweet));
+                                    } else {
+										ws.send(tweet);
+										ws.close();
+									}
                                 });
                                 
                             } else {
