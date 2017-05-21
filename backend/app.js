@@ -198,13 +198,17 @@ var appRouter = function(app) {
 	 *       201:
 	 *         description: User created
 	 *       400:
-	 *         description: Captcha validation error
+	 *         description: Captcha validation error OR Params error
 	 *       409:
 	 *         description: Email address already in use
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/signup", function(request, response) {
+		
+		if(!request.body.name || !request.body.surname || !request.body.email || !request.body['g-recaptcha-response']){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-SIGNUP: Trying to create user " + request.body.email);
 		
@@ -273,7 +277,7 @@ var appRouter = function(app) {
 	 *       200:
 	 *         description: Login OK 
 	 *       400:
-	 *         description: Captcha validation error
+	 *         description: Captcha validation error OR Params error
 	 *       401:
 	 *         description: Incorrect login
 	 *       409:
@@ -284,6 +288,10 @@ var appRouter = function(app) {
 	 *         description: DB error
 	 */
 	app.post("/login/signin", function(request, response) {
+		
+		if(!request.body.email || !request.body.passwd){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-SIGNIN: Trying to authenticate user " + request.body.email);
 		
@@ -362,12 +370,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Account validated
+     *       400:
+     *         description: Params error
 	 *       401:
 	 *         description: Incorrect validation code
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/validate", function(request, response) {
+		
+		if(!request.body.email || !request.body.code){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-VALIDATE: Trying to validate user " + request.body.email);
 		
@@ -423,12 +437,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Email sent
+     *       400:
+     *         description: Params error
 	 *       409:
 	 *         description: User already validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/validate/resend", function(request, response) {
+		
+		if(!request.body.email){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-VALIDATE-RESEND: Resending validation email to user " + request.body.email);
 		
@@ -483,12 +503,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: New password sent
+     *       400:
+     *         description: Params error
 	 *       409:
 	 *         description: User not validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/remember", function(request, response) {
+		
+		if(!request.body.email){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-REMEMBER: Resending password to user " + request.body.email);
 		
@@ -543,12 +569,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: New password sent
+     *       400:
+     *         description: Params error
 	 *       409:
 	 *         description: User not validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/firstlogin", function(request, response) {
+		
+		if(!request.body.email || !request.body.oldPasswd || !request.body.newPasswd){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-FIRSTLOGIN: Changing password to user " + request.body.email);
 		
@@ -610,6 +642,7 @@ var appRouter = function(app) {
 	 *         description: Error getting the accounts from database
 	 */
 	app.get("/twitter-accounts", function(request, response) {
+		
 		console.log("APP-GET-ALL-ACCOUNTS");
 		
 		twitterAccounts.getAll(request.headers.token, function (err, data){
@@ -732,6 +765,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: Twitter account created
+     *       400:
+     *         description: Params error
 	 *       403:
 	 *         description: The user (token) can not be verified
 	 *       409:
@@ -742,6 +777,11 @@ var appRouter = function(app) {
 	 *         description: Twitter service unavailable OR Wrong twitter-autentication data
 	 */
 	app.post("/twitter-accounts", function(request, response) {
+		
+		if(!request.body.description || !request.body.information){
+			return response.status(400).send("Parameters error!");
+		}
+		
 		console.log("APP-POST-ACCOUNT");
 		
 		var newAccount = {
@@ -888,7 +928,7 @@ var appRouter = function(app) {
 	 *       201:
 	 *         description: Tweet published
 	 *       400:
-	 *         description: The provided {id} is not valid
+	 *         description: The provided {id} is not valid OR Params error
 	 *       403:
 	 *         description: Given token does not have permission to the provided twitter-account's {id}
 	 *       404:
@@ -897,6 +937,10 @@ var appRouter = function(app) {
 	 *         description: Twitter service unavailable
 	 */
 	app.post("/twitter-accounts/:id/tweets/publish", function(request, response) {
+		
+		if(!request.body.text){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		var accountID = {
 			'token': request.headers.token,
@@ -978,7 +1022,7 @@ var appRouter = function(app) {
 	 *       201:
 	 *         description: Tweet scheduled
 	 *       400:
-	 *         description: The provided {id} is not valid 
+	 *         description: The provided {id} is not valid OR Params error
 	 *       403:
 	 *         description: Given token does not have permission to the provided twitter-account's {id}
 	 *       500:
@@ -987,6 +1031,10 @@ var appRouter = function(app) {
 	 *         description: Twitter service unavailable
 	 */
 	app.post("/twitter-accounts/:id/tweets/schedule", function(request, response) {
+		
+		if(!request.body.text || !request.body.date){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		var accountID = {
 			'token': request.headers.token,
@@ -1730,7 +1778,7 @@ var appRouter = function(app) {
 	 *       201:
 	 *         description: Hashtag created
 	 *       400:
-	 *         description: The provided {id} is not valid
+	 *         description: The provided {id} is not valid OR Params error
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
 	 *       404:
@@ -1741,6 +1789,11 @@ var appRouter = function(app) {
 	 *         description: DB error
 	 */
 	app.post("/twitter-accounts/:id/hashtags", function(request, response) {
+		
+		if(!request.body.hashtag){
+			return response.status(400).send("Parameters error!");
+		}
+		
 		var accountID = {
 			'token': request.headers.token,
 			'twitterAccountId': request.params.id
@@ -2043,6 +2096,8 @@ var appRouter = function(app) {
      *     responses:
      *       201:
      *         description: Followed user created
+     *       400:
+     *         description: Params error
      *       403:
      *         description: Given token does not own the provided twitter-account's {id}
      *       409:
@@ -2053,6 +2108,11 @@ var appRouter = function(app) {
      *         description: Twitter service unavailable
      */
 	app.post("/twitter-accounts/:id/followed-users", function(request, response) {
+		
+		if(!request.body.newuser){
+			return response.status(400).send("Parameters error!");
+		}
+		
 	    var accountID = {
 	            'token': request.headers.token,
 	            'twitterAccountId': request.params.id
@@ -2331,7 +2391,7 @@ var appRouter = function(app) {
 	 *       200:
 	 *         description: The user info
 	 *       400:
-	 *         description: The provided {id} is not valid
+	 *         description: The provided {id} is not valid OR Params error
 	 *       401:
 	 *         description: The provided {oldPasswd} does not match the one in DB
 	 *       403:
@@ -2342,6 +2402,10 @@ var appRouter = function(app) {
 	 *         description: DB error
 	 */
 	app.put("/users/:id", function(request, response) {
+		
+		if(!request.body.oldPasswd || !request.body.newPasswd){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		var accountID = {
 			'token': request.headers.token,
@@ -2590,10 +2654,16 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: The short URL was created successfully
+     *       400:
+     *         description: Params error
 	 *       500:
 	 *         description: DB insert error
 	 */
 	app.post("/urls", function(request, response) {
+		
+		if(!request.body.url){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-POST-URLS: Posted URL is: " + request.body.url);
 		urlShortener.post(request.body.url,
@@ -2729,10 +2799,16 @@ var appRouter = function(app) {
      *     responses:
      *       200:
      *         description: Captcha response (verified or not)
+     *       400:
+     *         description: Params error
      *       503:
      *         description: Captcha service unavailable
      */
     app.post("/verify-captcha", function(request, response){
+		
+		if(!request.bodybody['g-recaptcha-response']){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-VERIFY-CAPTCHA: Verifying captcha response");
 		
