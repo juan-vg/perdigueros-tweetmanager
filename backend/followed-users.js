@@ -120,7 +120,7 @@ exports.get = function (accountID, user, callback){
 
 };
 
-//Create new followed user app.post("/followed-users", function(request, response) {
+//Create new followed user
 exports.post = function (accountID, user, callback){
 
     var error, data;
@@ -216,7 +216,7 @@ exports.post = function (accountID, user, callback){
     });
 };
 
-//Delete a followed user app.delete("/followed-users/:id", function(request, response) {
+//Delete a followed user
 exports.delete = function (accountID, user, callback){
 
     var error, data;

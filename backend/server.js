@@ -4,6 +4,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var swaggerJSDoc = require('swagger-jsdoc');
 var mongoose = require("mongoose");
+var cors = require('cors');
 var router = express.Router();
 var app = express();
 
@@ -51,6 +52,7 @@ var swaggerSpec = swaggerJSDoc(options);
 //Acepta JSON y valores codificados en la propia URL
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ "extended": true }));
+app.use(cors());
 
 //Previene mostrar info sensible por errores del body parser
 app.use(function (error, req, res, next) {

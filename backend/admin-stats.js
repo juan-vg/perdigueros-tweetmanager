@@ -107,7 +107,7 @@ function storeDownStats(access, callback){
     });
 }
 
-// Save the last accesses in the system
+// Save the resource in the system
 exports.saveTweet = function(tweetData){
     
     storeTweetStats(tweetData, function(err, data){
@@ -373,7 +373,7 @@ function resourcesByUser(results, callback){
                     result.push(entry);
                 }
                 
-                results.byCountry = result;
+                results.byUser = result;
                 callback(error);
                 
             } else {
