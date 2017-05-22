@@ -4,7 +4,6 @@ var api = "http://zaratech-ptm.ddns.net:8888";
 
 // Password Data and Check 
 var PwdCheck=angular.module('PwdCheck', ['ngStorage','vcRecaptcha']);
-
 PwdCheck.controller('PasswordController', function ($scope,$http,$window,$location,$localStorage,vcRecaptchaService) {
     $scope.pwdError =false;
     $scope.checkPwd =function() {
@@ -37,8 +36,6 @@ UsersData.controller('UserController', function($scope,$http,$localStorage) {
 	function successCallback(response){
 		//Get response data
 		var users=response.data;
-		console.log(users);
-		
 		var usersArr = eval( users );
 		var data = [];
 		for ( var i = 0; i < usersArr.length; i++ ) {
@@ -187,7 +184,6 @@ StadisticsData.controller('UserDoorController', function($scope,$http,$localStor
 	// Get data Stadistics from the server
 	$http.get(api+'/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackStats, errorCallbackStats);
 	function successCallbackStats(stats){ 
-		console.log(stats);
 		var registrationData= stats.data.ups;	// Registration Data
 		var downsData= stats.data.downs;					// Downs Data
 		var label=[];
@@ -374,10 +370,8 @@ StadisticsData.controller('StadisticsController', function($scope,$localStorage,
 	}
 	console.log($localStorage.token);
 	$scope.onClick = function (points, evt) {
-		console.log(points[0]._view.label);
 		$http.get(api+'/users/'+points[0]._view.label,{headers: {'token': $localStorage.token}}).then(successCallbackInfo, errorCallbackInfo);
 		function successCallbackInfo(info){
-			console.log(info.data[0]);
 			$scope.user_id=points[0]._view.label;
 			$scope.info="Email: " + info.data[0].email + "\n" +
 						"Nombre: " + info.data[0].name + "\n" +
