@@ -80,7 +80,6 @@ UsersData.controller('UserController', function($scope,$http,$localStorage) {
 				$scope.users.splice( index, 1 );
 			}
 			function errorCallback(error){
-				$scope.pwdError = true;
 				console.log("Error Removing Account");
 			}
 		}
@@ -368,7 +367,6 @@ StadisticsData.controller('StadisticsController', function($scope,$localStorage,
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
 	}
-	console.log($localStorage.token);
 	$scope.onClick = function (points, evt) {
 		$http.get(api+'/users/'+points[0]._view.label,{headers: {'token': $localStorage.token}}).then(successCallbackInfo, errorCallbackInfo);
 		function successCallbackInfo(info){
@@ -377,7 +375,7 @@ StadisticsData.controller('StadisticsController', function($scope,$localStorage,
 						"Nombre: " + info.data[0].name + "\n" +
 						"Apellido: "+ info.data[0].surname + "\n" + 
 						"Registro: "+ formatDate(new Date(info.data[0].registrationDate)) + "\n" +
-						"Ultima Conexión: " + formatDate(new Date(info.data[0].lastAcces)) + "\n";
+						"Ultima Conexión: " + formatDate(new Date(info.data[0].lastAccess)) + "\n";
 		}
 		function errorCallbackInfo(error){
 			$scope.info="Error obteniendo datos";
