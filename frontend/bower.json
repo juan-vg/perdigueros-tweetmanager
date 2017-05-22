@@ -1,0 +1,24 @@
+{
+  "name": "angular-seed",
+  "description": "A starter project for AngularJS",
+  "version": "0.0.0",
+  "homepage": "https://github.com/angular/angular-seed",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "~1.5.0",
+    "angular-route": "~1.5.0",
+    "angular-loader": "~1.5.0",
+    "angular-mocks": "~1.5.0",
+    "html5-boilerplate": "^5.3.0",
+    "satellizer": "^0.15.5",
+    "angular-ui-router": "^1.0.3",
+    "angular-cookies": "^1.6.4",
+    "angular-recaptcha": "^4.1.0",
+    "angular-messages": "^1.6.4",
+    "toastr": "^2.1.3",
+    "angular-resource": "^1.6.4",
+    "ngstorage": "^0.3.11",
+    "ng-twitter-api": "^0.1.5"
+  }
+}

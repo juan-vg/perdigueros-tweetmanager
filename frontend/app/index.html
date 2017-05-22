@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <base href="/">
+
+  <title>Perdigueros Tweet Manager</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+  <!-- Bootstrap Framework load -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="css/footer.css" rel="stylesheet">
+  <link href="css/common-styles.css" rel="stylesheet">
+  <link href="css/login.css" rel="stylesheet">
+  <link href="css/sign-up.css" rel="stylesheet">
+  <link href="css/validate.css" rel="stylesheet">
+
+  <link href="css/dashboard.css" rel="stylesheet">
+
+  <!-- Font Awesome library load -->
+  <link rel="stylesheet" href="css/font-awesome.min.css">
+
+
+  <!-- ngStore module for localStorage and sessionStorage -->
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="bower_components/satellizer/dist/satellizer.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <script src="bower_components/toastr/toastr.js"></script>
+  <script src="bower_components/ngstorage/ngStorage.min.js"></script>
+
+
+  <script src="scripts/app.js"></script>
+  <script src="scripts/controllers.js"></script>
+
+  <!-- Captcha library -->
+  <script type="text/javascript "src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
+  <script type="text/javascript" src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
+</head>
+
+<body>
+<!-- Static top navbar -->
+<nav class="navbar navbar-default navbar-fixed-top hidden-xs">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <!-- Navbar brand-->
+      <a class="navbar-brand" href="/">Perdigueros Tweet Manager</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <!-- Right list with user information and logout button-->
+      <ul class="nav navbar-nav navbar-right">
+        <!-- User drodown -->
+        <li class="dropdown ">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+             aria-expanded="false"> <i class="fa fa-user" aria-hidden="true"></i>&nbsp;Bienvenido {{$scope.username}}<span
+                  class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Mi perfil</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a ng-click="logout()" href="">Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+
+<!-- Login form -->
+<div id="main">
+  <!-- angular templating -->
+  <div ng-view>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <p class=text-muted">@Copyright PTM</p>
+  </div>
+</footer>
+
+<!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<!-- Bootstrap js library required -->
+<script src="js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
