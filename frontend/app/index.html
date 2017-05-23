@@ -41,7 +41,7 @@
 
   <script src="scripts/app.js"></script>
   <script src="scripts/controllers.js"></script>
-  <script src="scripts/dashboard/dashboard.js"></script>
+  <script src="scripts/dashboard/dashboard-controllers.js"></script>
 
   <!-- Captcha library -->
   <script type="text/javascript "src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
@@ -65,7 +65,7 @@
         <!-- User drodown -->
         <li ng-show="userVisible" class="dropdown ">
           <a  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"> <i class="fa fa-user" aria-hidden="true"></i>&nbsp;Bienvenido <span
+             aria-expanded="false"> <i class="fa fa-user" aria-hidden="true"></i>&nbsp;Bienvenido {{username}}<span
                   class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="">Mi perfil</a></li>
