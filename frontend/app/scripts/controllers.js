@@ -4,68 +4,68 @@
 // create the controller and inject Angular's $scope
 var app = angular.module('app');
 
-//Signup, signin Controllers
-app.controller('signinCtrl',  ['$auth','$location','$scope','$http','$localStorage',
-    function($auth,$location,$scope,$http,$localStorage) {
-        $scope.login = function() {
-            var data = {
-                'email': $scope.email,
-                'passwd': $scope.passwd,
-                'g-recaptcha-response': $scope.captchaResponse
-            };
-            $http.post('http://zaratech-ptm.ddns.net:8888/login/signin',data)
-                .then(function (response) {
-                    $localStorage.token = response.data.token;
-                    $localStorage.userId = response.data.id;
-                    $location.url('/dashboard');
-                })
-                .catch(function (response) {
-                    // Captcha validation error OR params error
-                    if(response.status==400) {
-
-                    }
-                    //Incorrect login
-                    else if(response.status==401){
-                        console.log("Captcha validation error");
-                    }
-                    // Must validate the account (email)
-                    else if(response.status==409){
-                        console.log("DB error");
-                    }
-                    else if(response.status==459){
-                        console.log("Must change password first")
-                    }
-                    else if(response.status==500){
-                        console.log("DB error");
-                    }
-                });
-
-        };
-
-        $scope.authenticate = function(provider){
-            $auth.authenticate(provider)
-                //succesful authentication
-                .then(function() {
-                    $location.url('/dashboard');
-                })
-                //handle errors
-                .catch(function(error) {
-                    if (error.message) {
-                        console.log(error);
-
-                    } else if (error.data) {
-                        console.log(error);
-
-                    } else {
-                        console.log(error);
-                    }
-                });
-        };
-
-        $scope.logout = function(){
-            $localStorage.token = null;
-            $location.url('/');
+app.controller('signinCtrl',  ['$auth','$location','$scope','$http',
+    function($auth,$location,$scope,$http) {
+        if(localStorage.getItem("token")){
+            $location.url('/dashboard');
+            $scope.menuState.show = true;
         }
+        else{
+            $scope.login = function () {
+                var data = {
+                    'email': $scope.email,
+                    'passwd': $scope.passwd,
+                    'g-recaptcha-response': $scope.captchaResponse
+                };
+                $http.post('http://zaratech-ptm.ddns.net:8888/login/signin', data)
+                    .then(function (response) {
+                        localStorage.setItem("token", response.data.token);
+                        localStorage.setItem("userId", response.data.id);
+                        $location.url('/dashboard');
+                    })
+                    .catch(function (response) {
+                        // Captcha validation error OR params error
+                        if (response.status == 400) {
+
+                        }
+                        //Incorrect login
+                        else if (response.status == 401) {
+                            console.log("Captcha validation error");
+                        }
+                        // Must validate the account (email)
+                        else if (response.status == 409) {
+                            console.log("DB error");
+                        }
+                        else if (response.status == 459) {
+                            console.log("Must change password first")
+                        }
+                        else if (response.status == 500) {
+                            console.log("DB error");
+                        }
+                    });
+            }
+
+            };
+
+            $scope.authenticate = function (provider) {
+                $auth.authenticate(provider)
+                //succesful authentication
+                    .then(function () {
+                        $location.url('/dashboard');
+                    })
+                    //handle errors
+                    .catch(function (error) {
+                        if (error.message) {
+                            console.log(error);
+
+                        } else if (error.data) {
+                            console.log(error);
+
+                        } else {
+                            console.log(error);
+                        }
+                    });
+            };
     }]);
 
 //create the singup controller, if success redirection to /validate, else
@@ -209,13 +209,22 @@ app.controller('forgotPasswdCtrl', ['$scope','$http','$location',function($scope
     };
 }]);
 
-
 //create the firstLoginCtrl, verify the e-mail and update passwords
-app.controller('mainPanelCtrl', ['$scope','$http','$localStorage','$location',function($scope,$http,$auth,$location) {
-    $scope.welcomeUser = function(){
-        $http.get('http://zaratech-ptm')
-    };
+app.controller('LogoutController',['$location','$scope',function($location){
+    localStorage.clear();
+    $location.url('/');
 }]);
+
+app.controller('ShowHideUserMenu',['$scope','$route',function($scope,$route) {
+    $scope.$on('$routeChangeSuccess', function() {
+        $scope.userVisible = false;
+        if(localStorage.getItem("token")){
+            $scope.userVisible = true;
+        }
+    });
+}]);
+
+
 
 
 
