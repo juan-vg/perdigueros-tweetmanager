@@ -34,17 +34,21 @@
   <script src="bower_components/angular-route/angular-route.js"></script>
   <script src="bower_components/toastr/toastr.js"></script>
   <script src="bower_components/ngstorage/ngStorage.min.js"></script>
+  <script src="bower_components/ng-twitter-api/dist/ng-twitter-api.min.js"></script>
+  <script src="bower_components/jsSHA/src/sha1.js"></script>
+  <script src="js/angular-resource.min.js"></script>
 
 
   <script src="scripts/app.js"></script>
   <script src="scripts/controllers.js"></script>
+  <script src="scripts/dashboard/dashboard.js"></script>
 
   <!-- Captcha library -->
   <script type="text/javascript "src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
   <script type="text/javascript" src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
 </head>
 
-<body>
+<body ng-controller="ShowHideUserMenu">
 <!-- Static top navbar -->
 <nav class="navbar navbar-default navbar-fixed-top hidden-xs">
   <div class="container">
@@ -55,18 +59,18 @@
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <div ng-controller="ShowHideUserMenu" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <!-- Right list with user information and logout button-->
       <ul class="nav navbar-nav navbar-right">
         <!-- User drodown -->
-        <li class="dropdown ">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"> <i class="fa fa-user" aria-hidden="true"></i>&nbsp;Bienvenido {{$scope.username}}<span
+        <li ng-show="userVisible" class="dropdown ">
+          <a  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+             aria-expanded="false"> <i class="fa fa-user" aria-hidden="true"></i>&nbsp;Bienvenido <span
                   class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="#">Mi perfil</a></li>
+            <li><a href="">Mi perfil</a></li>
             <li role="separator" class="divider"></li>
-            <li><a ng-click="logout()" href="">Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+            <li><a href="/logout" >Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
           </ul>
         </li>
       </ul>
@@ -94,6 +98,7 @@
 <script src="bower_components/jquery/dist/jquery.js"></script>
 <!-- Bootstrap js library required -->
 <script src="js/bootstrap.min.js"></script>
+
 
 </body>
 
