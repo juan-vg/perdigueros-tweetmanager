@@ -1,0 +1,29 @@
+<div class="container">
+    <h1 id="firstloginTitle"class="text-center">Este es tu primer logueo, debes cambiar tu contraseña</h1>
+    <div class="container center-block">
+    <form firstloginTitlename="firstLoginForm" ng-submit="firstlogin()" class="form-horizontal signup-form">
+        <div class="form-group">
+            <div class="col-xs-10">
+                <input type="email" name="email" class="form-control" placeholder="E-mail" required ng-model="email">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-10">
+                <input type="password" name="oldPasswd" class="form-control" placeholder="Contraseña vieja:" required ng-model="oldPasswd">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-10">
+                <input type="password" name="newPasswd" class="form-control" placeholder="Nueva contraseña:" required ng-model="newPasswd">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-xs-10">
+                <button type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    </form>
+
+</div>
