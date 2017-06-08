@@ -1,0 +1,31 @@
+/*
+ * Description: CSS file that stores Perdiguero Tweet Manager styles.
+ * Author: Sergio Pedrero Benedi
+ */
+
+/* Style that makes a clickable icon (Font Awesome) button*/
+.icon-button{
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    border: 0;
+    background: transparent;
+}
+
+
+
+.nav-tabs > li, .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+    zoom:1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs, .nav-pills {
+    text-align:center;
+}
+
+.dropdown-menu {
+    width: 100%;
+}
