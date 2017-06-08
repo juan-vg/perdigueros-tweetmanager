@@ -4,74 +4,77 @@
 // Create the principal module that contains all the services and controllers which management the application
 var app = angular.module('app');
 
+
 /**
  * Controller that manage the signin view,that is the main view of the application.
  * Uses services $auth for satellizer, $location for routes, $scope for the scope and $http for internet services.
  */
-app.controller('signinCtrl', ['$auth', '$location', '$scope', '$http',
-    function ($auth, $location, $scope, $http) {
-        if (localStorage.getItem("token")) {
+app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
+    function ($location, $http,$auth,$rootScope) {
+    var vm = this;
+
+    // Login function
+    this.login = function(){
+        $auth.login({
+            'email' : vm.email,
+            'passwd' : vm.passwd,
+            'g-recaptcha-response' : vm.captchaResponse
+        })
+        .then(function(response){
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('userId', response.data.id);
+            $location.path('/dashboard');
+        })
+            .catch(function(response){
+                console.log(response);
+            });
+    }
+
+    // Authenticate function for social network login
+    this.authenticate = function(provider) {
+        $auth.authenticate(provider)
+            .then(function () {
+                data = {
+                    'code' : localStorage.getItem('satellizer_token'),
+                };
+                $http.post('http://zaratech-ptm.ddns.net:8888/auth/'+provider, data)
+                    .then(function(response){
+                        if(provider=='facebook') {
+                            $rootScope.currentUser = response.data.profile['first_name'];
+                        }
+                        else if(provider=='google'){
+                            $rootScope.currentUser = response.data.profile['given_name'];
+                        }
+                        $location.path('/dashboard');
+                    });
+            })
+            .catch(function (error) {
+                if (error.message) {
+                    console.log(error);
+                    // Satellizer promise reject error.
+                    console.log(error.message);
+                } else if (error.data) {
+                    // HTTP response error from server
+                    console.log(error.data.message + "   " + error.status);
+                } else {
+                    console.log(error);
+                }
+                localStorage.clear();
+                $auth.logout();
+
+            });
+    }
+
+        if($auth.isAuthenticated()){
+            console.log($auth);
             $location.url('/dashboard');
         }
-        else {
-            $scope.login = function () {
-                var data = {
-                    'email': $scope.email,
-                    'passwd': $scope.passwd,
-                    'g-recaptcha-response': $scope.captchaResponse
-                };
-                $http.post('http://zaratech-ptm.ddns.net:8888/login/signin', data)
-                    .then(function (response) {
-                        localStorage.setItem("token", response.data.token);
-                        localStorage.setItem("userId", response.data.id);
-                        $location.url('/dashboard');
-                    })
-                    .catch(function (response) {
-                        // Captcha validation error OR params error
-                        if (response.status == 400) {
-
-                        }
-                        //Incorrect login
-                        else if (response.status == 401) {
-                            console.log("Captcha validation error");
-                        }
-                        // Must validate the account (email)
-                        else if (response.status == 409) {
-                            console.log("DB error");
-                        }
-                        else if (response.status == 459) {
-                            console.log("Must change password first")
-                        }
-                        else if (response.status == 500) {
-                            console.log("DB error");
-                        }
-                    });
-            }
-
+        else{
+            $location.url('/');
         }
-        ;
-
-        $scope.authenticate = function (provider) {
-            $auth.authenticate(provider)
-            //succesful authentication
-                .then(function () {
-                    $location.url('/dashboard');
-                })
-                //handle errors
-                .catch(function (error) {
-                    if (error.message) {
-                        console.log(error);
-
-                    } else if (error.data) {
-                        console.log(error);
-
-                    } else {
-                        console.log(error);
-                    }
-                });
-        };
 
     }]);
+
 
 /**
  * Create the signup controller. Once it is successfully executed, redirects to validate view.
@@ -123,7 +126,6 @@ app.controller('validateCtrl', ['$scope', '$http', '$location', function ($scope
         };
         $http.post('http://zaratech-ptm.ddns.net:8888/login/validate', data
         ).then(function (response) {
-                console.log(response);
                 $location.url('/first-login');
             },
             //status code errors
@@ -144,11 +146,10 @@ app.controller('validateCtrl', ['$scope', '$http', '$location', function ($scope
     // RESEND FUNCTION
     $scope.resend = function () {
         var data = {
-            'email': $scope.emailresend
+            'email': $scope.email
         };
         $http.post('http://zaratech-ptm.ddns.net:8888/login/validate/resend', data
         ).then(function (response) {
-                console.log(response);
                 $location.url('/validate');
             },
             //status code errors
@@ -226,7 +227,30 @@ app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location', function ($s
 /**
  * Create the LogoutController that manage the logout function of the site.
  */
-app.controller('LogoutController', ['$location', '$scope', function ($location) {
+app.controller('LogoutController', ['$auth','$location', function ($auth,$location) {
+    $auth.logout();
     localStorage.clear();
     $location.url('/');
 }]);
+
+
+/**
+ * Dashboard page controller
+ */
+app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http,$auth) {
+});
+
+/**
+ * Controller to show or hide top user dropdown menu
+ */
+app.controller('userMenuCtrl', function ($scope,$auth) {
+    $scope.isUserActive = function () {
+        return $auth.isAuthenticated();
+    }
+
+});
+
+
+
+
+

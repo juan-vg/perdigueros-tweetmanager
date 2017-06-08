@@ -5,21 +5,21 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer',
-    'ngStorage', 'ngResource']);
+angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule']);
 
 //variable for manage the main module
 var app = angular.module("app");
 
-// configure our routes
+// configure our application
 app.config(function ($routeProvider, $locationProvider, $authProvider) {
 
+    //configure our routes
     $routeProvider
 
     // route for the home page
         .when('/', {
             templateUrl: 'partials/login/signin.html',
-            controller: 'signinCtrl'
+            controller: 'signinCtrl as login'
         })
         // route for the signup page
         .when('/signup', {
@@ -45,7 +45,7 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         //route for dashboard page, token required
         .when('/dashboard', {
             templateUrl: 'partials/dashboard/dashboard.html',
-            controller: 'ShowHideUserMenu',
+            controller : 'dashboardCtrl'
         })
 
         //route for forgot password
@@ -56,26 +56,29 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         .when('/logout', {
             templateUrl: 'partials/login/signin.html',
             controller: 'LogoutController'
-        }).otherwise('/home');
+        })
     ;
     $locationProvider.html5Mode(true);
-    /**
-     *  Satellizer config
-     */
-    $authProvider.tokenName = "token";
-    $authProvider.tokenPrefix = "ptm";
-    $authProvider.loginUrl = "http://zaratech-ptm.ddns.net:8888/login/signin";
+
+    //configure auth providers
+    $authProvider.loginUrl = 'http://zaratech-ptm.ddns.net:8888/login/signin';
+    $authProvider.signupUrl = 'http://zaratech-ptm.ddns.net:8888/login/signup';
+
+    //facebook auth provider config
     $authProvider.facebook({
-        clientId: '212919395883976',
-        url: 'http://zaratech-ptm.ddns.net:8888/auth/facebook',
-        authorizationEndpoint: 'https://www.facebook.com/v2.5/dialog/oauth',
-        redirectUri: 'http://localhost:8000'
+        clientId : '212919395883976',
+        responseType: 'token',
+        name: 'facebook',
+        url: 'http://zaratech-ptm.ddns.net:8888/auth/facebook'
     });
 
+    //google auth provider config
     $authProvider.google({
-        clientId: '60622240890',
+        clientId: '60622240890-eg0kb7s2v246edt7nbpqqjst6rk8uj75.apps.googleusercontent.com',
+        responseType:'token',
+        name: 'google',
         url: 'http://zaratech-ptm.ddns.net:8888/auth/google',
-        authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
-        redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host
+        authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth'
     });
+
 });

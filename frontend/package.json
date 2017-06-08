@@ -1,9 +1,9 @@
 {
-  "name": "angular-PTM",
+  "name": "angular-seed",
   "private": true,
-  "version": "1.0.0",
-  "description": "Perdiguero Tweet Manager V1",
-  "repository": "https://github.com/juan-vg/perdigueros-tweetmanager",
+  "version": "0.0.0",
+  "description": "A starter project for AngularJS",
+  "repository": "https://github.com/angular/angular-seed",
   "license": "MIT",
   "devDependencies": {
     "bower": "^1.7.7",
