@@ -13,18 +13,21 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
     function ($location, $http,$auth,$rootScope) {
     var vm = this;
 
-    // Login function
+    // Local Login function
     this.login = function(){
+        // Uses the $auth login function for login process
         $auth.login({
             'email' : vm.email,
             'passwd' : vm.passwd,
-            'g-recaptcha-response' : vm.captchaResponse
+            'g-recaptcha-response' : vm.captchaResponse,
+            'loginType' : 'local'
         })
+        // success, sets userId in localStorage and redirects to dashboard view
         .then(function(response){
-            localStorage.setItem('token', response.data.token);
             localStorage.setItem('userId', response.data.id);
             $location.path('/dashboard');
         })
+            //error
             .catch(function(response){
                 console.log(response);
             });
@@ -32,22 +35,21 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
 
     // Authenticate function for social network login
     this.authenticate = function(provider) {
+        // satellizer $auth function authenticate for providers login
         $auth.authenticate(provider)
             .then(function () {
                 data = {
-                    'code' : localStorage.getItem('satellizer_token'),
+                    'code': localStorage.getItem('satellizer_token'),
+                    'loginType': provider
                 };
-                $http.post('http://zaratech-ptm.ddns.net:8888/auth/'+provider, data)
-                    .then(function(response){
-                        if(provider=='facebook') {
-                            $rootScope.currentUser = response.data.profile['first_name'];
-                        }
-                        else if(provider=='google'){
-                            $rootScope.currentUser = response.data.profile['given_name'];
-                        }
+                // Sends 'code' and 'loginType' to backend
+                $http.post('http://zaratech-ptm.ddns.net:8888/login/signin', data)
+                    // if success redirect to /dashboard view
+                    .then(function (response) {
                         $location.path('/dashboard');
                     });
             })
+            // Handle errors
             .catch(function (error) {
                 if (error.message) {
                     console.log(error);
@@ -59,16 +61,19 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
                 } else {
                     console.log(error);
                 }
+                //if errors calls to clear and logout for clean localstorage
                 localStorage.clear();
                 $auth.logout();
 
             });
     }
 
+    // if localStorage has an user active, the behaviour is to redirect to dashboard view
         if($auth.isAuthenticated()){
             console.log($auth);
             $location.url('/dashboard');
         }
+        // else redirects to signin view
         else{
             $location.url('/');
         }
