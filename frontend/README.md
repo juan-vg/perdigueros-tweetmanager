@@ -7,11 +7,11 @@ Here are the instructions for Perdigueros Tweet Manager Frontend deployment:
 
 You need npm and bower. Npm is distributed with Node.js- which means that when you download Node.js, you automatically get npm installed on your computer :
 
-[Npm install]: https://nodejs.org/en/
+https://nodejs.org/en/
 
 You need to install git too :
 
-[Git install]: https://git-scm.org/downloads
+https://git-scm.org/downloads
 
 Furthermore, you need bower and you can install with the next command :
 
