@@ -1,0 +1,81 @@
+/* Sign up view styles
+-------------------------------------------------- */
+.img-signup {
+    height: 10em;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.input-signup{
+    display: block;
+    margin-left: 2em;
+    margin-top: 2em;
+}
+.signup-form{
+    display: block;
+    margin-left: auto;
+    margin-top: auto;
+}
+
+/*==========  Mobile First Method  ==========*/
+/*Media query for sizes less than 768px(tablet or pc) -- remember me component */
+/* Dispositivos pequeños (tablets, anchura mayor o igual a 768px) */
+@media (min-width: 768px) {
+    .img-signup {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .input-signup{
+        display: block;
+        margin-left: 7em;
+        margin-top: 2em;
+        padding-right:10em;
+    }
+}
+
+/* Dispositivos medianos (ordenadores, anchura mayor o igual a 992px) */
+@media (min-width: 992px) {
+    .img-signup {
+        display: block;
+        margin-left: 18em;
+        margin-right: auto;
+        margin-top:2em;
+    }
+    .input-signup{
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-right:3em;
+    }
+    .signup-form{
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 1200px) {
+    .img-signup {
+        display: block;
+        margin-left: 24em;
+        margin-right: auto;
+        margin-top:2em;
+    }
+    .input-signup{
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-right:10em;
+    }
+    .signup-form{
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+
+
+
+

@@ -1,0 +1,27 @@
+<!-- Index body content, component jumbotron with welcome message -->
+<div id="welcomeHeader" class="jumbotron">
+    <div class="container text-center">
+        <h2 class="hidden-xs">Recupera tu contraseña en </h2>
+        <h1>Perdigueros Tweet Manager</h1>
+    </div>
+</div>
+<div class="container">
+    <h4 class="text-center">Completa el siguiente formulario y el equipo de PTM te reenviará una contraseña al instante.</h4>
+
+        <form name="forgotForm" ng-submit="remember()" class="form-horizontal validate-form" role="form" >
+            <div class="row input-validate">
+                    <div class="form-group">
+                        <div class="col-xs-10">
+                            <input type="email" name="email" class="form-control" placeholder="E-mail" required ng-model="emailForgot" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-10">
+                            <button type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg">Reenviar contraseña</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+</div>

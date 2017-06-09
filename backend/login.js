@@ -1,132 +1,167 @@
 var userAccModel = require("./models/user-accounts");
 var mailCreator = require("./email-creator.js");
+var verifyCaptcha = require('./verify-captcha.js');
+var adminStats = require("./admin-stats.js");
 var crypto = require('crypto');
 var objectID = require('mongodb').ObjectID;
 
 // accountID = {email, passwd}
-exports.localSignin = function (accountID, callback) {
+exports.localSignin = function (accountID, captchaData, callback) {
     
     var error, data;
     
-    var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
-    
-    // validate password and get user data (avoiding retrieval of password)
-    userAccModel.find({"email": accountID.email, "password": passwd, "activated": true, "loginType": "local"}, {"password":0},
-    
-        function(err, dbData){
-            if(!err){
-                
-                if(dbData.length > 0 && dbData[0].validated && !dbData[0].firstLogin){
-                    
-                    // get current date
-                    var lastDate = new Date();
-                    
-                    // generate token
-                    var token = crypto.randomBytes(25).toString('hex');
-                    
-                    // set token expiration date (10 mins)
-                    var tokenExpire = new Date();
-                    tokenExpire.setMinutes(tokenExpire.getMinutes() + 10);
-                    
-                    
-                    // update lastDate, token & tokenExpire
-                    userAccModel.update({"_id" : new objectID(dbData[0]._id)},
-                        {$set : {"lastAccess": lastDate, "token": token, "tokenExpire": tokenExpire}},
-                        
-                        function(err, res){
-                            if(!err){
-                                // return token and userId
-                                error = false;
-                                data = {"token": token, "id": dbData[0]._id};
-                            } else {
-                                error = true;
-                                data = "DB ERROR";
-                            }
-                            callback(error, data);
-                        }
-                    );
-
-                } else if(dbData.length > 0 && dbData[0].validated) {
-                    // must change the passwd yet
-                    error = true;
-                    data = "MUST CHANGE PASSWD";
-                    callback(error, data);
-                } else if(dbData.length > 0) {
-                    // must validate the account yet
-                    error = true;
-                    data = "MUST VALIDATE";
-                    callback(error, data);
-                } else {
-                    error = true;
-                    data = "INCORRECT";
-                    callback(error, data);
-                }
-                
-            } else {
-                error = true;
-                data = "DB ERROR";
-                callback(error, data);
-            }
-        }
-    );
-};
-
-exports.signup = function (accountData, callback) {
-    
-    var error, data;
-    
-    userAccModel.find({"email": accountData.email}, function(err, dbData){
+    verifyCaptcha.verify(captchaData.gResponse, captchaData.rAddress, function(err, data){
         if(!err){
-            if(dbData.length > 0){
-                error = true;
-                data = "ALREADY EXISTS";
-                callback(error, data);
-                
-            } else {
-                var dbUsers = new userAccModel();
-                dbUsers.loginType = "local";
-                dbUsers.name = accountData.name;
-                dbUsers.surname = accountData.surname;
-                dbUsers.email = accountData.email;
-                dbUsers.registrationDate = new Date();
-                dbUsers.lastAccess = null;
-                dbUsers.validated = false;
-                dbUsers.validateHash = crypto.randomBytes(20).toString('hex');
-                dbUsers.firstLogin = true;
-                dbUsers.activated = true;
-                
-                dbUsers.save(function(err,dbData){
+            
+            var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
+    
+            // validate password and get user data (avoiding retrieval of password)
+            userAccModel.find({"email": accountID.email, "password": passwd, "activated": true, "loginType": "local"}, {"password":0},
+            
+                function(err, dbData){
                     if(!err){
                         
-                        var emailData = {
-                            "type": "validate",
-                            "name": dbUsers.name,
-                            "code": dbUsers.validateHash,
-                            "to": dbUsers.email
-                        };
-                        
-                        // async (not waiting for callback)
-                        mailCreator.sendMail(emailData, function(err, mData){
-                            if(err){
-                                console.log("LOGIN-SIGNUP: ERROR sending email to " + dbUsers.email);
-                            }
-                        });
-                        
-                        error = false;
-                        data = null;
-                        callback(error, data);
+                        if(dbData.length > 0 && dbData[0].validated && !dbData[0].firstLogin){
+                            
+                            // get current date
+                            var lastDate = new Date();
+                            
+                            // generate token
+                            var token = crypto.randomBytes(25).toString('hex');
+                            
+                            // set token expiration date (10 mins)
+                            var tokenExpire = new Date();
+                            tokenExpire.setMinutes(tokenExpire.getMinutes() + 10);
+                            
+                            // save last access for statistics
+                            adminStats.saveLastAccess(lastDate);
+                            
+                            // update lastDate, token & tokenExpire
+                            userAccModel.update({"_id" : new objectID(dbData[0]._id)},
+                                {$set : {"lastAccess": lastDate, "token": token, "tokenExpire": tokenExpire}},
+                                
+                                function(err, res){
+                                    if(!err){
+                                        // return token and userId
+                                        error = false;
+                                        data = {"token": token, "id": dbData[0]._id};
+                                    } else {
+                                        error = true;
+                                        data = "DB ERROR";
+                                    }
+                                    callback(error, data);
+                                }
+                            );
+
+                        } else if(dbData.length > 0 && dbData[0].validated) {
+                            // must change the passwd yet
+                            error = true;
+                            data = "MUST CHANGE PASSWD";
+                            callback(error, data);
+                        } else if(dbData.length > 0) {
+                            // must validate the account yet
+                            error = true;
+                            data = "MUST VALIDATE";
+                            callback(error, data);
+                        } else {
+                            error = true;
+                            data = "INCORRECT";
+                            callback(error, data);
+                        }
                         
                     } else {
                         error = true;
                         data = "DB ERROR";
                         callback(error, data);
                     }
-                });
-            }
+                }
+            );
             
         } else {
+            
+            console.log("LOGIN-SIGNIN: CAPTCHA FAILURE");
+            
             error = true;
-            data = "DB ERROR";
+            data = "CAPTCHA ERROR";
+            callback(error, data);
+        }
+    });
+};
+
+exports.signup = function (accountData, captchaData, callback) {
+    
+    var error, data;
+    
+    verifyCaptcha.verify(captchaData.gResponse, captchaData.rAddress, function(err, data){
+        
+        if(!err){
+            
+            userAccModel.find({"email": accountData.email}, function(err, dbData){
+                
+                if(!err){
+                    
+                    if(dbData.length > 0){
+                        error = true;
+                        data = "ALREADY EXISTS";
+                        callback(error, data);
+                        
+                    } else {
+                        var dbUsers = new userAccModel();
+                        dbUsers.loginType = "local";
+                        dbUsers.name = accountData.name;
+                        dbUsers.surname = accountData.surname;
+                        dbUsers.email = accountData.email;
+                        dbUsers.registrationDate = new Date();
+                        dbUsers.lastAccess = null;
+                        dbUsers.validated = false;
+                        dbUsers.validateHash = crypto.randomBytes(20).toString('hex');
+                        dbUsers.firstLogin = true;
+                        dbUsers.activated = true;
+                        
+                        dbUsers.save(function(err,dbData){
+                            if(!err){
+                                
+                                var emailData = {
+                                    "type": "validate",
+                                    "name": dbUsers.name,
+                                    "code": dbUsers.validateHash,
+                                    "to": dbUsers.email
+                                };
+                                
+                                // async (not waiting for callback)
+                                mailCreator.sendMail(emailData, function(err, mData){
+                                    if(err){
+                                        console.log("LOGIN-SIGNUP: ERROR sending email to " + dbUsers.email);
+                                    }
+                                });
+                                
+                                // save registry for statistics
+                                adminStats.saveRegistry(dbUsers.registrationDate);
+                                
+                                error = false;
+                                data = null;
+                                callback(error, data);
+                                
+                            } else {
+                                error = true;
+                                data = "DB ERROR";
+                                callback(error, data);
+                            }
+                        });
+                    }
+                    
+                } else {
+                    error = true;
+                    data = "DB ERROR";
+                    callback(error, data);
+                }
+            });
+        } else {
+            
+            console.log("LOGIN-SIGNUP: CAPTCHA FAILURE");
+            
+            error = true;
+            data = "CAPTCHA ERROR";
             callback(error, data);
         }
     });

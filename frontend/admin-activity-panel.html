@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head;
+    any other head content must come *after* these tags -->
+    <title>Perdigueros Tweet Manager</title>
+
+    <!-- Bootstrap Framework load -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Perdigueros Css styles load -->
+    <link href="css/perdiguero.css" rel="stylesheet">
+    <!-- Footer styles -->
+    <link href="css/footer.css" rel="stylesheet">
+    <!-- Common Styles -->
+    <link href="css/common-styles.css" rel="stylesheet">
+    <!-- Font Awesome library -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- Bootstrap js library required -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Angular js library required -->
+    <script src="js/angular.min.js"></script>
+	<!-- Chart js library required -->
+    <script src="js/Chart.bundle.min.js"></script>
+	<!-- Stadistics libraries required -->
+    <script src="https://www.google.com/jsapi"></script>
+    <script src="js/chartkick.js"></script>
+    <script src="js/angular-chart.min.js"></script>
+	<!-- Angular Data-->
+    <script src="js/angular_data.js"></script>
+	<!-- NgStorage library -->
+	<script src="js/ngStorage.min.js"></script>
+        
+</head>
+<body>
+
+        <!-- Static top navbar -->
+        <nav class="navbar navbar-default navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    </button>
+                <!-- Navbar brand-->
+                <a class="navbar-brand" href="#">Perdigueros Tweet Manager. Admin Control</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <!-- Accounts link -->
+                        <li><a href="admin-accounts-panel.html"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Cuentas de Twitter</a></li>
+            	       <!-- Users link -->
+            	       <li><a href="admin-main-panel.html"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Usuarios</a></li>
+                            <!-- Right list with logout button-->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                                aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                    <li><a href="admin-login-panel.html">Salir&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+		<!-- Stadistics-->
+        <div class="container">
+            <div class="row">
+                <div>
+			         <ul class="nav nav-pills">
+  				          <li><a href="admin-door-panel.html">Altas y Bajas</a></li>
+  				          <li><a href="admin-last-panel.html">Entradas</a></li>
+  				          <li  class="active"><a href="admin-activity-panel.html">Actividad</a></li>
+			         </ul>
+                </div>
+                <div class="col-xs-12" ng-app="StadisticsData" ng-controller="StadisticsController">
+                    <h2 align="center">Tweets por zona</h2>
+                    <div id="map" style="height: 400px;"></div>
+                    <h2 align="center">Tweets por dia</h2>
+                    <canvas id="tweetsday" class="chart chart-bar"
+                        chart-data="data" chart-labels="labels" chart-options="options" chart-colors="colors">
+                    </canvas>
+                    <h2 align="center">Top Usuarios con mas tweets</h2>
+					<div class="col-xs-6">
+						<canvas id="tweetsuser" class="chart chart-pie"
+                        chart-data="data2" chart-labels="labels2" chart-options="options2" chart-click="onClick">
+						</canvas>
+					</div>
+					<div class="col-xs-6">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th class="text-center">Información del usuario con id: {{user_id}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+								<td class="text-center"><pre>{{info}}</pre></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="footer">
+        <div class="container-fluid">
+            <p class="text-center">@Copyright PTM</p>
+        </div>
+        </footer>
+    </body>
+</html>

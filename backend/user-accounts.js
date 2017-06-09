@@ -1,6 +1,7 @@
 var userAccModel = require("./models/user-accounts");
 var accVerificator = require('./account-verifications.js');
 var dbVerificator = require('./db-verifications.js');
+var adminStats = require('./admin-stats.js');
 var crypto = require('crypto');
 var objectID = require('mongodb').ObjectID;
 
@@ -235,6 +236,10 @@ exports.delete = function (accountID, callback){
                                     userAccModel.update({"_id" : new objectID(accountID.userAccountId)},{$set : {"activated":false}},
                                         function(err, res){
                                             if(!err){
+                                                
+                                                // save down for statistics
+                                                adminStats.saveDown(new Date());
+                                                
                                                 error = false;
                                                 data = null;
                                             } else {

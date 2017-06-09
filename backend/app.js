@@ -2,6 +2,8 @@ var fs = require("fs"),
 	querystring = require("querystring"),
 	util = require("util"),
 	url = require("url");
+var schedule = require('node-schedule');
+var scheduler = require('./scheduler.js');
 var urlShortener = require('./url-shortener.js');
 var twitterAccounts = require('./twitter-accounts.js');
 var hashtags = require('./hashtags.js');
@@ -10,6 +12,14 @@ var userAccounts = require('./user-accounts.js');
 var uploadImages = require('./upload-images.js');
 var formidable = require('formidable');
 var login = require('./login.js');
+var adminStats = require('./admin-stats.js');
+var tweets = require('./tweets.js');
+var verifyCaptcha = require('./verify-captcha.js');
+
+// scheduler every minute (second=5)
+var scheduling = schedule.scheduleJob('5 * * * * *', function(){
+  scheduler.update();
+});
 
 var appRouter = function(app) {
 	
@@ -22,7 +32,9 @@ var appRouter = function(app) {
 	 * - name: "Hashtags"
 	 * - name: "Followed"
 	 * - name: "URL shortener"
-   * - name: "Images"
+     * - name: "Images"
+     * - name: "Tweets"
+     * - name: "Captcha"
 	 * 
 	 * definitions:
 	 *   Twitter-accounts:
@@ -84,6 +96,9 @@ var appRouter = function(app) {
 	 *       passwd:
 	 *         type: string
 	 *         description: "The user password"
+	 *       "g-recaptcha-response":
+	 *         type: string
+	 *         description: "The google captcha response"
 	 * 
 	 *   Signup:
 	 *     type: "object"
@@ -97,6 +112,9 @@ var appRouter = function(app) {
 	 *       email:
 	 *         type: string
 	 *         description: "The user email"
+	 *       "g-recaptcha-response":
+	 *         type: string
+	 *         description: "The google captcha response"
 	 * 
 	 *   Validate:
 	 *     type: "object"
@@ -128,6 +146,30 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The NEW password"
 	 * 
+	 *   Tweet:
+	 *     type: "object"
+	 *     properties:
+	 *       text:
+	 *         type: string
+	 *         description: "The tweet text"
+	 * 
+	 *   ScheduledTweet:
+	 *     type: "object"
+	 *     properties:
+	 *       text:
+	 *         type: string
+	 *         description: "The tweet text"
+	 *       date:
+	 *         type: string
+	 *         description: "The publish date"
+	 * 
+	 *   GoogleCaptchaResponse:
+	 *     type: "object"
+	 *     properties:
+	 *       "g-recaptcha-response":
+	 *         type: string
+	 *         description: "The google captcha response"
+	 * 
 	 */
 
 
@@ -155,12 +197,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: User created
+	 *       400:
+	 *         description: Captcha validation error OR Params error
 	 *       409:
 	 *         description: Email address already in use
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/signup", function(request, response) {
+		
+		if(!request.body.name || !request.body.surname || !request.body.email || !request.body['g-recaptcha-response']){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-SIGNUP: Trying to create user " + request.body.email);
 		
@@ -170,7 +218,12 @@ var appRouter = function(app) {
 			"email": request.body.email
 		};
 		
-		login.signup(accountData, function (err, data){
+		var captchaData = {
+			gResponse: request.body['g-recaptcha-response'],
+			rAddress: request.connection.remoteAddress
+		};
+		
+		login.signup(accountData, captchaData, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNUP: OK");
 						
@@ -178,7 +231,13 @@ var appRouter = function(app) {
 					response.write("Created");
 					
 				} else {
-					if(data == "ALREADY EXISTS"){
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-LOGIN-SIGNUP: Captcha validation error");
+						
+						response.writeHead(400, {"Content-Type": "text/html"});
+						response.write("Captcha validation error");
+						
+					} else if(data == "ALREADY EXISTS"){
 						console.log("APP-LOGIN-SIGNUP: Already exists");
 						
 						response.writeHead(409, {"Content-Type": "text/html"});
@@ -217,6 +276,8 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Login OK 
+	 *       400:
+	 *         description: Captcha validation error OR Params error
 	 *       401:
 	 *         description: Incorrect login
 	 *       409:
@@ -228,6 +289,10 @@ var appRouter = function(app) {
 	 */
 	app.post("/login/signin", function(request, response) {
 		
+		if(!request.body.email || !request.body.passwd){
+			return response.status(400).send("Parameters error!");
+		}
+		
 		console.log("APP-LOGIN-SIGNIN: Trying to authenticate user " + request.body.email);
 		
 		var accountID = {
@@ -235,7 +300,12 @@ var appRouter = function(app) {
 			"passwd": request.body.passwd
 		};
 		
-		login.localSignin(accountID, function (err, data){
+		var captchaData = {
+			gResponse: request.body['g-recaptcha-response'],
+			rAddress: request.connection.remoteAddress
+		};
+		
+		login.localSignin(accountID, captchaData, function (err, data){
 				if(!err){	
 					console.log("APP-LOGIN-SIGNIN: OK");
 						
@@ -243,7 +313,13 @@ var appRouter = function(app) {
 					response.write(JSON.stringify(data));
 					
 				} else {
-					if (data == "MUST CHANGE PASSWD") {
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-LOGIN-SIGNIN: Captcha validation error");
+						
+						response.writeHead(400, {"Content-Type": "text/html"});
+						response.write("Captcha validation error");
+						
+					} else if (data == "MUST CHANGE PASSWD") {
 						console.log("APP-LOGIN-SIGNIN: Must change password");
 						
 						response.writeHead(459, {"Content-Type": "text/html"});
@@ -294,12 +370,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Account validated
+     *       400:
+     *         description: Params error
 	 *       401:
 	 *         description: Incorrect validation code
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/validate", function(request, response) {
+		
+		if(!request.body.email || !request.body.code){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-VALIDATE: Trying to validate user " + request.body.email);
 		
@@ -355,12 +437,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: Email sent
+     *       400:
+     *         description: Params error
 	 *       409:
 	 *         description: User already validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/validate/resend", function(request, response) {
+		
+		if(!request.body.email){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-VALIDATE-RESEND: Resending validation email to user " + request.body.email);
 		
@@ -415,12 +503,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: New password sent
+     *       400:
+     *         description: Params error
 	 *       409:
 	 *         description: User not validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/remember", function(request, response) {
+		
+		if(!request.body.email){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-REMEMBER: Resending password to user " + request.body.email);
 		
@@ -475,12 +569,18 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       200:
 	 *         description: New password sent
+     *       400:
+     *         description: Params error
 	 *       409:
 	 *         description: User not validated, not active, or not existing email
 	 *       500:
 	 *         description: DB error
 	 */
 	app.post("/login/firstlogin", function(request, response) {
+		
+		if(!request.body.email || !request.body.oldPasswd || !request.body.newPasswd){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-LOGIN-FIRSTLOGIN: Changing password to user " + request.body.email);
 		
@@ -526,7 +626,7 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Get information of all twitter accounts (ADMIN)
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -542,9 +642,10 @@ var appRouter = function(app) {
 	 *         description: Error getting the accounts from database
 	 */
 	app.get("/twitter-accounts", function(request, response) {
+		
 		console.log("APP-GET-ALL-ACCOUNTS");
 		
-		twitterAccounts.getAll(request.headers.usertoken, function (err, data){
+		twitterAccounts.getAll(request.headers.token, function (err, data){
 				if(!err){	
 					console.log("APP-GET-ALL-ACCOUNTS: Accounts found OK");
 						
@@ -577,7 +678,7 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Get information of a single account (ADMIN)
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -603,7 +704,7 @@ var appRouter = function(app) {
 	app.get("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-GET-ACCOUNTS-ID");
 		
-		twitterAccounts.getAccount(request.params.id, request.headers.usertoken, function (err, data){
+		twitterAccounts.getAccount(request.params.id, request.headers.token, function (err, data){
 				if(!err){
 					console.log("APP-GET-ACCOUNTS-ID: Account found OK");
 					
@@ -648,7 +749,7 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Create a new twitter account
 	 *     parameters:
-	 *       - name: usertoken
+	 *       - name: token
 	 *         in: header
 	 *         required: true
 	 *         description: The user token
@@ -664,14 +765,23 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: Twitter account created
+     *       400:
+     *         description: Params error
 	 *       403:
 	 *         description: The user (token) can not be verified
 	 *       409:
 	 *         description: The account already exists.
 	 *       500:
 	 *         description: Error inserting the twitter account into the database
+	 *       503:
+	 *         description: Twitter service unavailable OR Wrong twitter-autentication data
 	 */
 	app.post("/twitter-accounts", function(request, response) {
+		
+		if(!request.body.description || !request.body.information){
+			return response.status(400).send("Parameters error!");
+		}
+		
 		console.log("APP-POST-ACCOUNT");
 		
 		var newAccount = {
@@ -679,7 +789,7 @@ var appRouter = function(app) {
 				"information": request.body.information
 		};
 		
-		twitterAccounts.postAccount(request.headers.usertoken, newAccount, function (err, data){
+		twitterAccounts.postAccount(request.headers.token, newAccount, function (err, data){
 			if(!err){
 				console.log("APP-POST-ACCOUNT: OK");
 				
@@ -691,11 +801,19 @@ var appRouter = function(app) {
 					
 					response.writeHead(500, {"Content-Type": "text/html"});
 					response.write("Error while performing query");
+					
 				} else if (data == "FORBIDDEN") {
 					console.log("APP-POST-ACCOUNT: Forbidden");
 					
 					response.writeHead(403, {"Content-Type": "text/html"});
 					response.write("Forbidden");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-ACCOUNT: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable OR Wrong twitter-autentication data");
+					
 				} else {
 					console.log("APP-POST-ACCOUNT: Already exists");
 					
@@ -704,8 +822,7 @@ var appRouter = function(app) {
 				}
 			}
 			response.end();
-		}
-	);
+		});
 	});
 	
 	//borra una cuenta
@@ -717,14 +834,14 @@ var appRouter = function(app) {
 	 *       - Twitter Accounts
 	 *     description: Disable a twitter account (ADMIN)
 	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
 	 *       - name: id
 	 *         in: path
 	 *         required: true
 	 *         description: The twitter account ID 
-	 *       - name: usertoken
-	 *         in: header
-	 *         required: true
-	 *         description: The user token
 	 *     produces:
 	 *       - text/html
 	 *     responses:
@@ -742,7 +859,7 @@ var appRouter = function(app) {
 	app.delete("/twitter-accounts/:id", function(request, response) {
 		console.log("APP-DEL-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
 		
-		twitterAccounts.deleteAccount(request.headers.usertoken, request.params.id,
+		twitterAccounts.deleteAccount(request.headers.token, request.params.id,
 			function (err, res){
 				if(!err){
 					console.log("APP-DEL-ACCOUNTS-ID: Delete OK");
@@ -778,29 +895,699 @@ var appRouter = function(app) {
 		);
 	});
 	
+	
+	// TWEETS
+	
 	//publicar tweet
-	app.post("/tweets/publish", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/publish:
+	 *   post:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Publish a new tweet (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *       - name: tweet
+	 *         in: body
+	 *         required: true
+	 *         description: The tweet text
+	 *         schema:
+	 *           $ref: "#/definitions/Tweet"
+	 *     produces:
+	 *       - text/html
+	 *       - application/json
+	 *     responses:
+	 *       201:
+	 *         description: Tweet published
+	 *       400:
+	 *         description: The provided {id} is not valid OR Params error
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.post("/twitter-accounts/:id/tweets/publish", function(request, response) {
+		
+		if(!request.body.text){
+			return response.status(400).send("Parameters error!");
+		}
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-POST-TWEET-PUBLISH: Publishing tweet for account: " + accountID.twitterAccountId);
+		
+		var text = request.body.text;
+		var ip = request.connection.remoteAddress;
+		
+		tweets.publish(accountID, text, ip, function (err, data){
+			
+			if(!err){
+				console.log("APP-POST-TWEET-PUBLISH: OK");
+				response.writeHead(201, {"Content-Type": "text/html"});
+				response.write("Published");
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-USER-TIMELINE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-POST-TWEET-PUBLISH: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-POST-TWEET-PUBLISH: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT Found");
+									
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-TWEET-PUBLISH: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-POST-TWEET-PUBLISH: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	//programar tweet
-	app.post("/tweets/schedule", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/schedule:
+	 *   post:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Create a new scheduled tweet (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *       - name: tweet
+	 *         in: body
+	 *         required: true
+	 *         description: The tweet text and the publish date
+	 *         schema:
+	 *           $ref: "#/definitions/ScheduledTweet"
+	 *     produces:
+	 *       - text/html
+	 *       - application/json
+	 *     responses:
+	 *       201:
+	 *         description: Tweet scheduled
+	 *       400:
+	 *         description: The provided {id} is not valid OR Params error
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       500:
+	 *         description: Error saving scheduled tweet
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.post("/twitter-accounts/:id/tweets/schedule", function(request, response) {
+		
+		if(!request.body.text || !request.body.date){
+			return response.status(400).send("Parameters error!");
+		}
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		var tweetData = {
+			text: request.body.text,
+			date: new Date(request.body.date)
+		};
+		
+		var ip = request.connection.remoteAddress;
+		
+		console.log("APP-POST-TWEET-PUBLISH: Scheduling tweet for account: " + accountID.twitterAccountId);
+		
+		tweets.schedule(accountID, tweetData, ip, function (err, data){
+			
+			if(!err){
+				console.log("APP-POST-TWEET-SCHEDULE: OK");
+				response.writeHead(201, {"Content-Type": "text/html"});
+				response.write("Scheduled");
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-SCHEDULE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-POST-TWEET-SCHEDULE: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-POST-TWEET-SCHEDULE: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT Found");
+									
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-TWEET-SCHEDULE: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-POST-TWEET-SCHEDULE: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
+	});
+	
+	//tweeter user timeline
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/user-timeline:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the user-timeline-tweets (published by user) for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The user timeline tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.get("/twitter-accounts/:id/tweets/user-timeline", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-USER-TIMELINE: Retrieving user timeline for account " + request.params.id);
+		
+		tweets.userTimeline(accountID,	function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-USER-TIMELINE: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-USER-TIMELINE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-USER-TIMELINE: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-USER-TIMELINE: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-USER-TIMELINE: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-USER-TIMELINE: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
+	});
+	
+	//tweeter home timeline
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/home-timeline:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the home-timeline-tweets (published by followed users) for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The home timeline tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.get("/twitter-accounts/:id/tweets/home-timeline", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-HOME-TIMELINE: Retrieving home timeline for account " + request.params.id);
+		
+		tweets.homeTimeline(accountID,	function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-HOME-TIMELINE: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-HOME-TIMELINE: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-HOME-TIMELINE: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-HOME-TIMELINE: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-HOME-TIMELINE: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-HOME-TIMELINE: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
+	});
+	
+	//scheduled tweets
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/scheduled:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the scheduled-tweets for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The scheduled tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.get("/twitter-accounts/:id/tweets/scheduled", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-SCHEDULED: Retrieving scheduled tweets for account " + request.params.id);
+		
+		tweets.scheduled(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-SCHEDULED: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-SCHEDULED: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-SCHEDULED: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-SCHEDULED: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-SCHEDULED: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-SCHEDULED: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
+	});
+	
+	//mentions
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/mentions:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the tweets containing mentions for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The mentions tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.get("/twitter-accounts/:id/tweets/mentions", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-MENTIONS: Retrieving tweets containing mentions to account " + request.params.id);
+		
+		tweets.mentions(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-MENTIONS: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-MENTIONS: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-MENTIONS: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-MENTIONS: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-MENTIONS: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	//tweets retuiteados
-	app.get("/tweets/retweeted", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/retweeted:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the retweeted tweets for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The retweeted tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.get("/twitter-accounts/:id/tweets/retweeted", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-RETWEETED: Retrieving retweeted tweets for account " + request.params.id);
+		
+		tweets.retweeted(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-RETWEETED: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-RETWEETED: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-RETWEETED: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-RETWEETED: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-RETWEETED: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
 	
 	//tweets marcados favoritos
-	app.get("/tweets/favourited", function(request, response) {
-
-
+	/**
+	 * @swagger
+	 * /twitter-accounts/{id}/tweets/favorited:
+	 *   get:
+	 *     tags:
+	 *       - Tweets
+	 *     description: Gets all the favorited tweets for the provided twitter-account's {id} (ADMIN)
+	 *     parameters:
+	 *       - name: token
+	 *         in: header
+	 *         required: true
+	 *         description: The user token
+	 *       - name: id
+	 *         in: path
+	 *         required: true
+	 *         description: The twitter account ID
+	 *     produces:
+	 *       - application/json
+	 *       - text/html
+	 *     responses:
+	 *       200:
+	 *         description: The favorited tweet list
+	 *       400:
+	 *         description: The provided {id} is not valid
+	 *       403:
+	 *         description: Given token does not have permission to the provided twitter-account's {id}
+	 *       404:
+	 *         description: Unable to find the requested twitter account {id}
+	 *       500:
+	 *         description: DB error
+	 *       503:
+	 *         description: Twitter service unavailable
+	 */
+	app.get("/twitter-accounts/:id/tweets/favorited", function(request, response) {
+		
+		var accountID = {
+			'token': request.headers.token,
+			'twitterAccountId': request.params.id
+		};
+		
+		console.log("APP-GET-TWEET-FAVORITED: Retrieving favorited tweets for account " + request.params.id);
+		
+		tweets.favorited(accountID, function (err, data){
+			
+			if(!err){
+				console.log("APP-GET-TWEET-FAVORITED: OK");
+				response.writeHead(200, {"Content-Type": "application/json"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if (data == "ID NOT VALID"){
+					console.log("APP-GET-TWEET-FAVORITED: Bad request. ID not valid");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Bad request. Twitter account ID not valid");
+					
+				} else if(data == "FORBIDDEN"){
+					console.log("APP-GET-TWEET-FAVORITED: Forbidden!!!");
+					response.writeHead(403, {"Content-Type": "text/html"});
+					response.write("Forbidden");
+					
+				} else if(data == "ACCOUNT NOT FOUND"){
+					console.log("APP-GET-TWEET-FAVORITED: Twitter account NOT found!!!");
+					response.writeHead(404, {"Content-Type": "text/html"});
+					response.write("Twitter account NOT found");
+					
+				} else if (data == "TWITTER ERROR") {
+					console.log("APP-GET-TWEET-FAVORITED: Twitter error");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
+					console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB Error!");
+				}
+			}
+			response.end();
+		});
 	});
+	
 	
 	//HASHTAGS
 	
@@ -991,7 +1778,7 @@ var appRouter = function(app) {
 	 *       201:
 	 *         description: Hashtag created
 	 *       400:
-	 *         description: The provided {id} is not valid
+	 *         description: The provided {id} is not valid OR Params error
 	 *       403:
 	 *         description: Given token does not own the provided twitter-account's {id}
 	 *       404:
@@ -1002,6 +1789,11 @@ var appRouter = function(app) {
 	 *         description: DB error
 	 */
 	app.post("/twitter-accounts/:id/hashtags", function(request, response) {
+		
+		if(!request.body.hashtag){
+			return response.status(400).send("Parameters error!");
+		}
+		
 		var accountID = {
 			'token': request.headers.token,
 			'twitterAccountId': request.params.id
@@ -1034,7 +1826,7 @@ var appRouter = function(app) {
 					response.write("Hashtag already exists for the provided twitter account");
 									
 				} else if(data == "ACCOUNT NOT FOUND"){
-					console.log("APP-GET-HASHTAGS: Twitter account NOT found!!!");
+					console.log("APP-POST-HASHTAGS: Twitter account NOT found!!!");
 					response.writeHead(404, {"Content-Type": "text/html"});
 					response.write("Twitter account NOT Found");
 									
@@ -1304,14 +2096,23 @@ var appRouter = function(app) {
      *     responses:
      *       201:
      *         description: Followed user created
+     *       400:
+     *         description: Params error
      *       403:
      *         description: Given token does not own the provided twitter-account's {id}
      *       409:
      *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
      *       500:
      *         description: DB error
+     *       503:
+     *         description: Twitter service unavailable
      */
 	app.post("/twitter-accounts/:id/followed-users", function(request, response) {
+		
+		if(!request.body.newuser){
+			return response.status(400).send("Parameters error!");
+		}
+		
 	    var accountID = {
 	            'token': request.headers.token,
 	            'twitterAccountId': request.params.id
@@ -1340,7 +2141,13 @@ var appRouter = function(app) {
                     response.writeHead(409, {"Content-Type": "text/html"});
                     response.write("Followed user already exists for the provided twitter account");    
                     
-                } else {
+                } else if (data == "TWITTER ERROR") {
+					console.log("APP-POST-ACCOUNT: Twitter service unavailable");
+					
+					response.writeHead(503, {"Content-Type": "text/html"});
+					response.write("Twitter service unavailable");
+					
+				} else {
                     console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
                     
                     response.writeHead(500, {"Content-Type": "text/html"});
@@ -1584,7 +2391,7 @@ var appRouter = function(app) {
 	 *       200:
 	 *         description: The user info
 	 *       400:
-	 *         description: The provided {id} is not valid
+	 *         description: The provided {id} is not valid OR Params error
 	 *       401:
 	 *         description: The provided {oldPasswd} does not match the one in DB
 	 *       403:
@@ -1595,6 +2402,10 @@ var appRouter = function(app) {
 	 *         description: DB error
 	 */
 	app.put("/users/:id", function(request, response) {
+		
+		if(!request.body.oldPasswd || !request.body.newPasswd){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		var accountID = {
 			'token': request.headers.token,
@@ -1740,9 +2551,46 @@ var appRouter = function(app) {
 
 	});
 	
+	 /**
+     * @swagger
+     * /stats/app:
+     *   get:
+     *     tags:
+     *       - Statistics 
+     *     description: Get application statistics (ADMIN)
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: Statistics of last accesses, registries and downs
+     *       403:
+     *         description: Forbidden
+     */
 	app.get("/stats/app", function(request, response) {
 
-
+	    console.log("APP-GET-ADMIN-STATS: Request stats.");
+	    var accountID = { "token" : request.headers.token };
+	    
+	    adminStats.get(accountID, function(err, res){
+	        if(!err){
+	            console.log("APP-GET-ADMIN-STATS: OK ");
+	            
+	            response.writeHead(200, {"Content-Type": "application/json"});
+	            response.write(JSON.stringify(res));
+	        } else {
+	            console.log("APP-GET-ADMIN-STATS: Forbidden!!!");
+	            
+	            response.writeHead(403, {"Content-Type": "text/html"});
+                response.write("Forbidden");
+	        }
+	        response.end();
+	    });
 	});
 	
 	//ACORTAR URL
@@ -1806,10 +2654,16 @@ var appRouter = function(app) {
 	 *     responses:
 	 *       201:
 	 *         description: The short URL was created successfully
+     *       400:
+     *         description: Params error
 	 *       500:
 	 *         description: DB insert error
 	 */
 	app.post("/urls", function(request, response) {
+		
+		if(!request.body.url){
+			return response.status(400).send("Parameters error!");
+		}
 		
 		console.log("APP-POST-URLS: Posted URL is: " + request.body.url);
 		urlShortener.post(request.body.url,
@@ -1925,6 +2779,67 @@ var appRouter = function(app) {
               });
             });
     });
+    
+    /**
+     * @swagger
+     * /verify-captcha:
+     *   post:
+     *     tags:
+     *       - Captcha
+     *     description: Verify the captcha result
+     *     parameters:
+     *       - name: captcha-response
+     *         in: body
+     *         required: true
+     *         description: The google recaptcha response
+     *         schema:
+	 *           $ref: "#/definitions/GoogleCaptchaResponse"
+     *     produces:
+     *       - application/json
+     *     responses:
+     *       200:
+     *         description: Captcha response (verified or not)
+     *       400:
+     *         description: Params error
+     *       503:
+     *         description: Captcha service unavailable
+     */
+    app.post("/verify-captcha", function(request, response){
+		
+		if(!request.bodybody['g-recaptcha-response']){
+			return response.status(400).send("Parameters error!");
+		}
+		
+		console.log("APP-VERIFY-CAPTCHA: Verifying captcha response");
+		
+		verifyCaptcha.verify(request.body['g-recaptcha-response'], request.connection.remoteAddress,
+			function(err, data){
+				
+				if(!err){
+					console.log("APP-VERIFY-CAPTCHA: OK");
+					
+					response.writeHead(200, {"Content-Type": "application/json"});
+					response.write(JSON.stringify({"responseCode": 0, "responseDesc": data}));
+				} else {
+					
+					if(data == "CAPTCHA ERROR"){
+						console.log("APP-VERIFY-CAPTCHA: Captcha service unavailable");
+						
+						response.writeHead(503, {"Content-Type": "text/html"});
+						response.write("Captcha service unavailable");
+						
+					} else {
+						console.log("APP-VERIFY-CAPTCHA: " + data);
+						
+						response.writeHead(200, {"Content-Type": "application/json"});
+						response.write(JSON.stringify({"responseCode": 1, "responseDesc": data}));
+					}
+				}
+				
+				response.end();
+			}
+		);
+	});
 };
 
 module.exports = appRouter;
