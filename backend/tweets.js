@@ -570,7 +570,7 @@ exports.retweeted = function (accountID, callback){
                             
                             for(var i=0; i<body.length; i++){
                                 
-                                if(body[i].favorited && body[i].favorite_count > 1 || !body[i].favorited && body[i].favorite_count > 0){
+                                if(body[i].retweeted && body[i].retweet_count > 1 || !body[i].retweeted && body[i].retweet_count > 0){
                                     var tweet = {
                                         id: body[i].id,
                                         created_at: new Date(body[i].created_at),
@@ -656,7 +656,7 @@ exports.favorited = function (accountID, callback){
                     };
                     var Twitter = new TwitterPackage(secret);
                     
-                    Twitter.get('statuses/retweets_of_me', function(err, body){
+                    Twitter.get('favorites/list', function(err, body){
                         
                         if(!err){
                             error = false;
