@@ -87,7 +87,7 @@ var appRouter = function(app) {
 	 *         type: string
 	 *         description: "The NEW password"
 	 * 
-	 *   Signin:
+	 *   SigninLocal:
 	 *     type: "object"
 	 *     properties:
 	 *       email:
@@ -99,6 +99,13 @@ var appRouter = function(app) {
 	 *       "g-recaptcha-response":
 	 *         type: string
 	 *         description: "The google captcha response"
+	 * 
+	 *   SigninSocial:
+	 *     type: "object"
+	 *     properties:
+	 *       code:
+	 *         type: string
+	 *         description: "The social network access token"
 	 * 
 	 *   Signup:
 	 *     type: "object"
