@@ -90,74 +90,74 @@ exports.localSignin = function (accountID, captchaData, callback) {
 };
 
 exports.facebook = function (accountData, callback) {
-	
-	var error, data;
-	
-	//var fields = ['id', 'email', 'first_name', 'last_name', 'link', 'name'];
-	var fields = ['id', 'email'];
+    
+    var error, data;
+    
+    //var fields = ['id', 'email', 'first_name', 'last_name', 'link', 'name'];
+    var fields = ['id', 'email'];
     var graphApiUrl = 'https://graph.facebook.com/v2.9/me?fields=' + fields.join(',');
     graphApiUrl += '&access_token=' + accountData.code;
 
     request.get({ url: graphApiUrl, json: true },
-		function(err, response, profile) {
-		
-			if (response.statusCode == 200) {
-				
-				// save last access for statistics
+        function(err, response, profile) {
+        
+            if (response.statusCode == 200) {
+                
+                // save last access for statistics
                 adminStats.saveLastAccess(lastDate);
                 
                 // consultar en bd con loginType + profile.id
-					// si esta -> token
-					// si no esta -> registrar + token
-				
-			} else {
-				console.log("LOGIN-FB: Request profile error " + profile.error.message);
-				error = true;
-				data = "EXTERNAL SERVICE ERROR";
-				
-				callback(error, data);
-			}
-		}
+                    // si esta -> token
+                    // si no esta -> registrar + token
+                
+            } else {
+                console.log("LOGIN-FB: Request profile error " + profile.error.message);
+                error = true;
+                data = "EXTERNAL SERVICE ERROR";
+                
+                callback(error, data);
+            }
+        }
     );
-	
+    
 }
 
 exports.google = function (accountData, callback) {
-	
-	var error, data;
-	
+    
+    var error, data;
+    
     var peopleApiUrl = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
     var headers = { Authorization: 'Bearer ' + accountData.code };
 
     // Retrieve profile information about the current user.
     request.get({ url: peopleApiUrl, headers: headers, json: true },
-		function(err, response, profile) {
-			
-			if (!profile.error) {
-			
-				// save last access for statistics
-				adminStats.saveLastAccess(lastDate);
-				
-				// consultar en bd con loginType + profile.id
-					// si esta -> token
-					// si no esta -> registrar + token
+        function(err, response, profile) {
+            
+            if (!profile.error) {
+            
+                // save last access for statistics
+                adminStats.saveLastAccess(lastDate);
+                
+                // consultar en bd con loginType + profile.id
+                    // si esta -> token
+                    // si no esta -> registrar + token
 
-			} else {
-				console.log("LOGIN-GOOGLE: Request profile error " + profile.error.message);
-				error = true;
-				data = "EXTERNAL SERVICE ERROR";
-				
-				callback(error, data);
-			}
-		}
+            } else {
+                console.log("LOGIN-GOOGLE: Request profile error " + profile.error.message);
+                error = true;
+                data = "EXTERNAL SERVICE ERROR";
+                
+                callback(error, data);
+            }
+        }
     );
 }
 
 exports.openid = function (accountData, callback) {
-	
-	var error, data;
-	
-	callback(false, null);
+    
+    var error, data;
+    
+    callback(false, null);
 }
 
 exports.signup = function (accountData, captchaData, callback) {
