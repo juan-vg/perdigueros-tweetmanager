@@ -22,11 +22,11 @@ var swaggerDefinition = {
         description: 'Descripción del API del servicio de usuarios'
     },
     host: 'zaratech-ptm.ddns.net:8888',
-    basePath: '',
+    basePath: ''
 };
 
 if(local){
-    swaggerDefinition.host = 'localhost:8888',
+    swaggerDefinition.host = 'localhost:8888';
 }
 
 // options for the swagger docs
