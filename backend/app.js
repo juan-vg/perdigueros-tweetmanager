@@ -264,12 +264,34 @@ var appRouter = function(app) {
 	 *       - Login
 	 *     description: Log in the system
 	 *     parameters:
-	 *       - name: logindata
+	 *       - name: loginType
 	 *         in: body
 	 *         required: true
+	 *         description: The login type [local, facebook, google, openid]
+	 *       - name: logindata-local
+	 *         in: body
+	 *         required: false
 	 *         description: The user account data needed in order to log in
 	 *         schema:
-	 *           $ref: "#/definitions/Signin"
+	 *           $ref: "#/definitions/SigninLocal"
+	 *       - name: logindata-facebook
+	 *         in: body
+	 *         required: false
+	 *         description: The user data needed in order to log in (access token)
+	 *         schema:
+	 *           $ref: "#/definitions/SigninSocial"
+	 *       - name: logindata-local
+	 *         in: body
+	 *         required: false
+	 *         description: The user data needed in order to log in (access token)
+	 *         schema:
+	 *           $ref: "#/definitions/SigninSocial"
+	 *       - name: logindata-local
+	 *         in: body
+	 *         required: false
+	 *         description: The user data needed in order to log in (access token)
+	 *         schema:
+	 *           $ref: "#/definitions/SigninSocial"
 	 *     produces:
 	 *       - application/json
 	 *       - text/html
@@ -289,64 +311,108 @@ var appRouter = function(app) {
 	 */
 	app.post("/login/signin", function(request, response) {
 		
-		if(!request.body.email || !request.body.passwd){
+		if(!request.body.loginType){
 			return response.status(400).send("Parameters error!");
+		} else {
+			
+			if(request.body.loginType === "local" && (!request.body.email || !request.body.passwd)){
+				return response.status(400).send("Parameters error!");
+				
+			} else {
+				if(request.body.loginType !== "local" && !request.body.code){
+					return response.status(400).send("Parameters error!");
+				}
+			}
 		}
 		
-		console.log("APP-LOGIN-SIGNIN: Trying to authenticate user " + request.body.email);
+		console.log("APP-LOGIN-SIGNIN: Trying to authenticate" + request.body.loginType + "user");
 		
-		var accountID = {
-			"email": request.body.email,
-			"passwd": request.body.passwd
-		};
 		
-		var captchaData = {
-			gResponse: request.body['g-recaptcha-response'],
-			rAddress: request.connection.remoteAddress
-		};
 		
-		login.localSignin(accountID, captchaData, function (err, data){
-				if(!err){	
-					console.log("APP-LOGIN-SIGNIN: OK");
-						
-					response.writeHead(200, {"Content-Type": "text/html"});
-					response.write(JSON.stringify(data));
+		var callbackFunc = function (err, data){
+			
+			if(!err){	
+				console.log("APP-LOGIN-SIGNIN: OK");
+					
+				response.writeHead(200, {"Content-Type": "text/html"});
+				response.write(JSON.stringify(data));
+				
+			} else {
+				if(data == "CAPTCHA ERROR"){
+					console.log("APP-LOGIN-SIGNIN: Captcha validation error");
+					
+					response.writeHead(400, {"Content-Type": "text/html"});
+					response.write("Captcha validation error");
+					
+				} else if (data == "MUST CHANGE PASSWD") {
+					console.log("APP-LOGIN-SIGNIN: Must change password");
+					
+					response.writeHead(459, {"Content-Type": "text/html"});
+					response.write(request.body.email);
+					
+				} else if (data == "MUST VALIDATE") {
+					console.log("APP-LOGIN-SIGNIN: Must validate account");
+					
+					response.writeHead(409, {"Content-Type": "text/html"});
+					response.write("Must validate the account");
+					
+				} else if (data == "INCORRECT") {
+					console.log("APP-LOGIN-SIGNIN: Incorrect passwd");
+					
+					response.writeHead(401, {"Content-Type": "text/html"});
+					response.write("Incorrect login");
 					
 				} else {
-					if(data == "CAPTCHA ERROR"){
-						console.log("APP-LOGIN-SIGNIN: Captcha validation error");
-						
-						response.writeHead(400, {"Content-Type": "text/html"});
-						response.write("Captcha validation error");
-						
-					} else if (data == "MUST CHANGE PASSWD") {
-						console.log("APP-LOGIN-SIGNIN: Must change password");
-						
-						response.writeHead(459, {"Content-Type": "text/html"});
-						response.write(request.body.email);
-						
-					} else if (data == "MUST VALIDATE") {
-						console.log("APP-LOGIN-SIGNIN: Must validate account");
-						
-						response.writeHead(409, {"Content-Type": "text/html"});
-						response.write("Must validate the account");
-						
-					} else if (data == "INCORRECT") {
-						console.log("APP-LOGIN-SIGNIN: Incorrect passwd");
-						
-						response.writeHead(401, {"Content-Type": "text/html"});
-						response.write("Incorrect login");
-						
-					} else {
-						console.log("APP-LOGIN-SIGNIN: Error while performing query");
-						
-						response.writeHead(500, {"Content-Type": "text/html"});
-						response.write("Sorry, DB error!");
-					}
+					console.log("APP-LOGIN-SIGNIN: Error while performing query");
+					
+					response.writeHead(500, {"Content-Type": "text/html"});
+					response.write("Sorry, DB error!");
 				}
-				response.end();
 			}
-		);
+			response.end();
+		}
+		
+		
+		if(request.body.loginType === "local"){
+			
+			var accountID = {
+				"email": request.body.email,
+				"passwd": request.body.passwd
+			};
+			
+			var captchaData = {
+				gResponse: request.body['g-recaptcha-response'],
+				rAddress: request.connection.remoteAddress
+			};
+			
+			login.localSignin(accountID, captchaData, callbackFunc);
+			
+		} else if(request.body.loginType === "facebook"){
+			
+			var accountID = {
+				"code": request.body.code
+			};
+			
+			login.facebook(accountID, callbackFunc);
+			
+		} else if(request.body.loginType === "google"){
+			
+			var accountID = {
+				"code": request.body.code
+			};
+			
+			login.google(accountID, callbackFunc);
+			
+		} else if(request.body.loginType === "openid"){
+			
+			var accountID = {
+				"code": request.body.code
+			};
+			
+			login.openid(accountID, callbackFunc);
+			
+		}
+		
 	});
 	
 	//validate email
