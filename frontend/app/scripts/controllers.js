@@ -255,7 +255,3 @@ app.controller('userMenuCtrl', function ($scope,$auth) {
     }
 
 });
-
-
-
-
