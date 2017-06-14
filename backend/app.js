@@ -428,12 +428,12 @@ var appRouter = function(app) {
             login.openid(accountID, callbackFunc);
              
         } else {
-			console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
+            console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
                     
-			response.writeHead(460, {"Content-Type": "text/html"});
-			response.write("Incorrect LoginType");
+            response.writeHead(460, {"Content-Type": "text/html"});
+            response.write("Incorrect LoginType");
             response.end();
-		}
+        }
     });
     
     //validate email

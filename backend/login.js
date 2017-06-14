@@ -90,90 +90,90 @@ exports.localSignin = function (accountID, captchaData, callback) {
 };
 
 function socialSignin(loginType, profile, callback){
-	
-	// save last access for statistics
-	adminStats.saveLastAccess(new Date());
-	
-	userAccModel.find({"loginType": loginType, "socialId": profile.id}, function(err, dbData){
-		
-		// generate token
-		var token = crypto.randomBytes(25).toString('hex');
-		
-		// set token expiration date (10 mins)
-		var tokenExpire = new Date();
-		tokenExpire.setMinutes(tokenExpire.getMinutes() + 10);
-		
-		// search user in DB
-		if(!err && dbData.length > 0){
-			
-			// already registered -> update lastDate, token & tokenExpire
-			userAccModel.update({"socialId" : profile.id},
-				{$set : {"lastAccess": lastDate, "token": token, "tokenExpire": tokenExpire}},
-				
-				function(err, res){
-					if(!err){
-						// return token and userId
-						error = false;
-						data = {"token": token, "id": dbData[0]._id};
-					} else {
-						error = true;
-						data = "DB ERROR";
-					}
-					callback(error, data);
-				}
-			);
-			
-		} else if(!err) {
-			
-			// not registered
-			var dbUsers = new userAccModel();
-			dbUsers.loginType = loginType;
-			
-			if(loginType === "facebook"){
-				dbUsers.socialId = profile.id;
-				dbUsers.name = profile.first_name;
-				dbUsers.surname = profile.last_name;
-				
-			} else if(loginType === "google") {
-				dbUsers.socialId = profile.sub;
-				dbUsers.name = profile.given_name;
-				dbUsers.surname = profile.family_name;
-			}
-			
-			dbUsers.email = profile.email;
-			dbUsers.registrationDate = new Date();
-			dbUsers.lastAccess = new Date();
-			dbUsers.token = token;
-			dbUsers.tokenExpire = tokenExpire;
-			dbUsers.validated = true;
-			dbUsers.firstLogin = false;
-			dbUsers.activated = true;
-			
-			// save registry for statistics
+    
+    // save last access for statistics
+    adminStats.saveLastAccess(new Date());
+    
+    userAccModel.find({"loginType": loginType, "socialId": profile.id}, function(err, dbData){
+        
+        // generate token
+        var token = crypto.randomBytes(25).toString('hex');
+        
+        // set token expiration date (10 mins)
+        var tokenExpire = new Date();
+        tokenExpire.setMinutes(tokenExpire.getMinutes() + 10);
+        
+        // search user in DB
+        if(!err && dbData.length > 0){
+            
+            // already registered -> update lastDate, token & tokenExpire
+            userAccModel.update({"socialId" : profile.id},
+                {$set : {"lastAccess": lastDate, "token": token, "tokenExpire": tokenExpire}},
+                
+                function(err, res){
+                    if(!err){
+                        // return token and userId
+                        error = false;
+                        data = {"token": token, "id": dbData[0]._id};
+                    } else {
+                        error = true;
+                        data = "DB ERROR";
+                    }
+                    callback(error, data);
+                }
+            );
+            
+        } else if(!err) {
+            
+            // not registered
+            var dbUsers = new userAccModel();
+            dbUsers.loginType = loginType;
+            
+            if(loginType === "facebook"){
+                dbUsers.socialId = profile.id;
+                dbUsers.name = profile.first_name;
+                dbUsers.surname = profile.last_name;
+                
+            } else if(loginType === "google") {
+                dbUsers.socialId = profile.sub;
+                dbUsers.name = profile.given_name;
+                dbUsers.surname = profile.family_name;
+            }
+            
+            dbUsers.email = profile.email;
+            dbUsers.registrationDate = new Date();
+            dbUsers.lastAccess = new Date();
+            dbUsers.token = token;
+            dbUsers.tokenExpire = tokenExpire;
+            dbUsers.validated = true;
+            dbUsers.firstLogin = false;
+            dbUsers.activated = true;
+            
+            // save registry for statistics
             adminStats.saveRegistry(dbUsers.registrationDate);
-			
-			// save user
-			dbUsers.save(function(err, dbData){
-				if(!err){
-					// return token and userId
-					error = false;
-					data = {"token": token, "id": dbData._id};
-					
-				} else {
-					error = true;
-					data = "DB ERROR";
-				}
-				
-				callback(error, data);
-			});
-			
-		} else {
-			error = true;
-			data = "DB ERROR";
-			
-			callback(error, data);
-		}
-	});
+            
+            // save user
+            dbUsers.save(function(err, dbData){
+                if(!err){
+                    // return token and userId
+                    error = false;
+                    data = {"token": token, "id": dbData._id};
+                    
+                } else {
+                    error = true;
+                    data = "DB ERROR";
+                }
+                
+                callback(error, data);
+            });
+            
+        } else {
+            error = true;
+            data = "DB ERROR";
+            
+            callback(error, data);
+        }
+    });
 }
 
 exports.facebook = function (accountData, callback) {
