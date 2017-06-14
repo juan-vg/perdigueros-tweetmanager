@@ -313,8 +313,12 @@ var appRouter = function(app) {
      *         description: Must validate the account (email)
      *       459:
      *         description: Must change password first (returns the email)
+     *       460:
+     *         description: Incorrect login type (local, facebook, google, openid)
      *       500:
      *         description: DB error
+     *       503:
+     *         description: External service error (Facebook, Google, OpenID)
      */
     app.post("/login/signin", function(request, response) {
         
@@ -334,8 +338,7 @@ var appRouter = function(app) {
         
         console.log("APP-LOGIN-SIGNIN: Trying to authenticate" + request.body.loginType + "user");
         
-        
-        
+        // define callback function
         var callbackFunc = function (err, data){
             
             if(!err){   
@@ -369,6 +372,12 @@ var appRouter = function(app) {
                     response.writeHead(401, {"Content-Type": "text/html"});
                     response.write("Incorrect login");
                     
+                } else if (data == "EXTERNAL SERVICE ERROR") {
+                    console.log("APP-LOGIN-SIGNIN: External service error");
+                    
+                    response.writeHead(503, {"Content-Type": "text/html"});
+                    response.write("External service error");
+                    
                 } else {
                     console.log("APP-LOGIN-SIGNIN: Error while performing query");
                     
@@ -379,7 +388,7 @@ var appRouter = function(app) {
             response.end();
         }
         
-        
+        // detect login method
         if(request.body.loginType === "local"){
             
             var accountID = {
@@ -417,9 +426,14 @@ var appRouter = function(app) {
             };
             
             login.openid(accountID, callbackFunc);
-            
-        }
-        
+             
+        } else {
+			console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
+                    
+			response.writeHead(460, {"Content-Type": "text/html"});
+			response.write("Incorrect LoginType");
+            response.end();
+		}
     });
     
     //validate email
