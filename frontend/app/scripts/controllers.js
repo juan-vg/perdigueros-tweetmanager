@@ -25,6 +25,7 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
         .then(function(response){
             console.log(response);
             localStorage.setItem('userId', response.data.id);
+            localStorage.setItem('token', response.data.token);
             $location.path('/dashboard');
         })
             //error
@@ -46,6 +47,9 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
                 $http.post('http://zaratech-ptm.ddns.net:8888/login/signin', data)
                     // if success redirect to /dashboard view
                     .then(function (response) {
+                        localStorage.removeItem('satellizer_token');
+                        localStorage.setItem('userId', response.data.id);
+                        localStorage.setItem('token', response.data.token);
                         $location.path('/dashboard');
                     });
             })
@@ -70,7 +74,6 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
 
     // if localStorage has an user active, the behaviour is to redirect to dashboard view
         if($auth.isAuthenticated()){
-            $
             $location.url('/dashboard');
         }
         // else redirects to signin view
@@ -255,3 +258,7 @@ app.controller('userMenuCtrl', function ($scope,$auth) {
     }
 
 });
+
+
+
+
