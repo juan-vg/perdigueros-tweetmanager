@@ -336,7 +336,7 @@ var appRouter = function(app) {
             }
         }
         
-        console.log("APP-LOGIN-SIGNIN: Trying to authenticate" + request.body.loginType + "user");
+        console.log("APP-LOGIN-SIGNIN: Trying to authenticate " + request.body.loginType + " user");
         
         // define callback function
         var callbackFunc = function (err, data){
