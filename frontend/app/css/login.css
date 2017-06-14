@@ -1,7 +1,6 @@
 /**
   * Login form styles
  */
-
 /* Media query from tablet (768px) and later screen width. */
 @media (min-width: 768px) {
     .omb_row-sm-offset-3 div:first-child[class*="col-"] {
@@ -13,6 +12,7 @@
     text-align: center;
     line-height: 300%;
 }
+
 /*Styles for social buttons(facebook,openid,google)*/
 .omb_login .omb_socialButtons a {
     font-size: 16px;
@@ -75,15 +75,12 @@
 
 
 @media (max-width: 768px) {
+    .omb_login {
+        padding-top: 50px;
+    }
     #welcomeHeader{
         background-color:#337ab7;
         color:white;
     }
 }
-
-
-
-
-
-
 
