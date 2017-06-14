@@ -42,23 +42,32 @@
 </head>
 
 <body>
+
 <!-- Static top navbar -->
-<nav class="navbar navbar-default navbar-fixed-top hidden-xs">
-  <div class="container">
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container" ng-controller="userMenuCtrl">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
+
+      <button type="button" class="navbar-toggle collapsed " ng-show="isUserActive()"  data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
       <!-- Navbar brand-->
-      <a class="navbar-brand" href="/">Perdigueros Tweet Manager</a>
+      <a  class="navbar-brand" href="/">Perdigueros Tweet Manager</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
-    <div ng-controller="userMenuCtrl" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <!-- Right list with user information and logout button-->
       <ul  class="nav navbar-nav navbar-right">
         <!-- User drodown -->
         <li ng-show="isUserActive()" class="dropdown ">
-          <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i> Bienvenido {{currentUser}} <span
+          <a class="dropdown-toggle pull-right" data-toggle="dropdown" role="button" aria-haspopup="true"
+             aria-expanded="false"><i class="fa fa-user" ></i> Bienvenido {{currentUser}} <span
                   class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="">Mi perfil</a></li>
@@ -70,7 +79,6 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-
 
 
 <!-- Login form -->
@@ -96,3 +104,4 @@
 </body>
 
 </html>
+
