@@ -8,8 +8,8 @@ var app = angular.module('app');
  * Controller that manage the signin view,that is the main view of the application.
  * Uses services $auth for satellizer, $location for routes, $scope for the scope and $http for internet services.
  */
-app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
-    function ($location, $http,$auth,$rootScope) {
+app.controller('signinCtrl', ['$location', '$http', '$auth', ,
+    function ($location, $http,$auth) {
     var vm = this;
 
     // Local Login function
@@ -73,7 +73,7 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
     }
 
     // if localStorage has an user active, the behaviour is to redirect to dashboard view
-        if($auth.isAuthenticated()){
+        if(localStorage.getItem('token')){
             $location.url('/dashboard');
         }
         // else redirects to signin view
@@ -235,8 +235,7 @@ app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location', function ($s
 /**
  * Create the LogoutController that manage the logout function of the site.
  */
-app.controller('LogoutController', ['$auth','$location', function ($auth,$location) {
-    $auth.logout();
+app.controller('LogoutController', ['$location', function ($location) {
     localStorage.clear();
     $location.url('/');
 }]);
@@ -252,9 +251,14 @@ app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http,$au
 /**
  * Controller to show or hide top user dropdown menu
  */
-app.controller('userMenuCtrl', function ($scope,$auth) {
+app.controller('userMenuCtrl', function ($scope) {
     $scope.isUserActive = function () {
-        return $auth.isAuthenticated();
+        if(localStorage.getItem('token')){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
 });
