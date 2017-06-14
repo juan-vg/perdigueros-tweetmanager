@@ -287,13 +287,13 @@ var appRouter = function(app) {
      *         description: The user data needed in order to log in (access token)
      *         schema:
      *           $ref: "#/definitions/SigninSocial"
-     *       - name: logindata-local
+     *       - name: logindata-google
      *         in: body
      *         required: false
      *         description: The user data needed in order to log in (access token)
      *         schema:
      *           $ref: "#/definitions/SigninSocial"
-     *       - name: logindata-local
+     *       - name: logindata-openid
      *         in: body
      *         required: false
      *         description: The user data needed in order to log in (access token)
