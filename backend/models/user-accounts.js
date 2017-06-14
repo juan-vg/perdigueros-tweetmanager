@@ -5,7 +5,6 @@ var mongoSchema =   mongoose.Schema;
 
 var usersAccountsSchema = new mongoSchema({
     "loginType": String, // local, Facebook, Google, OpenID, ...
-    "socialId": String, // only used if loginType != local
     "name": String,
     "surname": String,
     "email": String,
