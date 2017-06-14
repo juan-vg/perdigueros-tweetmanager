@@ -287,13 +287,13 @@ var appRouter = function(app) {
      *         description: The user data needed in order to log in (access token)
      *         schema:
      *           $ref: "#/definitions/SigninSocial"
-     *       - name: logindata-local
+     *       - name: logindata-google
      *         in: body
      *         required: false
      *         description: The user data needed in order to log in (access token)
      *         schema:
      *           $ref: "#/definitions/SigninSocial"
-     *       - name: logindata-local
+     *       - name: logindata-openid
      *         in: body
      *         required: false
      *         description: The user data needed in order to log in (access token)
@@ -336,7 +336,7 @@ var appRouter = function(app) {
             }
         }
         
-        console.log("APP-LOGIN-SIGNIN: Trying to authenticate" + request.body.loginType + "user");
+        console.log("APP-LOGIN-SIGNIN: Trying to authenticate " + request.body.loginType + " user");
         
         // define callback function
         var callbackFunc = function (err, data){
