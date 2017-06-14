@@ -108,7 +108,7 @@ function socialSignin(loginType, profile, callback){
             
             // already registered -> update lastDate, token & tokenExpire
             userAccModel.update({"socialId" : profile.id},
-                {$set : {"lastAccess": lastDate, "token": token, "tokenExpire": tokenExpire}},
+                {$set : {"lastAccess": new Date(), "token": token, "tokenExpire": tokenExpire}},
                 
                 function(err, res){
                     if(!err){
