@@ -4,7 +4,6 @@
 // Create the principal module that contains all the services and controllers which management the application
 var app = angular.module('app');
 
-
 /**
  * Controller that manage the signin view,that is the main view of the application.
  * Uses services $auth for satellizer, $location for routes, $scope for the scope and $http for internet services.
@@ -24,6 +23,7 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
         })
         // success, sets userId in localStorage and redirects to dashboard view
         .then(function(response){
+            console.log(response);
             localStorage.setItem('userId', response.data.id);
             $location.path('/dashboard');
         })
@@ -70,7 +70,7 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', '$rootScope',
 
     // if localStorage has an user active, the behaviour is to redirect to dashboard view
         if($auth.isAuthenticated()){
-            console.log($auth);
+            $
             $location.url('/dashboard');
         }
         // else redirects to signin view
@@ -243,6 +243,7 @@ app.controller('LogoutController', ['$auth','$location', function ($auth,$locati
  * Dashboard page controller
  */
 app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http,$auth) {
+
 });
 
 /**
@@ -254,7 +255,6 @@ app.controller('userMenuCtrl', function ($scope,$auth) {
     }
 
 });
-
 
 
 

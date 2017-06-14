@@ -16,6 +16,9 @@
     margin-left: auto;
     margin-top: auto;
 }
+.perdiguero_signup{
+    padding-top: 50px;
+}
 
 /*==========  Mobile First Method  ==========*/
 /*Media query for sizes less than 768px(tablet or pc) -- remember me component */
