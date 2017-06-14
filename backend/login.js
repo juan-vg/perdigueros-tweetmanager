@@ -3,6 +3,7 @@ var mailCreator = require("./email-creator.js");
 var verifyCaptcha = require('./verify-captcha.js');
 var adminStats = require("./admin-stats.js");
 var crypto = require('crypto');
+var request = require('request');
 var objectID = require('mongodb').ObjectID;
 
 // accountID = {email, passwd}
@@ -87,6 +88,154 @@ exports.localSignin = function (accountID, captchaData, callback) {
         }
     });
 };
+
+function socialSignin(loginType, profile, callback){
+    
+    // save last access for statistics
+    adminStats.saveLastAccess(new Date());
+    
+    userAccModel.find({"loginType": loginType, "socialId": profile.id}, function(err, dbData){
+        
+        // generate token
+        var token = crypto.randomBytes(25).toString('hex');
+        
+        // set token expiration date (10 mins)
+        var tokenExpire = new Date();
+        tokenExpire.setMinutes(tokenExpire.getMinutes() + 10);
+        
+        // search user in DB
+        if(!err && dbData.length > 0){
+            
+            // already registered -> update lastDate, token & tokenExpire
+            userAccModel.update({"socialId" : profile.id},
+                {$set : {"lastAccess": lastDate, "token": token, "tokenExpire": tokenExpire}},
+                
+                function(err, res){
+                    if(!err){
+                        // return token and userId
+                        error = false;
+                        data = {"token": token, "id": dbData[0]._id};
+                    } else {
+                        error = true;
+                        data = "DB ERROR";
+                    }
+                    callback(error, data);
+                }
+            );
+            
+        } else if(!err) {
+            
+            // not registered
+            var dbUsers = new userAccModel();
+            dbUsers.loginType = loginType;
+            
+            if(loginType === "facebook"){
+                dbUsers.socialId = profile.id;
+                dbUsers.name = profile.first_name;
+                dbUsers.surname = profile.last_name;
+                
+            } else if(loginType === "google") {
+                dbUsers.socialId = profile.sub;
+                dbUsers.name = profile.given_name;
+                dbUsers.surname = profile.family_name;
+            }
+            
+            dbUsers.email = profile.email;
+            dbUsers.registrationDate = new Date();
+            dbUsers.lastAccess = new Date();
+            dbUsers.token = token;
+            dbUsers.tokenExpire = tokenExpire;
+            dbUsers.validated = true;
+            dbUsers.firstLogin = false;
+            dbUsers.activated = true;
+            
+            // save registry for statistics
+            adminStats.saveRegistry(dbUsers.registrationDate);
+            
+            // save user
+            dbUsers.save(function(err, dbData){
+                if(!err){
+                    // return token and userId
+                    error = false;
+                    data = {"token": token, "id": dbData._id};
+                    
+                } else {
+                    error = true;
+                    data = "DB ERROR";
+                }
+                
+                callback(error, data);
+            });
+            
+        } else {
+            error = true;
+            data = "DB ERROR";
+            
+            callback(error, data);
+        }
+    });
+}
+
+exports.facebook = function (accountData, callback) {
+    
+    var error, data;
+    
+    var fields = ['id', 'email', 'first_name', 'last_name'];
+    var graphApiUrl = 'https://graph.facebook.com/v2.9/me?fields=' + fields.join(',');
+    graphApiUrl += '&access_token=' + accountData.code;
+
+    request.get({ url: graphApiUrl, json: true },
+        function(err, response, profile) {
+        
+            if (response.statusCode == 200) {
+                
+                var loginType = "facebook";
+                socialSignin(loginType, profile, callback);
+
+            } else {
+                console.log("LOGIN-FB: Request profile error " + profile.error.message);
+                error = true;
+                data = "EXTERNAL SERVICE ERROR";
+                
+                callback(error, data);
+            }
+        }
+    ); 
+}
+
+exports.google = function (accountData, callback) {
+    
+    var error, data;
+    
+    var peopleApiUrl = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
+    var headers = { Authorization: 'Bearer ' + accountData.code };
+
+    // Retrieve profile information about the current user.
+    request.get({ url: peopleApiUrl, headers: headers, json: true },
+        function(err, response, profile) {
+            
+            if (!profile.error) {
+            
+                var loginType = "google";
+                socialSignin(loginType, profile, callback);
+
+            } else {
+                console.log("LOGIN-GOOGLE: Request profile error " + profile.error.message);
+                error = true;
+                data = "EXTERNAL SERVICE ERROR";
+                
+                callback(error, data);
+            }
+        }
+    );
+}
+
+exports.openid = function (accountData, callback) {
+    
+    var error, data;
+    
+    callback(false, null);
+}
 
 exports.signup = function (accountData, captchaData, callback) {
     
@@ -270,9 +419,9 @@ exports.resendEmail = function (accountID, callback) {
 
 exports.rememberPasswd = function (accountID, callback) {
     
-        var error, data;
+    var error, data;
     
-    userAccModel.find({"email": accountID.email, "validated": true, "activated": true},
+    userAccModel.find({"email": accountID.email, "validated": true, "activated": true, "loginType": "local"},
         function(err, dbData){
             
             if(!err){

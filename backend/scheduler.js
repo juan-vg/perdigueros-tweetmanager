@@ -5,7 +5,7 @@ var objectID = require('mongodb').ObjectID;
  
 exports.update = function(){
     
-    console.log("SCHEDULER: Start");
+    console.log("SCHEDULER: Start AT: " + new Date());
     
     scheduler(function(err, data){
         if(!err){
