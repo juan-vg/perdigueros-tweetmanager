@@ -199,7 +199,7 @@ exports.facebook = function (accountData, callback) {
             }
         }
     ); 
-}
+};
 
 exports.google = function (accountData, callback) {
     
@@ -226,14 +226,14 @@ exports.google = function (accountData, callback) {
             }
         }
     );
-}
+};
 
 exports.openid = function (accountData, callback) {
     
     var error, data;
     
     callback(false, null);
-}
+};
 
 exports.signup = function (accountData, captchaData, callback) {
     
