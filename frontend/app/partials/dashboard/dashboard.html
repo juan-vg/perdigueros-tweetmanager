@@ -24,11 +24,11 @@
                             <tbody>
                             </tbody>
                         </table>
-                        <form>
-                            Token de acceso :
-                            Token de acceso secreto :
-                            Añade una descripcion: <input type="text" ng-model="description">
-                            <button class="icon-button"><i class="fa fa-plus-circle fa-lg" aria-hidden="true">Añadir cuenta</i></button>
+                        <form name="accountForm" ng-submit="createAccount()" role="form">
+                            Token de acceso : <input type="password" ng-model="accessToken">
+                            Token de acceso secreto : <input type="password" ng-model="accessTokenSecret">
+                            Añade una descripción : <input type="text" ng-model="description">
+                            <button type="submit" class="icon-button"><i class="fa fa-plus-circle fa-lg" aria-hidden="true">Añadir cuenta</i></button>
                         </form>
                     </div>
                     <div class="row">

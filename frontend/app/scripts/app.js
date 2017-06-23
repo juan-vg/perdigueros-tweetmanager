@@ -49,7 +49,8 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         })
         //route for dashboard page, token required
         .when('/auth/callback', {
-            templateUrl: 'partials/dashboard/callback.html'
+            templateUrl: 'partials/dashboard/dashboard.htmll',
+            controller : 'dashboardCtrl'
         })
 
         //route for forgot password
