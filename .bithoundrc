@@ -3,6 +3,8 @@
    "ignore": [
        "**/api-docs/**",
        "frontend/app/bower_components/**",
+       "frontend/app/js/**",
+       "frontend/app/components/**",
        "frontend/js/**"
    ],
 
