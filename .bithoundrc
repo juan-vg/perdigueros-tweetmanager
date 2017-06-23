@@ -1,11 +1,13 @@
 {
 
    "ignore": [
-       "**/api-docs/**"
+       "**/api-docs/**",
+       "frontend/app/bower_components/**",
+       "frontend/js/**"
    ],
 
    "critics": {
-     "wc": { "limit": 800 }
+     "wc": { "limit": 4000 }
    },
 
    "packageJsonLocation": "backend/package.json"
