@@ -49,7 +49,7 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         })
         //route for dashboard page, token required
         .when('/auth/callback', {
-            templateUrl: 'partials/dashboard/dashboard.htmll',
+            templateUrl: 'partials/dashboard/dashboard.html',
             controller : 'dashboardCtrl'
         })
 
