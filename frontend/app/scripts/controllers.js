@@ -8,7 +8,7 @@ var app = angular.module('app');
  * Controller that manage the signin view,that is the main view of the application.
  * Uses services $auth for satellizer, $location for routes, $scope for the scope and $http for internet services.
  */
-app.controller('signinCtrl', ['$location', '$http', '$auth', ,
+app.controller('signinCtrl', ['$location', '$http', '$auth',
     function ($location, $http,$auth) {
     var vm = this;
 
@@ -244,7 +244,20 @@ app.controller('LogoutController', ['$location', function ($location) {
 /**
  * Dashboard page controller
  */
-app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http,$auth) {
+app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http) {
+    var req = {
+        method: 'GET',
+        url: 'http://zaratech-ptm.ddns.net:8888/users/'+ localStorage.getItem('userId'),
+        headers: {
+            'Content-Type':'application/json',
+            'token' : localStorage.getItem('token')
+        }
+    };
+    $http(req).then(function(response){
+        var name   = response.data[0].email.substring(0, response.data[0].email.lastIndexOf("@"));
+        console.log(name);
+        $rootScope.currentUser = name;
+    });
 
 });
 
@@ -253,16 +266,16 @@ app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http,$au
  */
 app.controller('userMenuCtrl', function ($scope) {
     $scope.isUserActive = function () {
+        // if token exists
         if(localStorage.getItem('token')){
             return true;
         }
+        //if token not exists
         else{
             return false;
         }
     }
-
 });
-
 
 
 
