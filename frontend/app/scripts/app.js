@@ -47,6 +47,11 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
             templateUrl: 'partials/dashboard/dashboard.html',
             controller : 'dashboardCtrl'
         })
+        //route for dashboard page, token required
+        .when('/auth/callback', {
+            templateUrl: 'partials/dashboard/dashboard.html',
+            controller : 'dashboardCtrl'
+        })
 
         //route for forgot password
         .when('/forgot-password', {
@@ -57,6 +62,8 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
             templateUrl: 'partials/login/signin.html',
             controller: 'LogoutController'
         })
+
+    /* */
     ;
     $locationProvider.html5Mode(true);
 
@@ -69,7 +76,8 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         clientId : '212919395883976',
         responseType: 'token',
         name: 'facebook',
-        url: 'http://zaratech-ptm.ddns.net:8888/auth/facebook'
+        url: 'http://zaratech-ptm.ddns.net:8888/auth/facebook',
+        redirectUri : window.location.origin + '/auth/callback'
     });
 
     //google auth provider config
@@ -79,15 +87,19 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         name: 'google',
         url: 'http://zaratech-ptm.ddns.net:8888/auth/google',
         authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
-        redirectUri: window.location.origin,
+        redirectUri : window.location.origin + '/auth/callback'
+    });
+
+    //OpenID auth provider config
+    $authProvider.oauth2({
+        name: 'openidconnect',
+        redirectUri: window.location.origin + '/auth/callback',
+        clientId: 'ID',
+        responseType :'id_token token',
         requiredUrlParams: ['scope'],
-        optionalUrlParams: ['display'],
-        scope: ['profile', 'email'],
-        scopePrefix: 'openid',
-        scopeDelimiter: ' ',
-        display: 'popup',
-        oauthType: '2.0',
-        popupOptions: { width: 452, height: 633 }
+        scope: ['openid','profile','email'],
+        scopeDelimiter: '+',
+        authorizationEndpoint: 'http://zaratech-ptm.ddns.net:8888/auth/openid',
     });
 
 });
