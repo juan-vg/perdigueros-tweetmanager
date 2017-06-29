@@ -405,7 +405,7 @@ function resourcesStats(data, callback){
             error = true;
         }
         
-        if(count == 0){
+        if(count === 0){
             data.resources = results;
             callback(error);
         } else {
@@ -443,7 +443,7 @@ exports.get= function(accountID, callback){
                     error = true;
                 }
                 
-                if(count == 0){
+                if(count === 0){
                     callback(error, data);
                 } else {
                     count--;

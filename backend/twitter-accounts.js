@@ -31,8 +31,8 @@ exports.getAll = function(userToken, callback){
             
             twiAccModel.find(query, {information:0}, function(err, res){
                 if(!err){
-                    console.log("TWITTER-ACCOUNTS-GET-ALL: Obtained User: ", data);
-                    console.log("TWITTER-ACCOUNTS-GET-ALL: Accounts in database: ", res.length);
+                    console.log("TWITTER-ACCOUNTS-GET-ALL: Obtained User:", data);
+                    console.log("TWITTER-ACCOUNTS-GET-ALL: Accounts in database:", res.length);
                     
                     error = false;
                     
@@ -91,7 +91,7 @@ exports.getAccount = function(idAccount, userToken, callback){
                     twiAccModel.find({"_id": new objectID(idAccount), "activated": true}, {information:0}, function(err, res){
 
                         if(!err){
-                            console.log("TWITTER-ACCOUNTS-GET-ID: Account: ", res._id);
+                            console.log("TWITTER-ACCOUNTS-GET-ID: Account:", res._id);
 
                             error = false;
                             result = res;
@@ -140,7 +140,7 @@ exports.getAccount = function(idAccount, userToken, callback){
 //Create new account
 exports.postAccount = function(userToken, newAccount, callback){
     var error, result;  
-    console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account. Description='", newAccount.description,"'");
+    console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Trying to create new account. Description='" + newAccount.description + "'");
 
     accVerificator.getUserEmail(userToken, function(err, data){
         if(!err) {
@@ -156,7 +156,7 @@ exports.postAccount = function(userToken, newAccount, callback){
                         callback(error, result);
 
                     } else {
-                        console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Account does not exist. Adding...");
+                        console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Account does not exist");
                         
                         // create auth set
                         var secret = {

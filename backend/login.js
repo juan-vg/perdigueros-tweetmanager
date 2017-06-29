@@ -94,7 +94,7 @@ function socialSignin(loginType, profile, callback){
     // save last access for statistics
     adminStats.saveLastAccess(new Date());
     
-    userAccModel.find({"loginType": loginType, "socialId": profile.id}, function(err, dbData){
+    userAccModel.find({"email": profile.email}, function(err, dbData){
         
         // generate token
         var token = crypto.randomBytes(25).toString('hex');
@@ -107,7 +107,7 @@ function socialSignin(loginType, profile, callback){
         if(!err && dbData.length > 0){
             
             // already registered -> update lastDate, token & tokenExpire
-            userAccModel.update({"socialId" : profile.id},
+            userAccModel.update({"email": profile.email},
                 {$set : {"lastAccess": new Date(), "token": token, "tokenExpire": tokenExpire}},
                 
                 function(err, res){
@@ -130,12 +130,10 @@ function socialSignin(loginType, profile, callback){
             dbUsers.loginType = loginType;
             
             if(loginType === "facebook"){
-                dbUsers.socialId = profile.id;
                 dbUsers.name = profile.first_name;
                 dbUsers.surname = profile.last_name;
                 
             } else if(loginType === "google") {
-                dbUsers.socialId = profile.sub;
                 dbUsers.name = profile.given_name;
                 dbUsers.surname = profile.family_name;
             }
@@ -201,7 +199,7 @@ exports.facebook = function (accountData, callback) {
             }
         }
     ); 
-}
+};
 
 exports.google = function (accountData, callback) {
     
@@ -228,14 +226,14 @@ exports.google = function (accountData, callback) {
             }
         }
     );
-}
+};
 
 exports.openid = function (accountData, callback) {
     
     var error, data;
     
     callback(false, null);
-}
+};
 
 exports.signup = function (accountData, captchaData, callback) {
     

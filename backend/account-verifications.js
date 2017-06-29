@@ -16,7 +16,10 @@ function verifyUser(accountID, callback){
     
     verifyAdmin(accountID, function(success){
         
-        console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + accountID.token);
+        var censoredToken = "a2f381e8e34a033f038d564c5244408f3653b0303e0db62260";
+        censoredToken = "**********" + censoredToken.substr(10);
+        
+        console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + censoredToken);
         
         // Admin permission bypass
         if(success){
