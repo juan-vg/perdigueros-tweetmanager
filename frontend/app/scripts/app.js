@@ -49,7 +49,7 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         })
         //route for dashboard page, token required
         .when('/auth/callback', {
-            templateUrl: 'partials/dashboard/dashboard.html',
+            templateUrl: 'partials/login/callback.html',
             controller : 'dashboardCtrl'
         })
 
@@ -57,6 +57,10 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         .when('/forgot-password', {
             templateUrl: 'partials/login/forgot.html',
             controller: 'forgotPasswdCtrl'
+        })
+        //route for F.A.Q. page
+        .when('/faq',{
+            templateUrl : 'partials/login/faq.html'
         })
         .when('/logout', {
             templateUrl: 'partials/login/signin.html',

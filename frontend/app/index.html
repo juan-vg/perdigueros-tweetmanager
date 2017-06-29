@@ -32,7 +32,7 @@
   <script src="bower_components/angular-route/angular-route.js"></script>
   <script src="bower_components/satellizer/dist/satellizer.min.js"></script>
   <script src="bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
-
+  <!-- angular Resource module for creating objects which interacts with aPI REST -->
   <script src="scripts/app.js"></script>
   <script src="scripts/controllers.js"></script>
   <script src="scripts/dashboard/accountTable.js"></script>
@@ -68,12 +68,13 @@
         <!-- User drodown -->
         <li class="dropdown ">
           <a class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><i class="fa fa-user" ></i> Bienvenido <em>{{currentUser}}</em> <span
+             aria-expanded="false"><em>  {{currentUser}}  </em> <i class="fa fa-user fa-lg" ></i><span
                   class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="">Mi perfil</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="/logout" >Cerrar sesión&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+            <li><a href="">F.A.Q.</a></li>
+            <li><a href="/logout" >Cerrar sesión&nbsp;<i class="fa fa-sign-out fa-lg" aria-hidden="true"></i></a></li>
           </ul>
         </li>
       </ul>
