@@ -258,7 +258,6 @@ app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http) {
         console.log(name);
         $rootScope.currentUser = name;
     });
-
 });
 
 /**

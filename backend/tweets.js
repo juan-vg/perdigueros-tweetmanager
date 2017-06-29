@@ -15,16 +15,16 @@ exports.publish = function (accountID, text, ip, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, res){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
                     // create auth set
                     var secret = {
-                        consumer_key: res.consumerKey,
-                        consumer_secret: res.consumerSecret,
-                        access_token_key: res.accessToken,
-                        access_token_secret: res.accessTokenSecret
+                        consumer_key: resData.consumerKey,
+                        consumer_secret: resData.consumerSecret,
+                        access_token_key: resData.accessToken,
+                        access_token_secret: resData.accessTokenSecret
                     };
                     var Twitter = new TwitterPackage(secret);
                     
@@ -57,7 +57,7 @@ exports.publish = function (accountID, text, ip, callback){
                             });
 
                             error = false;
-                            data= null;
+                            data = null;
                         } else {
                             console.log("TWEETS-PUBLISH: Twitter error");
                             
@@ -70,13 +70,13 @@ exports.publish = function (accountID, text, ip, callback){
                     
                     
                 } else {
-                    if(res == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-PUBLISH: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(res == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-PUBLISH: DB ERROR!!!" );
 
                         error = true;
@@ -116,7 +116,7 @@ exports.schedule = function (accountID, tweetData, ip, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, data){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
@@ -165,13 +165,13 @@ exports.schedule = function (accountID, tweetData, ip, callback){
                     });
                     
                 } else {
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-SCHEDULE: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(reason == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-SCHEDULE: DB ERROR!!!" );
 
                         error = true;
@@ -209,16 +209,16 @@ exports.userTimeline = function (accountID, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, data){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
                     // create auth set
                     var secret = {
-                        consumer_key: data.consumerKey,
-                        consumer_secret: data.consumerSecret,
-                        access_token_key: data.accessToken,
-                        access_token_secret: data.accessTokenSecret
+                        consumer_key: resData.consumerKey,
+                        consumer_secret: resData.consumerSecret,
+                        access_token_key: resData.accessToken,
+                        access_token_secret: resData.accessTokenSecret
                     };
                     var Twitter = new TwitterPackage(secret);
                     
@@ -255,13 +255,13 @@ exports.userTimeline = function (accountID, callback){
                     });
                     
                 } else {
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-USER-TIMELINE: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(reason == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-USER-TIMELINE: DB ERROR!!!" );
 
                         error = true;
@@ -299,16 +299,16 @@ exports.homeTimeline = function (accountID, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, data){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
                     // create auth set
                     var secret = {
-                        consumer_key: data.consumerKey,
-                        consumer_secret: data.consumerSecret,
-                        access_token_key: data.accessToken,
-                        access_token_secret: data.accessTokenSecret
+                        consumer_key: resData.consumerKey,
+                        consumer_secret: resData.consumerSecret,
+                        access_token_key: resData.accessToken,
+                        access_token_secret: resData.accessTokenSecret
                     };
                     var Twitter = new TwitterPackage(secret);
                     
@@ -347,13 +347,13 @@ exports.homeTimeline = function (accountID, callback){
                     });
                     
                 } else {
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-HOME-TIMELINE: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(reason == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-HOME-TIMELINE: DB ERROR!!!" );
 
                         error = true;
@@ -391,7 +391,7 @@ exports.scheduled = function (accountID, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, data){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
@@ -413,13 +413,13 @@ exports.scheduled = function (accountID, callback){
                     );
                     
                 } else {
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-SCHEDULED: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(reason == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-SCHEDULED: DB ERROR!!!" );
 
                         error = true;
@@ -457,16 +457,16 @@ exports.mentions = function (accountID, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, data){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
                     // create auth set
                     var secret = {
-                        consumer_key: data.consumerKey,
-                        consumer_secret: data.consumerSecret,
-                        access_token_key: data.accessToken,
-                        access_token_secret: data.accessTokenSecret
+                        consumer_key: resData.consumerKey,
+                        consumer_secret: resData.consumerSecret,
+                        access_token_key: resData.accessToken,
+                        access_token_secret: resData.accessTokenSecret
                     };
                     var Twitter = new TwitterPackage(secret);
                     
@@ -505,13 +505,13 @@ exports.mentions = function (accountID, callback){
                     });
                     
                 } else {
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-MENTIONS: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(reason == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-MENTIONS: DB ERROR!!!" );
 
                         error = true;
@@ -549,16 +549,16 @@ exports.retweeted = function (accountID, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, data){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
                     // create auth set
                     var secret = {
-                        consumer_key: data.consumerKey,
-                        consumer_secret: data.consumerSecret,
-                        access_token_key: data.accessToken,
-                        access_token_secret: data.accessTokenSecret
+                        consumer_key: resData.consumerKey,
+                        consumer_secret: resData.consumerSecret,
+                        access_token_key: resData.accessToken,
+                        access_token_secret: resData.accessTokenSecret
                     };
                     var Twitter = new TwitterPackage(secret);
                     
@@ -599,13 +599,13 @@ exports.retweeted = function (accountID, callback){
                     });
                     
                 } else {
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-RETWEETED: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(reason == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-RETWEETED: DB ERROR!!!" );
 
                         error = true;
@@ -643,16 +643,16 @@ exports.favorited = function (accountID, callback){
         
         if(success){
             // check if the token has access to twitterAccountId
-            accVerificator.verifyUser(accountID, function(success, data){
+            accVerificator.verifyUser(accountID, function(success, resData){
                 
                 if(success){
                     
                     // create auth set
                     var secret = {
-                        consumer_key: data.consumerKey,
-                        consumer_secret: data.consumerSecret,
-                        access_token_key: data.accessToken,
-                        access_token_secret: data.accessTokenSecret
+                        consumer_key: resData.consumerKey,
+                        consumer_secret: resData.consumerSecret,
+                        access_token_key: resData.accessToken,
+                        access_token_secret: resData.accessTokenSecret
                     };
                     var Twitter = new TwitterPackage(secret);
                     
@@ -692,13 +692,13 @@ exports.favorited = function (accountID, callback){
                     });
                     
                 } else {
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(resData == "ACCOUNT NOT FOUND"){
                         console.log("TWEETS-FAVORITED: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
                         
-                    } else if(reason == "DB ERROR") {
+                    } else if(resData == "DB ERROR") {
                         console.log("TWEETS-FAVORITED: DB ERROR!!!" );
 
                         error = true;
