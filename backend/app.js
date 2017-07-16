@@ -17,8 +17,13 @@ var tweets = require('./tweets.js');
 var verifyCaptcha = require('./verify-captcha.js');
 
 // scheduler every minute (second=5)
-var scheduling = schedule.scheduleJob('5 * * * * *', function(){
-  scheduler.update();
+var tweetScheduling = schedule.scheduleJob('5 * * * * *', function(){
+  scheduler.tweetSchedulerUpdate();
+});
+
+// scheduler every day (at 00:00:00 h)
+var twitterAccountsCleaningScheduling = schedule.scheduleJob('0 0 0 * * *', function(){
+  scheduler.twitterAccountsCleaningUpdate();
 });
 
 var appRouter = function(app) {
@@ -972,6 +977,76 @@ var appRouter = function(app) {
                         response.write("Account ID not found!");
                     } else {
                         console.log("APP-DEL-ACCOUNTS-ID: Error performing query");
+                        
+                        response.writeHead(500, {"Content-Type": "text/html"});
+                        response.write("Error performing query");
+                    }
+                }
+                response.end();
+            }
+        );
+    });
+    
+    // reactiva una cuenta
+    /**
+     * @swagger
+     * /twitter-accounts/{id}:
+     *   put:
+     *     tags:
+     *       - Twitter Accounts
+     *     description: Reactivates a twitter account (ADMIN)
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID 
+     *     produces:
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The account has been successfully reactivated
+     *       400:
+     *         description: The provided {id} is not valid
+     *       403:
+     *         description: The user (token) does not own this twitter account (id)
+     *       404:
+     *         description: Unable to find the requested {id}
+     *       500:
+     *         description: Error reactivating twitter account
+     */
+    app.put("/twitter-accounts/:id/activated", function(request, response) {
+        console.log("APP-REACT-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
+        
+        twitterAccounts.reactivateAccount(request.headers.token, request.params.id,
+            function (err, res){
+                if(!err){
+                    console.log("APP-REACT-ACCOUNTS-ID: Reactivate OK");
+                    
+                    response.writeHead(200, {"Content-Type": "text/html"});
+                    response.write("Reactivated account");
+                } else {
+                    if (data == "ID NOT VALID"){
+                    console.log("APP-REACT-ACCOUNTS-ID: Bad request. ID not valid");
+                    
+                    response.writeHead(400, {"Content-Type": "text/html"});
+                    response.write("Bad request. Twitter account ID not valid");
+                    
+                    } else if(res == 'FORBIDDEN'){
+                        console.log("APP-REACT-ACCOUNTS-ID: Requested Account-ID is forbidden");
+                        
+                        response.writeHead(403, {"Content-Type": "text/html"});
+                        response.write("Forbidden. The user does not own this account");
+                    } else if(res == 'NOT FOUND') {
+                        console.log("APP-REACT-ACCOUNTS-ID: Requested Account-ID not found");
+                        
+                        response.writeHead(404, {"Content-Type": "text/html"});
+                        response.write("Account ID not found!");
+                    } else {
+                        console.log("APP-REACT-ACCOUNTS-ID: Error performing query");
                         
                         response.writeHead(500, {"Content-Type": "text/html"});
                         response.write("Error performing query");

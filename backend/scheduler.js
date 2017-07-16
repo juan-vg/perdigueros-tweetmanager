@@ -3,20 +3,33 @@ var schedTweetsModel = require("./models/scheduled-tweets");
 var twiAccModel = require("./models/twitter-accounts");
 var objectID = require('mongodb').ObjectID;
  
-exports.update = function(){
+exports.tweetSchedulerUpdate = function(){
     
-    console.log("SCHEDULER: Start AT: " + new Date());
+    console.log("TWEET-SCHEDULER: Start AT: " + new Date());
     
-    scheduler(function(err, data){
+    tweetScheduler(function(err, data){
         if(!err){
-            //console.log("SCHEDULER: " + data);
+            //console.log("TWEET-SCHEDULER: " + data);
         } else {
-            //console.log("SCHEDULER-ERROR: " + data);
+            //console.log("TWEET-SCHEDULER-ERROR: " + data);
         }
     });
 };
 
-function scheduler(callback){
+exports.twitterAccountsCleaningUpdate = function(){
+    
+    console.log("TWIT-ACC-SCHEDULER: Start AT: " + new Date());
+    
+    twitterAccountsCleaning(function(err, data){
+        if(!err){
+            //console.log("TWIT-ACC-SCHEDULER: " + data);
+        } else {
+            //console.log("TWIT-ACC-SCHEDULER-ERROR: " + data);
+        }
+    });
+};
+
+function tweetScheduler(callback){
 
     var error, data;
     
@@ -90,6 +103,26 @@ function scheduler(callback){
                 data = "DB ERROR";
                 callback(error, data);
             }
+        }
+    );
+}
+
+function twitterAccountsCleaning(callback){
+
+    var error, data;
+    
+    twiAccModel.remove({"activated":false, "deactivationDate": {$lte: new Date()}}, 
+        function(err, dbData){
+            
+            if(!err){
+                error = false;
+                data = null;
+            } else{
+                error = true;
+                data = "DB ERROR";
+            }
+            
+            callback(error, data);
         }
     );
 }
