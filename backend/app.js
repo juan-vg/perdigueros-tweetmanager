@@ -1018,7 +1018,7 @@ var appRouter = function(app) {
      *       500:
      *         description: Error reactivating twitter account
      */
-    app.put("/twitter-accounts/:id", function(request, response) {
+    app.put("/twitter-accounts/:id/activated", function(request, response) {
         console.log("APP-REACT-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
         
         twitterAccounts.reactivateAccount(request.headers.token, request.params.id,
