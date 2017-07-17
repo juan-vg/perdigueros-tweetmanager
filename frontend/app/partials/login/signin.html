@@ -1,0 +1,77 @@
+<!-- Index body content, component jumbotron with welcome message -->
+<div class="jumbotron hidden-xs">
+    <div  class="container text-center ">
+        <h1>Perdigueros Tweet Manager</h1>
+    </div>
+</div>
+
+<!-- Social networks login module -->
+
+<div class="container omb_login">
+    <h3 class="omb_authTitle">Inicia sesión</a> o <a href="/signup">regístrate</a></h3>
+    <div class="row omb_row-sm-offset-3 omb_socialButtons">
+        <div class="col-xs-4 col-sm-2">
+            <a ng-click="login.authenticate('facebook')" class="btn btn-lg btn-block omb_btn-facebook">
+                <!--Responsive method -->
+                <i class="fa fa-facebook visible-xs"></i>
+                <span class="hidden-xs">Facebook</span>
+            </a>
+        </div>
+        <div class="col-xs-4 col-sm-2">
+            <a  class="btn btn-lg btn-block omb_btn-openid">
+                <!--Responsive method -->
+                <i class="fa fa-openid visible-xs"></i>
+                <span class="hidden-xs">OpenID</span>
+            </a>
+        </div>
+        <div class="col-xs-4 col-sm-2">
+            <a ng-click="login.authenticate('google')" class="btn btn-lg btn-block omb_btn-google">
+                <!--Responsive method -->
+                <i class="fa fa-google-plus visible-xs"></i>
+                <span class="hidden-xs">Google+</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- or login with system credentials -->
+    <div class="row omb_row-sm-offset-3 omb_loginOr">
+        <div class="col-xs-12 col-sm-6">
+            <hr class="omb_hrOr">
+            <span class="omb_spanOr">o</span>
+        </div>
+    </div>
+
+    <div class="row omb_row-sm-offset-3">
+        <div class="col-xs-12 col-sm-6">
+            <form name="signinForm" ng-submit="login.login()" name="signinForm" role="form" class="omb_loginForm" novalidate method="post">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                    <input type="email" class="form-control" name="email" placeholder="E-mail" id="email" ng-model="login.email" required>
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                    <input type="password"  class="form-control" name="passwd" placeholder="Contraseña" id="passwd" ng-model="login.passwd" required>
+                </div>
+
+                <div class="form-group" id="captcha">
+                    <div class="col-xs-10">
+                        <div theme="light" size="normal" vc-recaptcha key="'6LcU-iEUAAAAANZLuIw0e1txZeTH1VAVSIl8RPKx'" ng-model="login.captchaResponse"></div>
+                    </div>
+                </div>
+
+                <button  class="btn btn-lg btn-primary btn-block" type="submit">Inicia sesión</button>
+            </form>
+        </div>
+    </div>
+    <div class="row omb_row-sm-offset-3">
+        <div class=" col-xs-12 col-sm-3">
+            <p class="omb_forgotPwd">
+                <a href="/forgot-password">¿Olvidaste la contraseña?</a>
+            </p>
+            <div class="omb_forgotPwd">
+                <a href="/validate">¿Todavía no has validado tu cuenta?</a>
+            </div>
+        </div>
+    </div>
+</div>

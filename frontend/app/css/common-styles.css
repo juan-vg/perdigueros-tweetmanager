@@ -1,0 +1,104 @@
+/*Redefined styles from bootstrap template
+-------------------------------------------------- */
+
+/*Navbar custom styles*/
+.navbar-default {
+    background-color: #337ab7;
+    border-color: #66afe9;
+}
+
+.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
+    color: white;
+    background-color: transparent;
+}
+
+.navbar-default .navbar-brand {
+    color: white;
+}
+
+/* L*/
+
+.navbar-default .navbar-nav > li > a {
+    color: white;
+}
+
+.navbar-default .navbar-nav > li > a:focus, .navbar-default .navbar-nav > li > a:hover {
+    color: #ffffff;
+    background-color: transparent;
+}
+
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+    color: black;
+    background-color: transparent;
+}
+
+.navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover {
+    background-color: white;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: white;
+}
+
+@media (max-width: 768px) {
+    .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+        color: white;
+    }
+}
+
+/*
+ * Description: CSS file that stores Perdiguero Tweet Manager styles.
+ * Author: Sergio Pedrero Benedi
+ */
+
+/* Style that makes a clickable icon (Font Awesome) button*/
+.icon-button {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    border: 0;
+    background: transparent;
+}
+
+.nav-tabs > li, .nav-pills > li {
+    float: none;
+    display: inline-block;
+    *display: inline; /* ie7 fix */
+    zoom: 1; /* hasLayout ie7 trigger */
+}
+
+.nav-tabs, .nav-pills {
+    text-align: center;
+}
+
+.dropdown-menu {
+    width: 100%;
+}
+@media (min-width: 768px) {
+    .input-validate {
+        display: block;
+        margin-left: 8em;
+        margin-top: 10em;
+        padding-right: 10em;
+    }
+}
+@media (min-width: 992px) {
+    .input-validate {
+        display: block;
+        margin-left: 16em;
+        margin-top: 10em;
+        padding-right: 10em;
+    }
+}
+
+.required {
+    color : red;
+}
+.mailerror {
+    color: red;
+}
+
+#captcha {
+    padding-left:1px;
+}

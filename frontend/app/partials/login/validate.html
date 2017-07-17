@@ -1,0 +1,54 @@
+<!-- Index body content, component jumbotron with welcome message -->
+<div id="welcomeHeader" class="jumbotron">
+    <div class="container text-center">
+        <h2 class="hidden-xs">Valida tu cuenta en </h2>
+        <h1>Perdigueros Tweet Manager</h1>
+    </div>
+</div>
+
+
+<div class="container">
+    <h1 id="validateTitle" class="text-center ">Valida tu registro</h1>
+    <div class="container">
+        <form name="validateForm" ng-submit="validate()" class="form-horizontal validate-form" role="form" >
+            <div class="row input-validate col-xs-12 col-sm-12 col-md-6">
+                <div class="form-group">
+                    <div class="col-xs-10">
+                        <input type="email" name="email" class="form-control" placeholder="E-mail" required ng-model="email" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-10">
+                        <input type="password" name="code" class="form-control" placeholder="Codigo de validación:" required ng-model="code">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-10">
+                        <button type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg">Validar</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="container">
+        <h4 class="text-center">Si quieres que se te reenvie el codigo de verificación,<br>completa el siguiente formulario.</h4>
+        <form name="resendForm"  class="form-horizontal validate-form" role="form" ng-submit="resend()">
+            <div class="row input-validate col-xs-12 col-sm-12 col-md-6">
+                <div class="form-group">
+                    <div class="col-xs-10">
+                        <input type="email" name="email" class="form-control" placeholder="E-mail" required ng-model="emailresend" >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-10">
+                        <button type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg">Reenviar codigo </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </p>
+    </div>
+</div>
+</div>
+</div>
+

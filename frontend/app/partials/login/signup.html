@@ -1,0 +1,55 @@
+<!-- Index body content, component jumbotron with welcome message -->
+<div id="welcomeHeader" class="jumbotron hidden-xs">
+    <div class="container text-center">
+        <h2 class="hidden-xs">Registrate en </h2>
+        <h1>Perdigueros Tweet Manager</h1>
+    </div>
+</div>
+<div class="container perdiguero_signup">
+    <h1 class="text-center">Crea tu cuenta en Perdigueros Tweet Manager</h1>
+    <div class="container ">
+        <form name="signupForm" ng-submit="postData()" class="form-horizontal signup-form" role="form" novalidate>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-6">
+                    <div class="container  ">
+                        <img class="img-signup" ng-src="img/photo.png">
+                    </div>
+
+                </div>
+                <div class="input-signup col-xs-12 col-sm-12 col-md-6">
+                    <div class="form-group ">
+                        <div class="col-xs-10">
+                            <input type="text" name="name" class="form-control" placeholder="Nombre" ng-model="name" required>
+                            <span class="required" ng-show="signupForm.name.$touched && signupForm.name.$invalid">El nombre es obligatorio.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-10">
+                            <input type="text" name="surname" class="form-control" placeholder="Apellido" ng-model="surname" required>
+                            <span class="required" ng-show="signupForm.surname.$touched && signupForm.surname.$invalid">El apellido es obligatorio.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-10">
+                            <input type="email" name="email" class="form-control" placeholder="E-mail" ng-model="email" required>
+                            <span ng-show="signupForm.email.$touched && signupForm.email.$invalid" class="required">El e-mail es obligatorio.</span>
+                            <span ng-show="signupForm.email.$error.email" class="mailerror"><br>Formato de e-mail incorrecto.</span>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group" id="captcha">
+                        <div class="col-xs-10 ">
+                            <div vc-recaptcha key="'6LcU-iEUAAAAANZLuIw0e1txZeTH1VAVSIl8RPKx'" ng-model="captchaResponse"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-10">
+                            <button ng-disabled="signupForm.$invalid" type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

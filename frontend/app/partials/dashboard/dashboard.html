@@ -1,0 +1,52 @@
+<!-- Content of home logged user view-->
+<div class="container">
+<div class="row">
+
+        <!-- Account panel -->
+        <div  ng-controller="accountTableCtrl" id="account-panel" class="col-md-6">
+            <div class="panel panel-default">
+                <!-- Account panel header -->
+                <div class="panel-heading text-center">
+                    Cuentas
+                </div>
+                <!-- Account panel body -->
+                <div  class="panel-body">
+                    <div class="span6">
+                        <table class="table table-responsive">
+                            <thead>
+                                <th style="min-width: 80px;">@Cuenta de twitter:</th>
+                                <th style="width:20px;">Descripcion</th>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="account in accountList">
+                                <td>@{{account.name}}</td>
+                                <td>{{account.description}}</td>
+                                <td><button class="icon-button">Eliminar cuenta  <i href="" class="fa fa-lg fa-trash" aria-hidden="true"></i></button> </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <form name="accountForm" ng-submit="createAccount()" role="form">
+                            <div ng-show = "menuState.show">
+                                Consumer key: <input type="password" ng-model="consumerKey"> <br>
+                                Consumer secret: <input type="password" ng-model="consumerSecret"> <br>
+                                Access token: <input type="password" ng-model="accessToken"> <br>
+                                Access token secret: <input type="password" ng-model="accessTokenSecret"> <br>
+                                Añade una descripción: <input type="text" ng-model="description"> <br>
+                                <button type="submit" class="icon-button">Enviar  <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
+                            </div>
+                        </form>
+                        <button ng-click ="changeMenu()" class="icon-button">{{addAccountState}}  <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <img src="" class="img-circle">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+

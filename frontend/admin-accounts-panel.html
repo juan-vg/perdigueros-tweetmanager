@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head;
+    any other head content must come *after* these tags -->
+    <title>Perdigueros Tweet Manager</title>
+
+    <!-- Bootstrap Framework load -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Perdigueros Css styles load -->
+    <link href="css/perdiguero.css" rel="stylesheet">
+    <!-- Footer styles -->
+    <link href="css/footer.css" rel="stylesheet">
+    <!-- Common Styles -->
+    <link href="css/common-styles.css" rel="stylesheet">
+    <!-- Font Awesome library -->
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+</head>
+<body>
+
+<!-- Static top navbar -->
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- Navbar brand-->
+            <a class="navbar-brand" href="#">Perdigueros Tweet Manager. Admin Control</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+            	<!-- Users link -->
+            	<li><a href="admin-main-panel.html"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Usuarios</a></li>
+            	<!-- Stadistics link -->
+            	<li><a href="admin-door-panel.html"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Estadisticas</a></li>
+                <!-- Right list with logout button-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="admin-login-panel.html">Salir&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Content of list of accounts view-->
+
+<div class="container" ng-app="ListAccounts" ng-controller="AccountController">
+    <div class="row" >
+        <!-- List with users -->
+        <div class="col-xs-12 col-md-6">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th class="text-center">Nombre</th>
+						<th class="text-center">Usuario</th>
+						<th class="text-center">Mas Información</th>
+						<th class="text-center col-md-1">¿Eliminar?</th>
+					</tr>
+				</thead>
+				<tbody ng-repeat="i in accounts">
+					<tr>
+						<td class="text-center">{{i.name}}</td>
+						<td class="text-center">{{i.email}}</td>
+						<td class="text-center"><button type="button" ng-click="showInfo(i)" class="btn btn-info">Información</button>
+						<td><button class="btn btn-danger center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
+					</tr>
+					<tr ng-if="toggle[$index]">
+						<td colspan="4"><h5 align="center">¿Estas seguro que deseas eliminarla?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="removeAccount(i)">Si</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
+					</tr>
+				</tbody>
+			</table>
+        </div>
+        <div class="col-xs-12 col-md-6" >
+        	<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th class="text-center">Hashtags de {{user_select}}</th>
+						<th class="text-center">Descripción de {{account_select}}</th>
+					</tr>
+						
+				</thead>
+				<tbody>
+					<tr>
+						<td class="text-center"><pre>{{hashtags_select}}</pre></td>
+						<td class="text-center"><pre>{{account_description}}</pre></td>
+					</tr>
+				</tbody>
+        	</table>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container-fluid">
+        <p class="text-center">@Copyright PTM</p>
+    </div>
+</footer>
+
+    <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <!-- Bootstrap js library required -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- Angular js library required -->
+    <script src="js/angular.min.js"></script>
+    <!-- Angular js Functions -->
+    <script src="js/angular_data.js"></script>
+	<!-- NgStorage library -->
+	<script src="js/ngStorage.min.js"></script>
+</body>
+</html>
