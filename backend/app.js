@@ -387,12 +387,12 @@ var appRouter = function(app) {
                     response.write("Incorrect login data OR User not found");
                     
                 } else if(data == "INCORRECT LOGINTYPE"){
-					console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
+                    console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
                     
-					response.writeHead(460, {"Content-Type": "text/html"});
-					response.write("Incorrect LoginType");
-					
-				} else if (data == "EXTERNAL SERVICE ERROR") {
+                    response.writeHead(460, {"Content-Type": "text/html"});
+                    response.write("Incorrect LoginType");
+                    
+                } else if (data == "EXTERNAL SERVICE ERROR") {
                     console.log("APP-LOGIN-SIGNIN: External service error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
@@ -427,7 +427,7 @@ var appRouter = function(app) {
         } else {
             
             var accountID = {
-				"loginType": request.body.loginType,
+                "loginType": request.body.loginType,
                 "code": request.body.code
             };
             
@@ -763,8 +763,8 @@ var appRouter = function(app) {
      *         description: External service error (Facebook, Google, OpenID)
      */
     app.post("/login/reactivate", function(request, response) {
-		
-		var error = false;
+        
+        var error = false;
         
         if(!request.body.loginType){
             return response.status(400).send("Parameters error!");
@@ -792,7 +792,7 @@ var appRouter = function(app) {
                 response.write("User reactivated");
                 
             } else {
-				
+                
                 if(data == "CAPTCHA ERROR"){
                     console.log("APP-LOGIN-REACT: Captcha validation error");
                     
@@ -818,12 +818,12 @@ var appRouter = function(app) {
                     response.write("Incorrect login data OR User not found OR User not deactivated");
                     
                 } else if(data == "INCORRECT LOGINTYPE"){
-					console.log("APP-LOGIN-REACT: Incorrect LoginType");
+                    console.log("APP-LOGIN-REACT: Incorrect LoginType");
                     
-					response.writeHead(460, {"Content-Type": "text/html"});
-					response.write("Incorrect LoginType");
-					
-				} else if (data == "EXTERNAL SERVICE ERROR") {
+                    response.writeHead(460, {"Content-Type": "text/html"});
+                    response.write("Incorrect LoginType");
+                    
+                } else if (data == "EXTERNAL SERVICE ERROR") {
                     console.log("APP-LOGIN-REACT: External service error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
@@ -852,7 +852,7 @@ var appRouter = function(app) {
             };
             
             accountID = {
-				"loginType": request.body.loginType,
+                "loginType": request.body.loginType,
                 "email": request.body.email,
                 "passwd": request.body.passwd,
                 "captchaData": captchaData
@@ -861,7 +861,7 @@ var appRouter = function(app) {
         } else {
             
             accountID = {
-				"loginType": request.body.loginType,
+                "loginType": request.body.loginType,
                 "code": request.body.code
             };
         }
