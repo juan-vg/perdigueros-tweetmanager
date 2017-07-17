@@ -551,41 +551,49 @@ exports.reactivateAccount = function (accountID, callback) {
     
     var callbackFunc = function(err, resData){
         
-        userAccModel.find({"email": email, "activated": false}, function(err, dbData){
-            if(!err){
-                    
-                if(dbData.length > 0){
-                    
-                    userAccModel.update({"_id" : new objectID(dbData[0]._id)},
-                        {$set : {"activated": true}},
+        if(!err){
+            userAccModel.find({"email": email, "activated": false}, function(err, dbData){
+                
+                if(!err){
+                    if(dbData.length > 0){
                         
-                        function(err, res){
-                            if(!err){                               
-                                error = false;
-                                data = null;
-                                
-                                // save registry for statistics
-                                adminStats.saveRegistry(dbUsers.registrationDate);
-                                
-                            } else {
-                                error = true;
-                                data = "DB ERROR";
+                        userAccModel.update({"_id" : new objectID(dbData[0]._id)},
+                            {$set : {"activated": true}},
+                            
+                            function(err, res){
+                                if(!err){                               
+                                    error = false;
+                                    data = null;
+                                    
+                                    // save registry for statistics
+                                    adminStats.saveRegistry(dbUsers.registrationDate);
+                                    
+                                } else {
+                                    error = true;
+                                    data = "DB ERROR";
+                                }
+                                callback(error, data);
                             }
-                            callback(error, data);
-                        }
-                    );
-                    
+                        );
+                        
+                    } else {
+                        error = true;
+                        data = "NOT FOUND";
+                        callback(error, data);
+                    }
                 } else {
                     error = true;
-                    data = "NOT FOUND";
+                    data = "DB ERROR";
                     callback(error, data);
                 }
-            } else {
-                error = true;
-                data = "DB ERROR";
-                callback(error, data);
-            }
-        });
+            });
+            
+        } else {
+            error = true;
+            data = resData;
+            
+            callback(error, data);
+        }
     };
     
     // call needed function
