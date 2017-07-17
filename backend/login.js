@@ -102,7 +102,7 @@ function facebook(accountData, callback) {
         
             if (response.statusCode == 200) {
                 error = false;
-                data = profile;
+                data = {"profile": profile};
 
             } else {
                 console.log("LOGIN-FB: Request profile error " + profile.error.message);
@@ -128,7 +128,7 @@ function google(accountData, callback) {
             
             if (!profile.error) {
                 error = false;
-                data = profile;
+                data = {"profile": profile};
 
             } else {
                 console.log("LOGIN-GOOGLE: Request profile error " + profile.error.message);
