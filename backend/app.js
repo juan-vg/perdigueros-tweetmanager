@@ -92,6 +92,13 @@ var appRouter = function(app) {
      *         type: string
      *         description: "The NEW password"
      * 
+     *   Signin:
+     *     type: "object"
+     *     properties:
+     *       loginType:
+     *         type: string
+     *         description: "The login type [local, facebook, google, openid]"
+     * 
      *   SigninLocal:
      *     type: "object"
      *     properties:
@@ -276,10 +283,12 @@ var appRouter = function(app) {
      *       - Login
      *     description: Log in the system
      *     parameters:
-     *       - name: loginType
+     *       - name: type
      *         in: body
      *         required: true
      *         description: The login type [local, facebook, google, openid]
+     *         schema:
+     *           $ref: "#/definitions/Signin"
      *       - name: logindata-local
      *         in: body
      *         required: false
@@ -313,7 +322,7 @@ var appRouter = function(app) {
      *       400:
      *         description: Captcha validation error OR Params error
      *       401:
-     *         description: Incorrect login data
+     *         description: Incorrect login data OR User not found
      *       409:
      *         description: Must validate the account (email)
      *       459:
@@ -372,10 +381,10 @@ var appRouter = function(app) {
                     response.write("Must validate the account");
                     
                 } else if (data == "INCORRECT") {
-                    console.log("APP-LOGIN-SIGNIN: Incorrect passwd");
+                    console.log("APP-LOGIN-SIGNIN: Incorrect login data OR User not found");
                     
                     response.writeHead(401, {"Content-Type": "text/html"});
-                    response.write("Incorrect login");
+                    response.write("Incorrect login data OR User not found");
                     
                 } else if(data == "INCORRECT LOGINTYPE"){
 					console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
@@ -702,10 +711,12 @@ var appRouter = function(app) {
      *       - Login
      *     description: Reactivates an account
      *     parameters:
-     *       - name: loginType
+     *       - name: type
      *         in: body
      *         required: true
      *         description: The login type [local, facebook, google, openid]
+     *         schema:
+     *           $ref: "#/definitions/Signin"
      *       - name: logindata-local
      *         in: body
      *         required: false
@@ -739,7 +750,7 @@ var appRouter = function(app) {
      *       400:
      *         description: Captcha validation error OR Params error
      *       401:
-     *         description: Incorrect login data
+     *         description: Incorrect login data OR User not found OR User not deactivated
      *       409:
      *         description: Must validate the account (email)
      *       459:
@@ -778,9 +789,10 @@ var appRouter = function(app) {
                 console.log("APP-LOGIN-REACT: OK");
                     
                 response.writeHead(200, {"Content-Type": "text/html"});
-                response.write(JSON.stringify(data));
+                response.write("User reactivated");
                 
             } else {
+				
                 if(data == "CAPTCHA ERROR"){
                     console.log("APP-LOGIN-REACT: Captcha validation error");
                     
@@ -800,13 +812,13 @@ var appRouter = function(app) {
                     response.write("Must validate the account");
                     
                 } else if (data == "INCORRECT") {
-                    console.log("APP-LOGIN-REACT: Incorrect passwd");
+                    console.log("APP-LOGIN-REACT: Incorrect login data OR User not found OR User not deactivated");
                     
                     response.writeHead(401, {"Content-Type": "text/html"});
-                    response.write("Incorrect login data");
+                    response.write("Incorrect login data OR User not found OR User not deactivated");
                     
                 } else if(data == "INCORRECT LOGINTYPE"){
-					console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
+					console.log("APP-LOGIN-REACT: Incorrect LoginType");
                     
 					response.writeHead(460, {"Content-Type": "text/html"});
 					response.write("Incorrect LoginType");
@@ -2815,8 +2827,8 @@ var appRouter = function(app) {
             
             if(!err){
                 console.log("APP-DELETE-USER: OK");
-                response.writeHead(200, {"Content-Type": "application/json"});
-                //response.write(JSON.stringify(data));
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write("User deleted");
                 
             } else {
                 if (data == "ID NOT VALID"){

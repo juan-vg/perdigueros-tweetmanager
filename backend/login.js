@@ -549,16 +549,19 @@ exports.firstLogin = function (accountID, callback) {
 
 exports.reactivateAccount = function (accountID, callback) {
     
+    var error, data;
+    
     var callbackFunc = function(err, resData){
         
         if(!err){
-            userAccModel.find({"email": email, "activated": false}, function(err, dbData){
+            
+            userAccModel.find({"email": resData.profile.email, "activated": false}, function(err, dbData){
                 
                 if(!err){
                     if(dbData.length > 0){
                         
                         userAccModel.update({"_id" : new objectID(dbData[0]._id)},
-                            {$set : {"activated": true}},
+                            {$set : {"activated": true, "deactivationDate":null}},
                             
                             function(err, res){
                                 if(!err){                               
@@ -566,9 +569,11 @@ exports.reactivateAccount = function (accountID, callback) {
                                     data = null;
                                     
                                     // save registry for statistics
-                                    adminStats.saveRegistry(dbUsers.registrationDate);
+                                    adminStats.saveRegistry(new Date());
                                     
                                 } else {
+                                    console.log("LOGIN-REACT: DB ERROR on update");
+                                    
                                     error = true;
                                     data = "DB ERROR";
                                 }
@@ -578,10 +583,12 @@ exports.reactivateAccount = function (accountID, callback) {
                         
                     } else {
                         error = true;
-                        data = "NOT FOUND";
+                        data = "INCORRECT";
                         callback(error, data);
                     }
                 } else {
+                    console.log("LOGIN-REACT: DB ERROR on find");
+                    
                     error = true;
                     data = "DB ERROR";
                     callback(error, data);
@@ -597,7 +604,41 @@ exports.reactivateAccount = function (accountID, callback) {
     };
     
     // call needed function
-    if(accountID.loginType === "facebook"){
+    if(accountID.loginType === "local"){
+        
+        verifyCaptcha.verify(accountID.captchaData.gResponse, accountID.captchaData.rAddress, function(err, data){
+            if(!err){
+                
+                var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
+        
+                // validate password and get user data (avoiding retrieval of password)
+                userAccModel.find({"email": accountID.email, "password": passwd, "loginType": "local"}, {"password":0},
+                
+                    function(err, dbData){
+                        if(!err && dbData.length > 0){
+        
+                            error = false;
+                            data = {"profile": {"email": accountID.email}};
+                            
+                            callbackFunc(error, data);
+                            
+                        } else {
+                            error = true;
+                            data = "INCORRECT";
+                            callback(error, data);
+                        }
+                    }
+                );
+            } else {
+                console.log("LOGIN-REACT: CAPTCHA FAILURE");
+            
+                error = true;
+                data = "CAPTCHA ERROR";
+                callback(error, data);
+            }
+        });
+
+    } else if(accountID.loginType === "facebook"){
         facebook(accountID, callbackFunc);
         
     } else if(accountID.loginType === "google"){
