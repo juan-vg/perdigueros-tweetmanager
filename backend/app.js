@@ -22,8 +22,9 @@ var tweetScheduling = schedule.scheduleJob('5 * * * * *', function(){
 });
 
 // scheduler every day (at 00:00:00 h)
-var twitterAccountsCleaningScheduling = schedule.scheduleJob('0 0 0 * * *', function(){
+var dailyCleaningScheduling = schedule.scheduleJob('0 0 0 * * *', function(){
   scheduler.twitterAccountsCleaningUpdate();
+  scheduler.userAccountsCleaningUpdate();
 });
 
 var appRouter = function(app) {
