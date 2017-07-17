@@ -1,6 +1,7 @@
 var TwitterPackage = require('twitter');
 var schedTweetsModel = require("./models/scheduled-tweets");
 var twiAccModel = require("./models/twitter-accounts");
+var userAccModel = require("./models/user-accounts");
 var objectID = require('mongodb').ObjectID;
  
 exports.tweetSchedulerUpdate = function(){
@@ -25,6 +26,19 @@ exports.twitterAccountsCleaningUpdate = function(){
             //console.log("TWIT-ACC-SCHEDULER: " + data);
         } else {
             //console.log("TWIT-ACC-SCHEDULER-ERROR: " + data);
+        }
+    });
+};
+
+exports.userAccountsCleaningUpdate = function(){
+    
+    console.log("USER-ACC-SCHEDULER: Start AT: " + new Date());
+    
+    userAccountsCleaning(function(err, data){
+        if(!err){
+            //console.log("USER-ACC-SCHEDULER: " + data);
+        } else {
+            //console.log("USER-ACC-SCHEDULER-ERROR: " + data);
         }
     });
 };
@@ -112,6 +126,26 @@ function twitterAccountsCleaning(callback){
     var error, data;
     
     twiAccModel.remove({"activated":false, "deactivationDate": {$lte: new Date()}}, 
+        function(err, dbData){
+            
+            if(!err){
+                error = false;
+                data = null;
+            } else{
+                error = true;
+                data = "DB ERROR";
+            }
+            
+            callback(error, data);
+        }
+    );
+}
+
+function userAccountsCleaning(callback){
+
+    var error, data;
+    
+    userAccModel.remove({"activated":false, "deactivationDate": {$lte: new Date()}}, 
         function(err, dbData){
             
             if(!err){
