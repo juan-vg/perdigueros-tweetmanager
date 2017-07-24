@@ -17,9 +17,9 @@ var local = true;
 //swagger definition
 var swaggerDefinition = {
     info: {
-        title: 'API de gestión de usuarios',
-        version: '1.0.0',
-        description: 'Descripción del API del servicio de usuarios'
+        title: 'Zaratech PTM Backend Project API',
+        version: '1.0.1',
+        description: 'Zaratech PTM Backend Project API'
     },
     host: 'zaratech-ptm.ddns.net:8888',
     basePath: ''
@@ -70,5 +70,5 @@ app.get('/swagger.json', function(req, res) {
 app.use(express.static('./public'));
 
 var server = app.listen(8888, function () {
-    console.log("Servidor escuchando peticiones en el puerto %s...", server.address().port);
+    console.log("Backend API server listening on port %s...", server.address().port);
 });

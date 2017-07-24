@@ -8,9 +8,11 @@ var dbVerificator = require("./db-verifications.js");
 var mongoose = require("mongoose");
 var objectID = require('mongodb').ObjectID;
 
-const wss = new WebSocketServer.Server({ port: 8889 }, function(err){
+const SERVER_PORT = 8889;
+
+const wss = new WebSocketServer.Server({ port: SERVER_PORT }, function(err){
     if(!err){
-        console.log("Servidor escuchando peticiones en el puerto 8889");
+        console.log("Backend RT server listening on port %s...", SERVER_PORT);
     }
 });
 
@@ -83,7 +85,7 @@ function streamFunc(index, callback){
                                 });
 
                                 stream.on('error', function(error) {
-                                    console.log("TWITTER ERROR : " + error);
+                                    console.log(">> [RT]: TWITTER ERROR : " + error);
                                     
                                     tweet = "TWITTER ERROR";
                                     error = true;
@@ -93,14 +95,14 @@ function streamFunc(index, callback){
                             });
                             
                         } else {
-                            console.log("EMPTY HASHTAG LIST");
+                            console.log(">> [RT]: EMPTY HASHTAG LIST");
                             tweet = "EMPTY LIST ERROR";
                             error = true;
                             callback(error, tweet);
                         }
                         
                     } else {
-                        console.log("H DB ERROR");
+                        console.log(">> [RT]: Hashtags DB ERROR");
                         tweet = "DB ERROR";
                         error = true;
                         callback(error, tweet);
@@ -143,7 +145,7 @@ function streamFunc(index, callback){
                                 });
 
                                 stream.on('error', function(error) {
-                                    console.log("TWITTER ERROR " + error);
+                                    console.log(">> [RT]: TWITTER ERROR " + error);
                                     
                                     tweet = "TWITTER ERROR";
                                     error = true;
@@ -153,7 +155,7 @@ function streamFunc(index, callback){
                             });
                             
                         } else {
-                            console.log("EMPTY FOLLOWED LIST");
+                            console.log(">> [RT]: EMPTY FOLLOWED LIST");
                             
                             tweet = "EMPTY LIST ERROR";
                             error = true;
@@ -161,7 +163,7 @@ function streamFunc(index, callback){
                         }
                         
                     } else {
-                        console.log("FU DB ERROR");
+                        console.log(">> [RT]: FollowedUsers DB ERROR");
                         
                         tweet = "DB ERROR";
                         error = true;
@@ -171,7 +173,7 @@ function streamFunc(index, callback){
             }
             
         } else {
-            console.log("TA DB ERROR");
+            console.log(">> [RT]: TwitterAccounts DB ERROR");
             
             tweet = "DB ERROR";
             error = true;
@@ -231,7 +233,7 @@ wss.on('connection', function connection(ws, req) {
             if(message.search("token:") === 0 && message.length > 6){
                 
                 var token = message.substr(6);
-                console.log("validating token " + token);
+                console.log(">> [RT]: validating token " + token);
                 
                 // Check if ID is valid
                 dbVerificator.verifyDbId(twitterAccountId, function(success){
@@ -245,7 +247,7 @@ wss.on('connection', function connection(ws, req) {
                         // validate token
                         accVerificator.verifyUser(accountID, function(success, data){
                             if(success){
-                                console.log("VALIDATION OK");
+                                console.log(">> [RT]: VALIDATION OK");
                                 
                                 clients[index].validated = true;
                                 
@@ -260,13 +262,13 @@ wss.on('connection', function connection(ws, req) {
                                 });
                                 
                             } else {
-                                console.log("VALIDATION ERROR");
+                                console.log(">> [RT]: VALIDATION ERROR");
                                 ws.send("VALIDATION-ERROR: " + data);
                                 ws.close();
                             }
                         });
                     } else {
-                        console.log("ID NOT VALID");
+                        console.log(">> [RT]: TWITTER ID NOT VALID");
                         ws.send("TWITTER ID NOT VALID");
                         ws.close();
                     }
