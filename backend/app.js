@@ -1152,7 +1152,7 @@ var appRouter = function(app) {
     // reactiva una cuenta
     /**
      * @swagger
-     * /twitter-accounts/{id}:
+     * /twitter-accounts/{id}/activated:
      *   put:
      *     tags:
      *       - Twitter Accounts
