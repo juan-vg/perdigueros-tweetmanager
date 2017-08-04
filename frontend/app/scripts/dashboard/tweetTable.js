@@ -10,7 +10,6 @@ app.controller('tweetTableCtrl', function ( $rootScope, $http,AlertService) {
     // GET HOME
     tweetCtrl.getHomeTimeline = function() {
         if($rootScope.activeAccount) {
-            console.log('here in getHomeTimeLine function');
             var req = {
                 method: 'GET',
                 url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
@@ -32,7 +31,6 @@ app.controller('tweetTableCtrl', function ( $rootScope, $http,AlertService) {
     // GET MY TWEETS
     tweetCtrl.getMyTweets = function() {
         if($rootScope.activeAccount) {
-            console.log('here in getMyTweets function');
             var req = {
                 method: 'GET',
                 url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
@@ -54,7 +52,6 @@ app.controller('tweetTableCtrl', function ( $rootScope, $http,AlertService) {
     // GET SCHEDULE TWEETS
     tweetCtrl.getScheduledTweets = function() {
         if($rootScope.activeAccount) {
-            console.log('here in getScheduledTweets function');
             var req = {
                 method: 'GET',
                 url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
@@ -75,7 +72,6 @@ app.controller('tweetTableCtrl', function ( $rootScope, $http,AlertService) {
     }
     tweetCtrl.publishTweet = function(){
         if($rootScope.activeAccount) {
-            console.log('here in publish function');
             var req = {
                 method: 'POST',
                 url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
@@ -95,6 +91,27 @@ app.controller('tweetTableCtrl', function ( $rootScope, $http,AlertService) {
         }
         else{
             console.log("Not user selected");
+        }
+    }
+    tweetCtrl.getMentions = function(){
+        // if an account is selected
+        if($rootScope.activeAccount) {
+            var req = {
+                method: 'GET',
+                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                + localStorage.getItem('selectedAccount') + '/tweets/mentions',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': localStorage.getItem('token')
+                }
+            }
+            $http(req).then(function (response) {
+                console.log(response);
+                tweetCtrl.mentions = response.data;
+            });
+        }
+        else{
+            tweetCtrl.mentions = null;
         }
     }
 
