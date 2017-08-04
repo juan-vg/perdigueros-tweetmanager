@@ -1,52 +1,146 @@
 <!-- Content of home logged user view-->
 <div class="container">
-<div class="row">
-
+    <div class="row">
         <!-- Account panel -->
-        <div  ng-controller="accountTableCtrl" id="account-panel" class="col-md-6">
+        <div ng-controller="accountTableCtrl as accountCtrl" id="account-panel" class="col-md-5">
             <div class="panel panel-default">
                 <!-- Account panel header -->
                 <div class="panel-heading text-center">
-                    Cuentas
+                    <a class="container">Cuentas</a>
                 </div>
                 <!-- Account panel body -->
-                <div  class="panel-body">
+                <div class="panel-body">
                     <div class="span6">
                         <table class="table table-responsive">
                             <thead>
-                                <th style="min-width: 80px;">@Cuenta de twitter:</th>
-                                <th style="width:20px;">Descripcion</th>
+                            <th style="min-width: 80px;">@Cuenta de twitter:</th>
+                            <th style="width:20px;">Descripcion</th>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="account in accountList">
+                            <tr ng-repeat="account in accountCtrl.accountList"
+                                ng-show="account.activated"
+                                ng-click="accountCtrl.selectAccount(account)"
+                                ng-class="{active: accountCtrl.active === true}">
                                 <td>@{{account.name}}</td>
                                 <td>{{account.description}}</td>
-                                <td><button class="icon-button">Eliminar cuenta  <i href="" class="fa fa-lg fa-trash" aria-hidden="true"></i></button> </td>
+                                <td>
+                                    <button ng-click="accountCtrl.deleteAccount(account)" class="icon-button">Eliminar
+                                        cuenta <i
+                                                href="" class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
+                                </td>
                             </tr>
                             </tbody>
                         </table>
-                        <form name="accountForm" ng-submit="createAccount()" role="form">
-                            <div ng-show = "menuState.show">
-                                Consumer key: <input type="password" ng-model="consumerKey"> <br>
-                                Consumer secret: <input type="password" ng-model="consumerSecret"> <br>
-                                Access token: <input type="password" ng-model="accessToken"> <br>
-                                Access token secret: <input type="password" ng-model="accessTokenSecret"> <br>
-                                Añade una descripción: <input type="text" ng-model="description"> <br>
-                                <button type="submit" class="icon-button">Enviar  <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
+
+                        <table class="table table-responsive">
+                            <thead>
+                            <th style="min-width: 80px;">@Cuenta desactivada:</th>
+                            <th style="width:20px;">Descripcion</th>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="account in accountCtrl.accountList"
+                                ng-click="accountCtrl.selectAccount(account)"
+                                ng-class="{active: accountCtrl.active === true}"
+                                ng-show="account.activated==false"
+                            >
+                                <td>@{{account.name}}</td>
+                                <td>{{account.description}}</td>
+                                <td>
+                                    <button ng-click="accountCtrl.reactivate(account)" class="icon-button">Reactivar cuenta <i
+                                                href="" class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <div>
+                            <button ng-click="accountCtrl.showModal()" class="icon-button">Añadir cuenta <i
+                                    class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-4">
+                                <img src="" class="img-circle">
                             </div>
-                        </form>
-                        <button ng-click ="changeMenu()" class="icon-button">{{addAccountState}}  <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <img src="" class="img-circle">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-            </div>
+        <!-- Tweet navigation toolbar with nav-pills -->
+        <div id="tweet-panel" ng-controller="tweetTableCtrl as tweetCtrl" class="col-md-7">
+            <uib-tabset active="activeJustified" justified="true">
+
+                <!-- Tweet information tab-->
+                <uib-tab index="0">
+                    <uib-tab-heading>
+                        <i class="fa fa-twitter"
+                           aria-hidden="true"></i>&nbsp;Información
+                        de tweets
+                    </uib-tab-heading>
+                    <div>
+                        <ui-tab-set justified="true">
+                            <uib-tab heading="Home" ng-click="tweetCtrl.getHomeTimeline()">
+                                <h1 class="text-center">Home Time Line</h1>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.homeTimeLineTweetsList">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Mis tweets" ng-click="tweetCtrl.getMyTweets()">
+                                <h1 class="text-center">Mis tweets</h1>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.myTweets">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Tweets programados" ng-click="tweetCtrl.getScheduledTweets()">
+                                <h1 class="text-center">Tweets programados</h1>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.scheduledTweets">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Menciones" ng-click="tweetCtrl.getMentions()">
+                                <h1 class="text-center">Menciones</h1>
+                            </uib-tab>
+                        </ui-tab-set>
+                    </div>
+                </uib-tab>
+
+                <!--  Publish tweet tab -->
+                <uib-tab index="1">
+                    <uib-tab-heading>
+                        <i class="fa fa-twitch" aria-hidden="true"></i>&nbsp;Publicar
+                        tweet
+                    </uib-tab-heading>
+                    <uib-tab-body>
+                        <form name="tweetForm" ng-submit="tweetCtrl.publishTweet()" role="form">
+                            <label>Añade un tweet:</label>
+                            <textarea class="form-control embed-responsive" row="5" ng-maxlength="140"
+                                      ng-model="tweetCtrl.tweet"></textarea>
+                            <label>Adjuntar imagen:</label>
+                            <input type="file" class="filestyle" data-iconName="fa fa-file-image-o"
+                                   data-buttonName="bnt-primary"> <br>
+                            <button type="submit" class="icon-button">Enviar <i class="fa fa-plus-circle fa-lg"></i>
+                            </button>
+                        </form>
+                    </uib-tab-body>
+                </uib-tab>
+
+                <!-- Other tools tab -->
+                <uib-tab index="2">
+                    <uib-tab-heading>
+                        <i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Más herramientas
+                    </uib-tab-heading>
+                    <uib-tab-body>
+                        <datepicker date-month-title="selected year">
+                            <input ng-model="date"/>
+                        </datepicker>
+
+                    </uib-tab-body>
+                </uib-tab>
+            </uib-tabset>
         </div>
     </div>
 </div>
-

@@ -5,7 +5,7 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule']);
+angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule','ngtweet','ui.bootstrap','720kb.datepicker']);
 
 //variable for manage the main module
 var app = angular.module("app");
@@ -19,7 +19,8 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
     // route for the home page
         .when('/', {
             templateUrl: 'partials/login/signin.html',
-            controller: 'signinCtrl as login'
+            controller: 'signinCtrl as login',
+            private : false
         })
         // route for the signup page
         .when('/signup', {
@@ -45,7 +46,8 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         //route for dashboard page, token required
         .when('/dashboard', {
             templateUrl: 'partials/dashboard/dashboard.html',
-            controller : 'dashboardCtrl'
+            controller : 'dashboardCtrl',
+            private : true
         })
         //route for dashboard page, token required
         .when('/auth/callback', {
@@ -62,11 +64,11 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         .when('/faq',{
             templateUrl : 'partials/login/faq.html'
         })
-        .when('/logout', {
-            templateUrl: 'partials/login/signin.html',
-            controller: 'LogoutController'
-        })
 
+        .when('/dashboard/profile',{
+            templateUrl : 'partials/dashboard/profile.html',
+            controller: 'profileCtrl'
+        })
     /* */
     ;
     $locationProvider.html5Mode(true);
@@ -96,7 +98,7 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
 
     //OpenID auth provider config
     $authProvider.oauth2({
-        name: 'openidconnect',
+        name: 'openid',
         redirectUri: window.location.origin + '/auth/callback',
         clientId: 'ID',
         responseType :'id_token token',

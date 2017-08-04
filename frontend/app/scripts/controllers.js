@@ -4,80 +4,104 @@
 // Create the principal module that contains all the services and controllers which management the application
 var app = angular.module('app');
 
+
 /**
  * Controller that manage the signin view,that is the main view of the application.
  * Uses services $auth for satellizer, $location for routes, $scope for the scope and $http for internet services.
  */
-app.controller('signinCtrl', ['$location', '$http', '$auth',
-    function ($location, $http,$auth) {
-    var vm = this;
+app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
+    function ($location, $http, $auth, AlertService) {
+        var vm = this;
 
-    // Local Login function
-    this.login = function(){
-        // Uses the $auth login function for login process
-        $auth.login({
-            'email' : vm.email,
-            'passwd' : vm.passwd,
-            'g-recaptcha-response' : vm.captchaResponse,
-            'loginType' : 'local'
-        })
-        // success, sets userId in localStorage and redirects to dashboard view
-        .then(function(response){
-            console.log(response);
-            localStorage.setItem('userId', response.data.id);
-            localStorage.setItem('token', response.data.token);
-            $location.path('/dashboard');
-        })
-            //error
-            .catch(function(response){
-                console.log(response);
-            });
-    }
-
-    // Authenticate function for social network login
-    this.authenticate = function(provider) {
-        // satellizer $auth function authenticate for providers login
-        $auth.authenticate(provider)
-            .then(function () {
-                data = {
-                    'code': localStorage.getItem('satellizer_token'),
-                    'loginType': provider
-                };
-                // Sends 'code' and 'loginType' to backend
-                $http.post('http://zaratech-ptm.ddns.net:8888/login/signin', data)
-                    // if success redirect to /dashboard view
-                    .then(function (response) {
-                        localStorage.removeItem('satellizer_token');
-                        localStorage.setItem('userId', response.data.id);
-                        localStorage.setItem('token', response.data.token);
-                        $location.path('/dashboard');
-                    });
+        // Local Login function
+        this.login = function () {
+            // Uses the $auth login function for login process
+            $auth.login({
+                'email': vm.email,
+                'passwd': vm.passwd,
+                'g-recaptcha-response': vm.captchaResponse,
+                'loginType': 'local'
             })
-            // Handle errors
-            .catch(function (error) {
-                if (error.message) {
-                    console.log(error);
-                    // Satellizer promise reject error.
-                    console.log(error.message);
-                } else if (error.data) {
-                    // HTTP response error from server
-                    console.log(error.data.message + "   " + error.status);
-                } else {
-                    console.log(error);
-                }
-                //if errors calls to clear and logout for clean localstorage
-                localStorage.clear();
-                $auth.logout();
+            // success, sets userId in localStorage and redirects to dashboard view
+                .then(function (response, $rootScope) {
+                    AlertService.alert('Enhorabuena', 'Te has logueado correctamente.', 'Cerrar');
+                    localStorage.setItem('userId', response.data.id);
+                    localStorage.setItem('token', response.data.token);
+                    $location.path('/dashboard');
+                })
+                // Handle signin errors
+                .catch(function (response) {
+                    if (response.status == 400) {
+                        AlertService.alert('Datos incorrectos', 'Revisa los datos ingresados en el formulario de logueo.', 'Cerrar');
+                    }
+                    else if (response.status == 401) {
+                        AlertService.alert('Datos incorrectos', 'Revisa los datos ingresados en el formulario de logueo.', 'Cerrar');
+                    }
+                    else if (response.status == 409) {
+                        AlertService.alert('Validar la cuenta', 'La cuenta esta pendiente de ser validada. Por favor validala. ', 'Cerrar');
+                    }
+                    else if (response.status == 459) {
+                        AlertService.alert('Cambia tu contraseña', 'Todavía no has cambiado la contraseña generada por defecto.', 'Cerrar');
+                    }
+                    else if (response.status == 460) {
 
-            });
-    }
+                        AlertService.alert('Datos incorrectos','Revisa los datos ingresados en el formulario de logueo.','Cerrar');
+                    }
+                    else if(response.status == 500){
+                        AlertService.alert('DB error','Error en la base de datos.Disculpe las molestias.','Cerrar');
+                    }
+                    else if(response.status == 503){
+                        AlertService.alert('Error externo','Error de logueo por causas externas(Facebook,Google,OpenID).','Cerrar');
+                    }
+                });
+        }
 
-    // if localStorage has an user active, the behaviour is to redirect to dashboard view
-        if(localStorage.getItem('token')){
+        // Authenticate function for social network login
+        this.authenticate = function (provider) {
+            // satellizer $auth function authenticate for providers login
+            $auth.authenticate(provider)
+                .then(function () {
+                    data = {
+                        'code': localStorage.getItem('satellizer_token'),
+                        'loginType': provider
+                    };
+                    // Sends 'code' and 'loginType' to backend
+                    $http.post('http://zaratech-ptm.ddns.net:8888/login/signin', data)
+                    // if success redirect to /dashboard view
+                        .then(function (response) {
+                            AlertService.alert('Enhorabuena', 'Te has logueado correctamente con ' + provider, 'Cerrar');
+                            localStorage.removeItem('satellizer_token');
+                            localStorage.setItem('userId', response.data.id);
+                            localStorage.setItem('token', response.data.token);
+                            $location.path('/dashboard');
+                        });
+                })
+                // Handle errors
+                .catch(function (error) {
+                    if (error.message) {
+                        console.log(error);
+                        // Satellizer promise reject error.
+                        console.log(error.message);
+                    } else if (error.data) {
+                        // HTTP response error from server
+                        console.log(error.data.message + "   " + error.status);
+                    } else {
+                        console.log(error);
+                    }
+                    //if errors calls to clear and logout for clean localstorage
+                    localStorage.clear();
+                    $auth.logout();
+
+                });
+        }
+
+
+        // if localStorage has an user active, the behaviour is to redirect to dashboard view
+        if (localStorage.getItem('token')) {
             $location.url('/dashboard');
         }
         // else redirects to signin view
-        else{
+        else {
             $location.url('/');
         }
 
@@ -232,48 +256,60 @@ app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location', function ($s
     };
 }]);
 
-/**
- * Create the LogoutController that manage the logout function of the site.
- */
-app.controller('LogoutController', ['$location', function ($location) {
-    localStorage.clear();
-    $location.url('/');
-}]);
-
 
 /**
  * Dashboard page controller
  */
-app.controller('dashboardCtrl', function ($rootScope,$location,$scope, $http) {
+app.controller('dashboardCtrl', function ($rootScope, $location, $scope, $http, AlertService) {
     var req = {
         method: 'GET',
-        url: 'http://zaratech-ptm.ddns.net:8888/users/'+ localStorage.getItem('userId'),
+        url: 'http://zaratech-ptm.ddns.net:8888/users/' + localStorage.getItem('userId'),
         headers: {
-            'Content-Type':'application/json',
-            'token' : localStorage.getItem('token')
+            'Content-Type': 'application/json',
+            'token': localStorage.getItem('token')
         }
     };
-    $http(req).then(function(response){
-        var name   = response.data[0].email.substring(0, response.data[0].email.lastIndexOf("@"));
+    $http(req).then(function (response) {
+        var name = response.data[0].email.substring(0, response.data[0].email.lastIndexOf("@"));
         console.log(name);
         $rootScope.currentUser = name;
-    });
+    })
+    //error
+        .catch(function (response) {
+            // Handle login errors
+            if (response.status == 403) {
+                localStorage.clear();
+                AlertService.alert('Tiempo de inactividad', 'Debido a periodo de inactividad se ha cerrado la sesion por seguridad.', 'Cerrar');
+                $location.url('/');
+            }
+        });
+
 });
 
 /**
  * Controller to show or hide top user dropdown menu
  */
-app.controller('userMenuCtrl', function ($scope) {
+app.controller('userMenuCtrl', function ($scope, AlertService, $location) {
     $scope.isUserActive = function () {
         // if token exists
-        if(localStorage.getItem('token')){
+        if (localStorage.getItem('token')) {
             return true;
         }
         //if token not exists
-        else{
+        else {
             return false;
         }
     }
+
+    $scope.logout = function () {
+        localStorage.clear();
+        $location.url('/');
+    }
+
+    $scope.showModal = function () {
+        AlertService.alert('Cerrar sesión ', '¿Estás seguro de que quieres cerrar la sesión?', 'Ok', $scope.logout, 'Cancel');
+    }
+
 });
 
 
