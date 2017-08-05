@@ -3,11 +3,16 @@
  */
 
 var app = angular.module('app');
+
 /**
  *
  */
-app.controller('accountTableCtrl', function ($rootScope,$location,$scope, $http) {
-        $scope.createAccount = function() {
+app.controller('accountTableCtrl',  function ($http,$rootScope,$uibModal) {
+    var accountCtrl = this;
+    accountCtrl.active = false;
+    $rootScope.activeAccount = accountCtrl.active;
+        // Create account function of account panel
+        accountCtrl.createAccount = function() {
             console.log('here');
             var req = {
                 method: 'POST',
@@ -18,46 +23,75 @@ app.controller('accountTableCtrl', function ($rootScope,$location,$scope, $http)
                 },
                 data: {
                     'information': {
-                        'consumerKey': $scope.consumerKey,
-                        'consumerSecret': $scope.consumerSecret,
-                        'accessToken': $scope.accessToken,
-                        'accessTokenSecret': $scope.accessTokenSecret
-
+                        'consumerKey': accountCtrl.consumerKey,
+                        'consumerSecret': accountCtrl.consumerSecret,
+                        'accessToken': accountCtrl.accessToken,
+                        'accessTokenSecret': accountCtrl.accessTokenSecret
                     },
-                    'description': $scope.description
+                    'description': accountCtrl.description
                 }
             };
             $http(req).then(function (response) {
                 console.log(response);
             });
         };
-        $scope.menuState = {};
-        $scope.addAccountState = 'Añadir cuenta';
-        $scope.menuState.show = false;
-        $scope.changeMenu    = function(){
-            $scope.menuState.show  = !$scope.menuState.show;
-            /*
-             * Change the name of the button according to the Boolean value of the variable that handles the visibility
-             * of the account creation menu.
-             */
-            if($scope.menuState.show == true){
-                $scope.addAccountState = 'Ocultar';
+        console.log('Get accounts');
+        var req = {
+            method: 'GET',
+            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts',
+            headers: {
+            'Content-Type': 'application/json',
+            'token': localStorage.getItem('token')
             }
-            else if($scope.menuState.show == false){
-                $scope.addAccountState = "Añadir cuenta";
-            }
+        };
+        $http(req).then(function (response) {
+            console.log(response.data);
+            accountCtrl.accountList =  response.data;
+        });
+
+        accountCtrl.selectAccount = function (account){
+            accountCtrl.active = !accountCtrl.active;
+            $rootScope.activeAccount = accountCtrl.active;
+            localStorage.setItem('selectedAccount',account._id);
         }
-            console.log('Get accounts');
+
+        accountCtrl.deleteAccount = function(){
             var req = {
-                method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts',
+                method: 'DELETE',
+                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                + localStorage.getItem('selectedAccount') ,
                 headers: {
                     'Content-Type': 'application/json',
                     'token': localStorage.getItem('token')
                 }
             };
             $http(req).then(function (response) {
-                console.log(response.data);
-                $scope.accountList =  response.data;
+                console.log(response);
             });
+        }
+        accountCtrl.showModal = function() {
+            accountCtrl.newAccount = {};
+            var modalInstance = $uibModal.open({
+                templateUrl : 'partials/modal/addTwitterAccount.html',
+                controller : 'accountTableCtrl as accountCtrl'
+            });
+            accountCtrl.cancelModal = function(){
+                modalInstance.dismiss();
+            }
+        }
+
+        accountCtrl.reactivate = function() {
+            var req = {
+                method: 'PUT',
+                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                + localStorage.getItem('selectedAccount') +"/activated",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': localStorage.getItem('token')
+                }
+            };
+            $http(req).then(function (response) {
+                console.log(response);
+            });
+        }
 });
