@@ -1,0 +1,103 @@
+
+<div class="container bootstrap snippet " id="profile-panel">
+    <div class="panel-body inf-content">
+        <div class="row">
+            <div class="col-md-4">
+                <img alt="" style="width:600px;" title="" class="img-circle img-thumbnail isTooltip" src="https://bootdey.com/img/Content/user-453533-fdadfd.png" data-original-title="Usuario">
+                <ul title="Ratings" class="list-inline ratings text-center">
+                    <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
+                    <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                    <table class="table table-condensed table-responsive table-user-information">
+                        <tbody>
+
+                        <tr>
+                            <strong><h4> Mi perfil </h4></strong>
+                            <td>
+                                <strong>
+                                    <span class="glyphicon glyphicon-user  text-primary"></span>
+                                    Nombre
+                                </strong>
+                            </td>
+                            <td class="text-primary">
+                                {{myInfo[0].name}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>
+                                    <span class="glyphicon glyphicon-cloud text-primary"></span>
+                                    Apellido
+                                </strong>
+                            </td>
+                            <td class="text-primary">
+                                {{myInfo[0].surname}}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <strong>
+                                    <span class="glyphicon glyphicon-envelope text-primary"></span>
+                                    Email
+                                </strong>
+                            </td>
+                            <td class="text-primary">
+                                {{myInfo[0].email}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>
+                                    <span class="glyphicon glyphicon-calendar text-primary"></span>
+                                    Creado en
+                                </strong>
+                            </td>
+                            <td class="text-primary">
+                                {{myInfo[0].registrationDate}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>
+                                    <span class="glyphicon glyphicon-calendar text-primary"></span>
+                                    Ultimo acceso
+                                </strong>
+                                <br><br>
+                                <hr>
+                            </td>
+                            <td class="text-primary">
+                                {{myInfo[0].lastAccess}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <form role="form" ng-submit="changePassword()">
+                                    <strong><h4> Cambia tu contraseña </h4></strong>
+                                    <strong>
+                                        <span class="glyphicon glyphicon-lock text-primary"></span>
+                                        Contraseña actual:
+                                    </strong>
+                                    <input type="text" ng-model="oldPasswd">
+                                    <br>
+                                    <strong>
+                                        <span class="glyphicon glyphicon-lock text-primary"></span>
+                                        Nueva contraseña:
+                                    </strong>
+                                    <input type="text" ng-model="newPasswd" >
+                                    <br>
+                                    <button type="submit" class="btn-primary">Cambiar contraseña</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>

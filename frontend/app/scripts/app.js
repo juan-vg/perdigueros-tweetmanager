@@ -5,7 +5,7 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule']);
+angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet','ui.bootstrap','720kb.datepicker']);
 
 //variable for manage the main module
 var app = angular.module("app");
@@ -16,21 +16,25 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
     //configure our routes
     $routeProvider
 
-    // route for the home page
+        // route for the home page
         .when('/', {
             templateUrl: 'partials/login/signin.html',
-            controller: 'signinCtrl as login'
+            controller: 'signinCtrl as login',
+            private : false
         })
+  
         // route for the signup page
         .when('/signup', {
             templateUrl: 'partials/login/signup.html',
             controller: 'signupCtrl'
         })
+  
         //route for the validate page
         .when('/validate', {
             templateUrl: 'partials/login/validate.html',
             controller: 'validateCtrl'
         })
+  
         //route for the remember page
         .when('/remember', {
             templateUrl: 'partials/login/validate.html',
@@ -42,11 +46,14 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
             templateUrl: 'partials/login/first-login.html',
             controller: 'firstLoginCtrl'
         })
+  
         //route for dashboard page, token required
         .when('/dashboard', {
             templateUrl: 'partials/dashboard/dashboard.html',
-            controller : 'dashboardCtrl'
+            controller : 'dashboardCtrl',
+            private : true
         })
+  
         //route for dashboard page, token required
         .when('/auth/callback', {
             templateUrl: 'partials/login/callback.html',
@@ -58,15 +65,53 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
             templateUrl: 'partials/login/forgot.html',
             controller: 'forgotPasswdCtrl'
         })
+  
         //route for F.A.Q. page
         .when('/faq',{
             templateUrl : 'partials/login/faq.html'
         })
-        .when('/logout', {
-            templateUrl: 'partials/login/signin.html',
-            controller: 'LogoutController'
-        })
 
+        .when('/dashboard/profile',{
+            templateUrl : 'partials/dashboard/profile.html',
+            controller: 'profileCtrl'
+        })
+  
+		    //route for signin admin
+        .when('/admin',{
+            templateUrl : 'partials/admin/admin-login-panel.html',
+			      controller: 'PasswordController'
+        })
+  
+		    //route for main admin
+        .when('/admin-main-panel',{
+            templateUrl : 'partials/admin/admin-main-panel.html',
+			      controller: 'UserController'
+        })
+  
+		    //route for list accounts admin
+        .when('/admin-accounts-panel',{
+            templateUrl : 'partials/admin/admin-accounts-panel.html',
+			      controller: 'AccountController'
+        })
+  
+		    //route for door stats admin
+        .when('/admin-door-panel',{
+            templateUrl : 'partials/admin/admin-door-panel.html',
+			      controller: 'UserDoorController'
+        })
+  
+		    //route for last stats admin
+        .when('/admin-last-panel',{
+            templateUrl : 'partials/admin/admin-last-panel.html',
+			      controller: 'AccessDataController'
+        })
+  
+		   //route for activity stats admin
+        .when('/admin-activity-panel',{
+            templateUrl : 'partials/admin/admin-activity-panel.html',
+			      controller: 'StadisticsController'
+        })
+  
     /* */
     ;
     $locationProvider.html5Mode(true);
@@ -96,7 +141,7 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
 
     //OpenID auth provider config
     $authProvider.oauth2({
-        name: 'openidconnect',
+        name: 'openid',
         redirectUri: window.location.origin + '/auth/callback',
         clientId: 'ID',
         responseType :'id_token token',
