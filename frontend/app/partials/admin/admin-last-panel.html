@@ -1,0 +1,17 @@
+<!-- Stadistics View-->
+
+<div class="container">
+    <div class="row">
+        <div ng-app="StadisticsData" ng-controller="AccessDataController">
+			<ul class="nav nav-pills">
+  				<li><a href="/admin-door-panel">Altas y Bajas</a></li>
+  				<li class="active"><a href="/admin-last-panel">Entradas</a></li>
+  				<li><a href="/admin-activity-panel">Actividad</a></li>
+			</ul>
+			<h2 align="center">Accesos por mes</h2>
+			<canvas id="accessmonth" class="chart chart-bar"
+                        chart-data="data" chart-labels="labels" chart-options="options">
+            </canvas>
+        </div>
+    </div>
+</div>
