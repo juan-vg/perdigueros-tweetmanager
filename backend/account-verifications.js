@@ -16,9 +16,7 @@ function verifyUser(accountID, callback){
     
     verifyAdmin(accountID, function(success){
         
-        var censoredToken = "a2f381e8e34a033f038d564c5244408f3653b0303e0db62260";
-        censoredToken = "**********" + censoredToken.substr(10);
-        
+        var censoredToken = "**********" + accountID.token.substr(10);
         console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + censoredToken);
         
         // Admin permission bypass
@@ -100,7 +98,7 @@ function checkTokenForTwitterAccount(accountID, callback){
             
         if(!err){
 
-            twiAccModel.find({"_id" : new objectID(accountID.twitterAccountId), "activated": true},
+            twiAccModel.find({"_id" : new objectID(accountID.twitterAccountId)},
                 
                 function(err, dbData){
                     

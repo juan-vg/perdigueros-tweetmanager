@@ -232,8 +232,13 @@ exports.delete = function (accountID, callback){
                             if(!err){
                                 
                                 if(dbData.length > 0){
+                                    
+                                    // Set (real) deactivation date 6 months in the future (as LOPD says)
+                                    var deactivationDate = new Date();
+                                    deactivationDate.setMonth(deactivationDate.getMonth() + 6);
+                                    
                                     // existing user -> delete (disable) user
-                                    userAccModel.update({"_id" : new objectID(accountID.userAccountId)},{$set : {"activated":false}},
+                                    userAccModel.update({"_id" : new objectID(accountID.userAccountId)},{$set : {"activated":false, "deactivationDate":deactivationDate}},
                                         function(err, res){
                                             if(!err){
                                                 

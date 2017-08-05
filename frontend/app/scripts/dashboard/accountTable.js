@@ -27,7 +27,6 @@ app.controller('accountTableCtrl',  function ($http,$rootScope,$uibModal) {
                         'consumerSecret': accountCtrl.consumerSecret,
                         'accessToken': accountCtrl.accessToken,
                         'accessTokenSecret': accountCtrl.accessTokenSecret
-
                     },
                     'description': accountCtrl.description
                 }

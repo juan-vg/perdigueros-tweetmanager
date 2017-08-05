@@ -17,8 +17,14 @@ var tweets = require('./tweets.js');
 var verifyCaptcha = require('./verify-captcha.js');
 
 // scheduler every minute (second=5)
-var scheduling = schedule.scheduleJob('5 * * * * *', function(){
-  scheduler.update();
+var tweetScheduling = schedule.scheduleJob('5 * * * * *', function(){
+  scheduler.tweetSchedulerUpdate();
+});
+
+// scheduler every day (at 00:00:00 h)
+var dailyCleaningScheduling = schedule.scheduleJob('0 0 0 * * *', function(){
+  scheduler.twitterAccountsCleaningUpdate();
+  scheduler.userAccountsCleaningUpdate();
 });
 
 var appRouter = function(app) {
@@ -86,6 +92,13 @@ var appRouter = function(app) {
      *       newPasswd:
      *         type: string
      *         description: "The NEW password"
+     * 
+     *   Signin:
+     *     type: "object"
+     *     properties:
+     *       loginType:
+     *         type: string
+     *         description: "The login type [local, facebook, google, openid]"
      * 
      *   SigninLocal:
      *     type: "object"
@@ -271,10 +284,12 @@ var appRouter = function(app) {
      *       - Login
      *     description: Log in the system
      *     parameters:
-     *       - name: loginType
+     *       - name: type
      *         in: body
      *         required: true
      *         description: The login type [local, facebook, google, openid]
+     *         schema:
+     *           $ref: "#/definitions/Signin"
      *       - name: logindata-local
      *         in: body
      *         required: false
@@ -308,7 +323,7 @@ var appRouter = function(app) {
      *       400:
      *         description: Captcha validation error OR Params error
      *       401:
-     *         description: Incorrect login
+     *         description: Incorrect login data OR User not found
      *       409:
      *         description: Must validate the account (email)
      *       459:
@@ -367,10 +382,16 @@ var appRouter = function(app) {
                     response.write("Must validate the account");
                     
                 } else if (data == "INCORRECT") {
-                    console.log("APP-LOGIN-SIGNIN: Incorrect passwd");
+                    console.log("APP-LOGIN-SIGNIN: Incorrect login data OR User not found");
                     
                     response.writeHead(401, {"Content-Type": "text/html"});
-                    response.write("Incorrect login");
+                    response.write("Incorrect login data OR User not found");
+                    
+                } else if(data == "INCORRECT LOGINTYPE"){
+                    console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
+                    
+                    response.writeHead(460, {"Content-Type": "text/html"});
+                    response.write("Incorrect LoginType");
                     
                 } else if (data == "EXTERNAL SERVICE ERROR") {
                     console.log("APP-LOGIN-SIGNIN: External service error");
@@ -388,51 +409,30 @@ var appRouter = function(app) {
             response.end();
         }
         
-        // detect login method
+        // call needed function
         if(request.body.loginType === "local"){
+            
+            var captchaData = {
+                "gResponse": request.body['g-recaptcha-response'],
+                "rAddress": request.connection.remoteAddress
+            };
             
             var accountID = {
                 "email": request.body.email,
-                "passwd": request.body.passwd
+                "passwd": request.body.passwd,
+                "captchaData": captchaData
             };
+
+            login.localSignin(accountID, callbackFunc);
             
-            var captchaData = {
-                gResponse: request.body['g-recaptcha-response'],
-                rAddress: request.connection.remoteAddress
-            };
-            
-            login.localSignin(accountID, captchaData, callbackFunc);
-            
-        } else if(request.body.loginType === "facebook"){
-            
-            var accountID = {
-                "code": request.body.code
-            };
-            
-            login.facebook(accountID, callbackFunc);
-            
-        } else if(request.body.loginType === "google"){
-            
-            var accountID = {
-                "code": request.body.code
-            };
-            
-            login.google(accountID, callbackFunc);
-            
-        } else if(request.body.loginType === "openid"){
-            
-            var accountID = {
-                "code": request.body.code
-            };
-            
-            login.openid(accountID, callbackFunc);
-             
         } else {
-            console.log("APP-LOGIN-SIGNIN: Incorrect LoginType");
-                    
-            response.writeHead(460, {"Content-Type": "text/html"});
-            response.write("Incorrect LoginType");
-            response.end();
+            
+            var accountID = {
+                "loginType": request.body.loginType,
+                "code": request.body.code
+            };
+            
+            login.socialSignin(accountID, callbackFunc); 
         }
     });
     
@@ -701,6 +701,173 @@ var appRouter = function(app) {
                 response.end();
             }
         );
+    });
+    
+    // reactivate account
+    /**
+     * @swagger
+     * /login/reactivate:
+     *   post:
+     *     tags:
+     *       - Login
+     *     description: Reactivates an account
+     *     parameters:
+     *       - name: type
+     *         in: body
+     *         required: true
+     *         description: The login type [local, facebook, google, openid]
+     *         schema:
+     *           $ref: "#/definitions/Signin"
+     *       - name: logindata-local
+     *         in: body
+     *         required: false
+     *         description: The user account data needed in order to log in
+     *         schema:
+     *           $ref: "#/definitions/SigninLocal"
+     *       - name: logindata-facebook
+     *         in: body
+     *         required: false
+     *         description: The user data needed in order to log in (access token)
+     *         schema:
+     *           $ref: "#/definitions/SigninSocial"
+     *       - name: logindata-google
+     *         in: body
+     *         required: false
+     *         description: The user data needed in order to log in (access token)
+     *         schema:
+     *           $ref: "#/definitions/SigninSocial"
+     *       - name: logindata-openid
+     *         in: body
+     *         required: false
+     *         description: The user data needed in order to log in (access token)
+     *         schema:
+     *           $ref: "#/definitions/SigninSocial"
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: Reactivation OK 
+     *       400:
+     *         description: Captcha validation error OR Params error
+     *       401:
+     *         description: Incorrect login data OR User not found OR User not deactivated
+     *       409:
+     *         description: Must validate the account (email)
+     *       459:
+     *         description: Must change password first (returns the email)
+     *       460:
+     *         description: Incorrect login type (local, facebook, google, openid)
+     *       500:
+     *         description: DB error
+     *       503:
+     *         description: External service error (Facebook, Google, OpenID)
+     */
+    app.post("/login/reactivate", function(request, response) {
+        
+        var error = false;
+        
+        if(!request.body.loginType){
+            return response.status(400).send("Parameters error!");
+        } else {
+            
+            if(request.body.loginType === "local" && (!request.body.email || !request.body.passwd)){
+                return response.status(400).send("Parameters error!");
+                
+            } else {
+                if(request.body.loginType !== "local" && !request.body.code){
+                    return response.status(400).send("Parameters error!");
+                }
+            }
+        }
+        
+        console.log("APP-LOGIN-REACT: Trying to reactivate " + request.body.loginType + " user");
+        
+        // define callback function
+        var callbackFunc = function (err, data){
+            
+            if(!err){   
+                console.log("APP-LOGIN-REACT: OK");
+                    
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write("User reactivated");
+                
+            } else {
+                
+                if(data == "CAPTCHA ERROR"){
+                    console.log("APP-LOGIN-REACT: Captcha validation error");
+                    
+                    response.writeHead(400, {"Content-Type": "text/html"});
+                    response.write("Captcha validation error");
+                    
+                } else if (data == "MUST CHANGE PASSWD") {
+                    console.log("APP-LOGIN-REACT: Must change password");
+                    
+                    response.writeHead(459, {"Content-Type": "text/html"});
+                    response.write(request.body.email);
+                    
+                } else if (data == "MUST VALIDATE") {
+                    console.log("APP-LOGIN-REACT: Must validate account");
+                    
+                    response.writeHead(409, {"Content-Type": "text/html"});
+                    response.write("Must validate the account");
+                    
+                } else if (data == "INCORRECT") {
+                    console.log("APP-LOGIN-REACT: Incorrect login data OR User not found OR User not deactivated");
+                    
+                    response.writeHead(401, {"Content-Type": "text/html"});
+                    response.write("Incorrect login data OR User not found OR User not deactivated");
+                    
+                } else if(data == "INCORRECT LOGINTYPE"){
+                    console.log("APP-LOGIN-REACT: Incorrect LoginType");
+                    
+                    response.writeHead(460, {"Content-Type": "text/html"});
+                    response.write("Incorrect LoginType");
+                    
+                } else if (data == "EXTERNAL SERVICE ERROR") {
+                    console.log("APP-LOGIN-REACT: External service error");
+                    
+                    response.writeHead(503, {"Content-Type": "text/html"});
+                    response.write("External service error");
+                    
+                } else {
+                    console.log("APP-LOGIN-REACT: Error while performing query");
+                    
+                    response.writeHead(500, {"Content-Type": "text/html"});
+                    response.write("Sorry, DB error!");
+                }
+            }
+            response.end();
+        }
+        
+        
+        // detect login method and set needed vars
+        
+        var accountID;
+        
+        if(request.body.loginType === "local"){
+            
+            var captchaData = {
+                "gResponse": request.body['g-recaptcha-response'],
+                "rAddress": request.connection.remoteAddress
+            };
+            
+            accountID = {
+                "loginType": request.body.loginType,
+                "email": request.body.email,
+                "passwd": request.body.passwd,
+                "captchaData": captchaData
+            };
+            
+        } else {
+            
+            accountID = {
+                "loginType": request.body.loginType,
+                "code": request.body.code
+            };
+        }
+        
+        login.reactivateAccount(accountID, callbackFunc);
     });
     
 
@@ -972,6 +1139,76 @@ var appRouter = function(app) {
                         response.write("Account ID not found!");
                     } else {
                         console.log("APP-DEL-ACCOUNTS-ID: Error performing query");
+                        
+                        response.writeHead(500, {"Content-Type": "text/html"});
+                        response.write("Error performing query");
+                    }
+                }
+                response.end();
+            }
+        );
+    });
+    
+    // reactiva una cuenta
+    /**
+     * @swagger
+     * /twitter-accounts/{id}:
+     *   put:
+     *     tags:
+     *       - Twitter Accounts
+     *     description: Reactivates a twitter account (ADMIN)
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         description: The twitter account ID 
+     *     produces:
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: The account has been successfully reactivated
+     *       400:
+     *         description: The provided {id} is not valid
+     *       403:
+     *         description: The user (token) does not own this twitter account (id)
+     *       404:
+     *         description: Unable to find the requested {id}
+     *       500:
+     *         description: Error reactivating twitter account
+     */
+    app.put("/twitter-accounts/:id/activated", function(request, response) {
+        console.log("APP-REACT-ACCOUNTS-ID: Requested ACCOUNT-ID is: " + request.params.id);
+        
+        twitterAccounts.reactivateAccount(request.headers.token, request.params.id,
+            function (err, res){
+                if(!err){
+                    console.log("APP-REACT-ACCOUNTS-ID: Reactivate OK");
+                    
+                    response.writeHead(200, {"Content-Type": "text/html"});
+                    response.write("Reactivated account");
+                } else {
+                    if (data == "ID NOT VALID"){
+                    console.log("APP-REACT-ACCOUNTS-ID: Bad request. ID not valid");
+                    
+                    response.writeHead(400, {"Content-Type": "text/html"});
+                    response.write("Bad request. Twitter account ID not valid");
+                    
+                    } else if(res == 'FORBIDDEN'){
+                        console.log("APP-REACT-ACCOUNTS-ID: Requested Account-ID is forbidden");
+                        
+                        response.writeHead(403, {"Content-Type": "text/html"});
+                        response.write("Forbidden. The user does not own this account");
+                    } else if(res == 'NOT FOUND') {
+                        console.log("APP-REACT-ACCOUNTS-ID: Requested Account-ID not found");
+                        
+                        response.writeHead(404, {"Content-Type": "text/html"});
+                        response.write("Account ID not found!");
+                    } else {
+                        console.log("APP-REACT-ACCOUNTS-ID: Error performing query");
                         
                         response.writeHead(500, {"Content-Type": "text/html"});
                         response.write("Error performing query");
@@ -2591,8 +2828,8 @@ var appRouter = function(app) {
             
             if(!err){
                 console.log("APP-DELETE-USER: OK");
-                response.writeHead(200, {"Content-Type": "application/json"});
-                //response.write(JSON.stringify(data));
+                response.writeHead(200, {"Content-Type": "text/html"});
+                response.write("User deleted");
                 
             } else {
                 if (data == "ID NOT VALID"){

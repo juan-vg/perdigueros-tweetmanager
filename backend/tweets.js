@@ -230,17 +230,7 @@ exports.userTimeline = function (accountID, callback){
                             
                             for(var i=0; i<body.length; i++){
                                 
-                                var tweet = {
-                                    id: body[i].id,
-                                    created_at: new Date(body[i].created_at),
-                                    text: body[i].text,
-                                    in_reply_to_screen_name: body[i].in_reply_to_screen_name,
-                                    retweet_count: body[i].retweet_count,
-                                    favorite_count: body[i].favorite_count,
-                                    favorited_by_user: body[i].favorited,
-                                    retweeted_by_user: body[i].retweeted
-                                };
-                                
+                                var tweet = body[i];
                                 data.push(tweet);
                             }
                             
@@ -320,19 +310,7 @@ exports.homeTimeline = function (accountID, callback){
                             
                             for(var i=0; i<body.length; i++){
                                 
-                                var tweet = {
-                                    id: body[i].id,
-                                    user_full_name: body[i].user.name,
-                                    user_name: body[i].user.screen_name,
-                                    created_at: new Date(body[i].created_at),
-                                    text: body[i].text,
-                                    in_reply_to_screen_name: body[i].in_reply_to_screen_name,
-                                    retweet_count: body[i].retweet_count,
-                                    favorite_count: body[i].favorite_count,
-                                    favorited_by_user: body[i].favorited,
-                                    retweeted_by_user: body[i].retweeted
-                                };
-                                
+                                var tweet = body[i];
                                 data.push(tweet);
                             }
                             
@@ -478,19 +456,7 @@ exports.mentions = function (accountID, callback){
                             
                             for(var i=0; i<body.length; i++){
                                 
-                                var tweet = {
-                                    id: body[i].id,
-                                    user_full_name: body[i].user.name,
-                                    user_name: body[i].user.screen_name,
-                                    created_at: new Date(body[i].created_at),
-                                    text: body[i].text,
-                                    in_reply_to_screen_name: body[i].in_reply_to_screen_name,
-                                    retweet_count: body[i].retweet_count,
-                                    favorite_count: body[i].favorite_count,
-                                    favorited_by_user: body[i].favorited,
-                                    retweeted_by_user: body[i].retweeted
-                                };
-                                
+                                var tweet = body[i];
                                 data.push(tweet);
                             }
                             
@@ -571,21 +537,9 @@ exports.retweeted = function (accountID, callback){
                             for(var i=0; i<body.length; i++){
                                 
                                 if(body[i].favorited && body[i].favorite_count > 1 || !body[i].favorited && body[i].favorite_count > 0){
-                                    var tweet = {
-                                        id: body[i].id,
-                                        created_at: new Date(body[i].created_at),
-                                        text: body[i].text,
-                                        in_reply_to_screen_name: body[i].in_reply_to_screen_name,
-                                        retweet_count: body[i].retweet_count,
-                                        favorite_count: body[i].favorite_count,
-                                        favorited_by_user: body[i].favorited,
-                                        retweeted_by_user: body[i].retweeted
-                                    };
-                                    
+                                    var tweet = body[i];
                                     data.push(tweet);
                                 }
-                                
-                                
                             }
                             
                         } else {
@@ -666,17 +620,7 @@ exports.favorited = function (accountID, callback){
                                 
                                 if(body[i].favorited && body[i].favorite_count > 1 || !body[i].favorited && body[i].favorite_count > 0){
                                     
-                                    var tweet = {
-                                        id: body[i].id,
-                                        created_at: new Date(body[i].created_at),
-                                        text: body[i].text,
-                                        in_reply_to_screen_name: body[i].in_reply_to_screen_name,
-                                        retweet_count: body[i].retweet_count,
-                                        favorite_count: body[i].favorite_count,
-                                        favorited_by_user: body[i].favorited,
-                                        retweeted_by_user: body[i].retweeted
-                                    };
-                                    
+                                    var tweet = body[i];
                                     data.push(tweet);
                                 }
                             }
