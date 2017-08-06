@@ -8,7 +8,7 @@ app.controller('PasswordController', function ($scope,$http,$location,vcRecaptch
 	var vm = this;
     $scope.checkPwd =function() {
 		if (vm.captchaResponse === "") { 
-			alert("Please resolve the captcha and submit!")
+			alert("Por favor, resuelva el captcha");
 		} else {
 			var data = {
 				'email': 'admin@admin.com',
@@ -25,6 +25,7 @@ app.controller('PasswordController', function ($scope,$http,$location,vcRecaptch
 			function errorCallback(error){
 				$scope.pwdError = true;
 				console.log("Error authentication");
+				
 			}
 		}
     };
@@ -81,11 +82,13 @@ app.controller('UserController', function($scope,$http) {
 			}
 			function errorCallback(error){
 				console.log("Error Removing Account");
+				alert("Error en la eliminación del usuario");
 			}
 		}
 	}
 	function errorCallback(error){
 		console.log("Error getting Users list");
+		alert("Error en la obtencion de datos");
 	}
 });
 
@@ -115,6 +118,7 @@ app.controller('AccountController', function($scope,$http) {
 				$scope.hashtags_select=result;
 			}
 			function errorCallbackHastags(error){
+				alert("Error en la obtencion de datos de las hashtags");
 				console.log("Error getting hashtags");
 			}
 		};
@@ -133,13 +137,13 @@ app.controller('AccountController', function($scope,$http) {
 				$scope.accounts.splice( index, 1 );
 			}
 			function errorCallback(error){
-				$scope.pwdError = true;
+				alert("Error eliminando la cuenta");
 				console.log("Error Removing Account");
 			}
 		};
 	}
 	function errorCallback(error){
-		$scope.pwdError = true;
+		alert("Error en la obtencion de datos de las cuentas");
 		console.log("Error getting user accounts");
 	}
 });
@@ -245,6 +249,7 @@ app.controller('UserDoorController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
+		alert("Error obteniendo datos del servidor");
 	}
 });
 
@@ -296,6 +301,7 @@ app.controller('AccessDataController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
+		alert("Error obteniendo datos del servidor");
 	}
 });
 
@@ -364,6 +370,7 @@ app.controller('StadisticsController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
+		alert("Error obteniendo datos del servidor");
 	}
 	$scope.onClick = function (points, evt) {
 		$http.get(api+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
@@ -378,6 +385,7 @@ app.controller('StadisticsController', function($scope,$http,DateService) {
 		function errorCallbackInfo(error){
 			$scope.info="Error obteniendo datos";
 			console.log("Error getting info user");
+			alert("Error obteniendo datos del usuario seleccionado");
 		}
 	};
 });
