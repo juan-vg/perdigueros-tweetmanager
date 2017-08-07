@@ -5,7 +5,7 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet','ui.bootstrap','720kb.datepicker']);
+angular.module('app', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule','ngtweet','ui.bootstrap','720kb.datepicker']);
 
 //variable for manage the main module
 var app = angular.module("app");

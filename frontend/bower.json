@@ -14,6 +14,8 @@
     "satellizer": "^0.15.5",
     "angular-recaptcha": "^4.1.0",
     "jquery": "^3.2.1",
-    "angular-local-storage": "^0.6.0"
+    "angular-local-storage": "^0.6.0",
+    "ngtweet": "^0.6.2",
+    "angularjs-datepicker": "^2.1.23"
   }
 }
