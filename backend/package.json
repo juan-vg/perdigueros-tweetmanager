@@ -16,6 +16,7 @@
     "cors": "^2.8.4",
     "express": "^4.15.2",
     "formidable": "^1.1.1",
+    "hashmap": "^2.1.0",
     "mongodb": "^2.2.25",
     "mongoose": "4.10.8",
     "node-schedule": "^1.2.1",

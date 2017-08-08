@@ -1,5 +1,6 @@
 const BigInteger = require('./utilities/biginteger').BigInteger;
 var TwitterPackage = require('twitter');
+var HashMap = require('hashmap');
 
 //console.log(a.subtract(1).toString());
 
@@ -15,6 +16,8 @@ var Twitter = new TwitterPackage(secret);
 
 var count, id=-1;
 const COUNT = 10;
+
+var favorited = new HashMap();
 
 function iter(){
     console.log();
@@ -42,11 +45,17 @@ function iter(){
             count = body.length;
             
             for(var i=0; i<body.length; i++){
+				
+				//console.log(JSON.stringify(body[i]));
+				//console.log();
                 
-                var tweet = body[i].text;
+                var favs = body[i].favorite_count;
                 id = body[i].id;
                 
-                console.log((i+1)+" --> Tweet ID='"+id+"': '"+tweet+"'")
+                
+               	favorited.set(id,body[i].favorite_count);
+                
+                //console.log((i+1)+" --> Tweet ID='"+id+"': '"+favs+"'");
             }
             
             callbackFunc()
@@ -58,9 +67,22 @@ function iter(){
 }
 
 function callbackFunc(){
+	
     if (count == COUNT){
+		// if COUNT elements then there may be more -> iterate again
         setTimeout(iter, 3000);
-    }
+        
+    } else {
+		//finish -> count
+		
+		var totalFav = 0;	
+		
+		favorited.forEach(function(value, key) {
+			totalFav += value;
+		});
+		
+		console.log("TOTAL: " + totalFav);
+	}
 }
 
 iter();
