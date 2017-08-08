@@ -1,14 +1,14 @@
 // Config API route
 var api = "http://zaratech-ptm.ddns.net:8888";
 
-var app = angular.module('app');
+var app_admin = angular.module('app_admin');
 // Password Data and Check 
-app.controller('PasswordController', function ($scope,$http,$location,vcRecaptchaService) {
+app_admin.controller('PasswordController', function ($scope,$http,$location,vcRecaptchaService) {
     $scope.pwdError =false;
 	var vm = this;
     $scope.checkPwd =function() {
 		if (vm.captchaResponse === "") { 
-			alert("Please resolve the captcha and submit!")
+			alert("Por favor, resuelva el captcha!");
 		} else {
 			var data = {
 				'email': 'admin@admin.com',
@@ -31,7 +31,7 @@ app.controller('PasswordController', function ($scope,$http,$location,vcRecaptch
   });
 
 // List of Users Data
-app.controller('UserController', function($scope,$http) {
+app_admin.controller('UserController', function($scope,$http) {
 	$http.get(api+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 	function successCallback(response){
 		//Get response data
@@ -80,17 +80,19 @@ app.controller('UserController', function($scope,$http) {
 				$scope.users.splice( index, 1 );
 			}
 			function errorCallback(error){
-				console.log("Error Removing Account");
+				console.log("Error Removing User");
+				alert("Error eliminando usuario");
 			}
 		}
 	}
 	function errorCallback(error){
 		console.log("Error getting Users list");
+		alert("Error Obteniendo datos de los usuarios");
 	}
 });
 
 // Accounts and Hastags Data Binding
-app.controller('AccountController', function($scope,$http) {
+app_admin.controller('AccountController', function($scope,$http) {
 	// Get accounts data 
 	$http.get(api+'/twitter-accounts',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 	
@@ -116,6 +118,7 @@ app.controller('AccountController', function($scope,$http) {
 			}
 			function errorCallbackHastags(error){
 				console.log("Error getting hashtags");
+				alert("Error Obteniendo datos de los hashtags");
 			}
 		};
 		// RemoveAccount from the list
@@ -135,19 +138,21 @@ app.controller('AccountController', function($scope,$http) {
 			function errorCallback(error){
 				$scope.pwdError = true;
 				console.log("Error Removing Account");
+				alert("Error eliminando cuenta");
 			}
 		};
 	}
 	function errorCallback(error){
 		$scope.pwdError = true;
 		console.log("Error getting user accounts");
+		alert("Error Obteniendo datos de las cuentas");
 	}
 });
 
 // Stadistics Data
 
 // Support Functions for parsing dates
-app.factory('DateService', function() {
+app_admin.factory('DateService', function() {
 	return {
 		// Return String Name month corresponding to a number
 		getMonthName: function(date) {
@@ -177,7 +182,7 @@ app.factory('DateService', function() {
 	};
 })
 // User Iputs and Outputs from the Application Data
-app.controller('UserDoorController', function($scope,$http,DateService) {
+app_admin.controller('UserDoorController', function($scope,$http,DateService) {
 	// Get data Stadistics from the server
 	$http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
 	function successCallbackStats(stats){ 
@@ -245,12 +250,13 @@ app.controller('UserDoorController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
+		alert("Error Obteniendo datos de las estadisticas");
 	}
 });
 
 
 // User Last Connection Time Data
-app.controller('AccessDataController', function($scope,$http,DateService) {
+app_admin.controller('AccessDataController', function($scope,$http,DateService) {
 	// Get last connection data stadistics from the server
 	$http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
 	function successCallbackStats(stats){
@@ -296,11 +302,12 @@ app.controller('AccessDataController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
+		alert("Error Obteniendo datos de las estadisticas");
 	}
 });
 
 // Stadistics Data Binding
-app.controller('StadisticsController', function($scope,$http,DateService) {
+app_admin.controller('StadisticsController', function($scope,$http,DateService) {
 	$http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
   
 	function successCallbackStats(stats){
@@ -364,6 +371,7 @@ app.controller('StadisticsController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
+		alert("Error Obteniendo datos de las estadisticas");
 	}
 	$scope.onClick = function (points, evt) {
 		$http.get(api+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
@@ -385,7 +393,7 @@ app.controller('StadisticsController', function($scope,$http,DateService) {
 /**
  * Controller to show or hide top admin dropdown menu and logout
  */
-app.controller('adminMenuCtrl', function ($scope,$location) {
+app_admin.controller('adminMenuCtrl', function ($scope,$location) {
     $scope.isAdminActive = function () {
         // if admin active
         if(localStorage.getItem('token_admin')){
