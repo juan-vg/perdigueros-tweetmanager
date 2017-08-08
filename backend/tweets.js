@@ -143,12 +143,12 @@ exports.schedule = function (accountID, tweetData, ip, callback){
                                 
                                 accVerificator.getUser(accountID.token, function(err, data){
                                     if(!err){
-                                        var tweetData = {
+                                        var tweetStatsData = {
                                             date: tweetData.date,
                                             country: country,
                                             userId: data._id
                                         };
-                                        adminStats.saveTweet(tweetData);
+                                        adminStats.saveTweet(tweetStatsData);
                                     }
                                 });
                             });
