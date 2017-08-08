@@ -7,7 +7,7 @@ var app = angular.module('app');
 /**
  *
  */
-app.controller('accountTableCtrl',  function ($http,$rootScope,$uibModal) {
+app.controller('accountTableCtrl',  function ($http,$rootScope,$uibModal,$route,AlertService) {
     var accountCtrl = this;
     accountCtrl.active = false;
     $rootScope.activeAccount = accountCtrl.active;
@@ -53,8 +53,10 @@ app.controller('accountTableCtrl',  function ($http,$rootScope,$uibModal) {
             accountCtrl.active = !accountCtrl.active;
             $rootScope.activeAccount = accountCtrl.active;
             localStorage.setItem('selectedAccount',account._id);
-        }
-
+        };
+        accountCtrl.showDeleteModal = function(){
+            AlertService.alert('Eliminar cuenta ', '¿Está seguro de que desea eliminar esta cuenta?', 'Si', accountCtrl.deleteAccount, 'Cancelar');
+        };
         accountCtrl.deleteAccount = function(){
             var req = {
                 method: 'DELETE',
@@ -66,18 +68,17 @@ app.controller('accountTableCtrl',  function ($http,$rootScope,$uibModal) {
                 }
             };
             $http(req).then(function (response) {
-                console.log(response);
+                $route.reload();
             });
         }
         accountCtrl.showModal = function() {
-            accountCtrl.newAccount = {};
             var modalInstance = $uibModal.open({
                 templateUrl : 'partials/modal/addTwitterAccount.html',
                 controller : 'accountTableCtrl as accountCtrl'
             });
             accountCtrl.cancelModal = function(){
                 modalInstance.dismiss();
-            }
+            };
         }
 
         accountCtrl.reactivate = function() {
@@ -91,7 +92,8 @@ app.controller('accountTableCtrl',  function ($http,$rootScope,$uibModal) {
                 }
             };
             $http(req).then(function (response) {
-                console.log(response);
+                AlertService.alert("La cuenta se ha reactivado correctamente","La cuenta se ha reactivado correctamente","Cerrar");
+                $route.reload();
             });
         }
 });
