@@ -14,20 +14,20 @@ function verifyUser(accountID, callback){
     
     var success, reason;
     
+    var censoredToken;
+        
+    if(accountID.token){
+        censoredToken = "**********" + accountID.token.substr(10);
+    } else {
+        censoredToken = accountID.token;
+    }
+    console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + censoredToken);
+        
+    
     verifyAdmin(accountID, function(success){
-        
-        var censoredToken;
-        
-        if(accountID.token){
-            censoredToken = "**********" + accountID.token.substr(10);
-        } else {
-            censoredToken = accountID.token;
-        }
-        console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + censoredToken);
         
         // Admin permission bypass
         if(success){
-            console.log("ACC-VERIFS-VERIFY-USER: ADMIN DETECTED. WHATEVER YOU WANT WILL BE GRANTED MY LORD. COME IN");
             reason = "ADMIN";
             callback(success, reason);
         } else {
@@ -65,6 +65,10 @@ function verifyAdmin(accountID, callback){
             
         if(!err){
             success = data.admin;
+            
+            if(success){
+                console.log("ACC-VERIFS-VERIFY-ADMIN: ADMIN DETECTED. WHATEVER YOU WANT WILL BE GRANTED MY LORD. COME IN");
+            }
         } else {
             success = false;
         }
