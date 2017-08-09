@@ -32,26 +32,26 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
                 // Handle signin errors
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Datos incorrectos', 'Revisa los datos ingresados en el formulario de logueo.', 'Cerrar');
+                        AlertService.alert('Captcha', 'No se ha validado correctamente el captcha.Repita el proceso.', 'Cerrar');
                     }
                     else if (response.status == 401) {
-                        AlertService.alert('Datos incorrectos', 'Revisa los datos ingresados en el formulario de logueo.', 'Cerrar');
+                        AlertService.alert('Datos incorrectos', 'Revise los datos ingresados en el formulario de logueo.', 'Cerrar');
                     }
                     else if (response.status == 409) {
-                        AlertService.alert('Validar la cuenta', 'La cuenta esta pendiente de ser validada. Por favor validala. ', 'Cerrar');
+                        AlertService.alert('Validar la cuenta', 'La cuenta esta pendiente de ser validada. Por favor valídela. ', 'Cerrar');
                     }
                     else if (response.status == 459) {
-                        AlertService.alert('Cambia tu contraseña', 'Todavía no has cambiado la contraseña generada por defecto.', 'Cerrar');
+                        AlertService.alert('Cambie su contraseña', 'Todavía no ha cambiado la contraseña generada por defecto.', 'Cerrar');
                     }
                     else if (response.status == 460) {
 
-                        AlertService.alert('Datos incorrectos','Revisa los datos ingresados en el formulario de logueo.','Cerrar');
+                        AlertService.alert('Datos incorrectos', 'Revise los datos ingresados en el formulario de logueo.', 'Cerrar');
                     }
-                    else if(response.status == 500){
-                        AlertService.alert('DB error','Error en la base de datos.Disculpe las molestias.','Cerrar');
+                    else if (response.status == 500) {
+                        AlertService.alert('DB error', 'Error en la base de datos.Disculpe las molestias.', 'Cerrar');
                     }
-                    else if(response.status == 503){
-                        AlertService.alert('Error externo','Error de logueo por causas externas(Facebook,Google,OpenID).','Cerrar');
+                    else if (response.status == 503) {
+                        AlertService.alert('Error externo', 'Error de logueo por causas externas(Facebook,Google,OpenID).', 'Cerrar');
                     }
                 });
         }
@@ -132,15 +132,15 @@ app.controller('signupCtrl', ['$scope', '$http', '$location', function ($scope, 
                 function (response) {
                     //if email address already in use
                     if (response.status == 409) {
-
+                        AlertService.alert('Error','Email ya está en uso en esta aplicación','Cerrar');
                     }
                     //if captcha validation error
                     else if (response.status == 400) {
-                        console.log("Captcha validation error");
+                        AlertService.alert('Error','Captcha no resuelto correctamente','Cerrar');
                     }
                     //db error
                     else if (response.status == 500) {
-                        console.log("DB error");
+                        AlertService.alert('Error','Error de la base de datos del sistema. Disculpe las molestias.','Cerrar');
                     }
                 });
     };
@@ -164,13 +164,15 @@ app.controller('validateCtrl', ['$scope', '$http', '$location', function ($scope
             function (response) {
                 //incorrect validation code
                 if (response.status == 401) {
-                    $scope.errorMessage = "Incorrect validation code";
-                    console.log("Incorrect validation code");
+                    AlertService.alert('Error','Ha ingresado mal el codigo de validación. Reviselo o solicite uno nuevo','Cerrar');
                     $location.url('/');
+                }
+                else if(response.status == 400) {
+                    AlertService.alert('Error','Error de parametros','Cerrar');
                 }
                 //db error
                 else if (response.status == 500) {
-                    console.log("DB error");
+                    AlertService.alert('Error','Error en la base de datos del sistema. Disculpe las molestias','Cerrar');
                 }
             });
     };
@@ -188,12 +190,15 @@ app.controller('validateCtrl', ['$scope', '$http', '$location', function ($scope
             function (response) {
                 //already validated, not active or not existing mail for user
                 if (response.status == 409) {
-                    console.log("User already validated,not active or not existing email.");
+                    AlertService.alert('Error','El usuario ya está validado,está deshabilitado o no existe el e-mail en la aplicación.','Cerrar');
                     $location.url('/');
+                }
+                else if(response.status == 400){
+                    AlertService.alert('Error','Parametros incorrectos','Cerrar');
                 }
                 //db error
                 else if (response.status == 500) {
-                    console.log("DB error");
+                    AlertService.alert('Error','Error en la base de datos del sistema.Disculpe las molestias.','Cerrar');
                 }
             });
     }
@@ -218,12 +223,15 @@ app.controller('firstLoginCtrl', ['$scope', '$http', '$location', function ($sco
             function (response) {
                 //incorrect validation user or non active user, or not existing email
                 if (response.status == 409) {
-                    console.log("User not validated,not active, or not existing email");
+                    AlertService.alert('Error','El usuario no está validado,está deshabilitado o no existe el e-mail en la aplicación.','Cerrar');
                     $location.url('/');
+                }
+                else if(response.status == 400){
+                    AlertService.alert('Error','Parametros incorrectos.','Cerrar');
                 }
                 //db error
                 else if (response.status == 500) {
-                    console.log("DB error");
+                    AlertService.alert('Error','Error en la base de datos del sistema. Disculpe las molestias.','Cerrar');
                 }
             });
     };
@@ -245,12 +253,12 @@ app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location', function ($s
             function (response) {
                 //incorrect validation user or non active user, or not existing email
                 if (response.status == 409) {
-                    console.log("User not validated,not active, or not existing email");
+                    AlertService.alert('Error','El usuario no está validado,está deshabilitado o no existe el e-mail en la aplicación.','Cerrar');
                     $location.url('/');
                 }
                 //db error
                 else if (response.status == 500) {
-                    console.log("DB error");
+                    AlertService.alert('Error','Error en la base de datos del sistema. Disculpe las molestias.','Cerrar');
                 }
             });
     };

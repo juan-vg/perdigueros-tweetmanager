@@ -7,11 +7,12 @@
                 <!-- Account panel header -->
                 <div class="panel-heading text-center">
                     Cuentas
-                    <div class="pull-right">
+                    <div class="pull-right modal-demo">
                         <button ng-click="accountCtrl.showModal()" class="icon-button"><i
                                 class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
                     </div>
                 </div>
+
                 <!-- Account panel body -->
                 <div class="panel-body">
                     <div class="span6">
@@ -19,7 +20,7 @@
                             <thead>
                             <th style="width: 40%">@Cuenta de twitter:</th>
                             <th style="width: 50%">Descripcion</th>
-                            <th style="width: 10%"> Eliminar </th>
+                            <th style="width: 10%"> Eliminar</th>
                             </thead>
                             <tbody>
                             <tr ng-repeat="account in accountCtrl.accountList"
@@ -30,7 +31,8 @@
                                 <td>{{account.description}}</td>
                                 <td>
                                     <button ng-click="accountCtrl.showDeleteModal()" class="icon-button center-block"><i
-                                                href="" class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
+                                            id="trashIcon"
+                                            href="" class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
                                 </td>
                             </tr>
                             </tbody>
@@ -38,9 +40,9 @@
 
                         <table class="table table-responsive">
                             <thead>
-                                <th style="width: 40%">@Cuenta desactivada:</th>
-                                <th style="width: 50%">Descripcion</th>
-                                <th style="width: 10%">Reactivar</th>
+                            <th style="width: 40%">@Cuenta desactivada:</th>
+                            <th style="width: 50%">Descripcion</th>
+                            <th style="width: 10%">Reactivar</th>
                             </thead>
 
                             <tbody>
@@ -53,7 +55,8 @@
                                 <td>{{account.description}}</td>
                                 <td>
                                     <div>
-                                    <button ng-click="accountCtrl.reactivate(account)" class="icon-button center-block"><i
+                                        <button ng-click="accountCtrl.reactivate(account)"
+                                                class="icon-button center-block"><i
                                                 href="" class="fa fa-lg fa-history" aria-hidden="true"></i></button>
                                     </div>
                                 </td>
@@ -84,32 +87,64 @@
                     </uib-tab-heading>
                     <uib-tab-body>
                         <hr>
-                            <uib-tabset type="pills">
-                                <uib-tab  heading="Home tweets" ng-click="tweetCtrl.getHomeTimeline()">
-                                    <div class="container" ng-repeat="tweet in tweetCtrl.homeTimeLineTweetsList">
-                                        <twitter-widget twitter-widget-id="tweet.id_str">
-                                        </twitter-widget>
-                                    </div>
-                                </uib-tab>
-                                <uib-tab heading="Mis tweets" ng-click="tweetCtrl.getMyTweets()">
-                                    <div class="container" ng-repeat="tweet in tweetCtrl.myTweets">
-                                        <twitter-widget twitter-widget-id="tweet.id_str">
-                                        </twitter-widget>
-                                    </div>
-                                </uib-tab>
-                                <uib-tab heading="Tweets programados" ng-click="tweetCtrl.getScheduledTweets()">
-                                    <div class="container" ng-repeat="tweet in tweetCtrl.scheduledTweets">
-                                        <twitter-widget twitter-widget-id="tweet.id_str">
-                                        </twitter-widget>
-                                    </div>
-                                </uib-tab>
-                                <uib-tab heading="Menciones" ng-click="tweetCtrl.getMentions()">
-                                    <div class="container" ng-repeat="tweet in tweetCtrl.mentions">
-                                        <twitter-widget twitter-widget-id="tweet.id_str">
-                                        </twitter-widget>
-                                    </div>
-                                </uib-tab>
-                            </uib-tabset>
+                        <uib-tabset type="pills" class="center-pills">
+                            <uib-tab heading="Home tweets" ng-click="tweetCtrl.getHomeTimeline()">
+                                <hr>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.homeTimeLineTweetsList">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Mis tweets" ng-click="tweetCtrl.getMyTweets()">
+                                <hr>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.myTweets">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Tweets programados" ng-click="tweetCtrl.getScheduledTweets()">
+                                <hr>
+                                <div ng-repeat="tweet in tweetCtrl.scheduledTweets">
+                                    <hr>
+                                    <h3>Tweets pendientes de publicación</h3>
+                                    <table class="table table-bordered table-responsive">
+                                        <thead>
+                                        <tr>
+                                            <th>Texto del tweet</th>
+                                            <th>Fecha y hora de publicación</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{tweet.text}}</td>
+                                                <td>{{tweet.publishDate}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Menciones" ng-click="tweetCtrl.getMentions()">
+                                <hr>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.mentions">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Mis retweets" ng-click="tweetCtrl.getRetweets()">
+                                <hr>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.retweets">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                            <uib-tab heading="Favoritos" ng-click="tweetCtrl.getFavorites()">
+                                <hr>
+                                <div class="container" ng-repeat="tweet in tweetCtrl.favorites">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
+                                    </twitter-widget>
+                                </div>
+                            </uib-tab>
+                        </uib-tabset>
 
                     </uib-tab-body>
                 </uib-tab>
@@ -135,12 +170,14 @@
                     </uib-tab-body>
                 </uib-tab>
 
+
                 <!-- Other tools tab -->
                 <uib-tab index="2">
                     <uib-tab-heading>
                         <i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Más herramientas
                     </uib-tab-heading>
                     <uib-tab-body>
+                        <hr>
                         <h1>Programar Tweet</h1>
                         <hr>
                         <form name="scheduleForm" ng-submit="tweetCtrl.scheduleTweet()" role="form">
@@ -150,7 +187,8 @@
                             <hr>
                             <label>Selecciona fecha y hora:</label>
                             <adm-dtp ng-model='tweetCtrl.sDate' options='{gregorianStartDay: 1}'></adm-dtp>
-                            <button type="submit" class="icon-button">Enviar <i class="fa fa-plus-circle fa-lg"></i></button>
+                            <button type="submit" class="icon-button">Enviar <i class="fa fa-plus-circle fa-lg"></i>
+                            </button>
                             {{tweetCtrl.sDate}}
                         </form>
                     </uib-tab-body>

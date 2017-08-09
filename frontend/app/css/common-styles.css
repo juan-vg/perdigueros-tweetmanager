@@ -75,6 +75,7 @@
 .dropdown-menu {
     width: 100%;
 }
+
 @media (min-width: 768px) {
     .input-validate {
         display: block;
@@ -83,6 +84,7 @@
         padding-right: 10em;
     }
 }
+
 @media (min-width: 992px) {
     .input-validate {
         display: block;
@@ -93,33 +95,53 @@
 }
 
 .required {
-    color : red;
+    color: red;
 }
+
 .mailerror {
     color: red;
 }
 
 #captcha {
-    padding-left:1px;
+    padding-left: 1px;
 }
 
-
-
-
-
 body {
-    padding : 10px ;
+    padding: 10px;
 
 }
 
 /* change border radius for the tab , apply corners on top*/
 
 #exTab3 .nav-pills > li > a {
-    border-radius: 4px 4px 0 0 ;
+    border-radius: 4px 4px 0 0;
 }
 
 #exTab3 .tab-content {
-    color : white;
+    color: white;
     background-color: #428bca;
-    padding : 5px 15px;
+    padding: 5px 15px;
+}
+
+.nav-pills > li > a {
+    font-family: 'Open Sans', sans-serif !important;
+    font-size: 0.9em;
+}
+
+.fa {
+    color: #337ab7;
+}
+
+#userIcon {
+    color: white;
+}
+
+.table > tbody > tr.active > td {
+    background-color: #428bca;
+    color: white;
+
+}
+
+#trashIcon {
+    color: #91c5d6
 }
