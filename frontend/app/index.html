@@ -11,6 +11,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
+  <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+
 
   <!-- Bootstrap Framework load -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -24,11 +27,12 @@
 
   <link href="css/dashboard.css" rel="stylesheet">
   <link href="css/scheduleForm.css" rel="stylesheet"/>
-  <link href="bower_components/angularjs-datepicker/src/css/angular-datepicker.css" rel="stylesheet" type="text/css" />
 
   <!-- Font Awesome library load -->
   <link rel="stylesheet" href="css/font-awesome.min.css">
 
+  <!-- ADM Datepicker Styles -->
+  <link rel="stylesheet" href="bower_components/adm-dtp/dist/ADM-dateTimePicker.css"/>
 
   <!-- ngStore module for localStorage and sessionStorage -->
   <script src="bower_components/angular/angular.min.js"></script>
@@ -48,23 +52,31 @@
   <script src="scripts/dashboard/scheduleForm.js"></script>
 
   <!-- Captcha library -->
-  <script type="text/javascript "src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
+  <script type="text/javascript " src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
   <script type="text/javascript" src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
   <!-- Ng Tweet -->
   <script src="bower_components/ngtweet/dist/ngtweet.min.js"></script>
 
-  <script src="bower_components/angularjs-datepicker/src/js/angular-datepicker.js"></script>
+
+  <script src="bower_components/angular-chart/angular-chart.min.js"></script>
+  <script src="bower_components/chart.js/dist/Chart.bundle.min.js"></script>
+  <script src="bower_components/angular-chart/angular-chart.min.js"></script>
+  <script src="bower_components/c3/c3.js"></script>
+  <script src="bower_components/d3/d3.js"></script>
+  <script src="bower_components/chartkick/chartkick.js"></script>
+  <script src="bower_components/adm-dtp/dist/ADM-dateTimePicker.js"></script>
 </head>
 
-<body >
+<body>
 
 <!-- Static top navbar -->
 <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
     <!-- Brand and toggle get grouped for better mobile display -->
-    <div ng-controller="userMenuCtrl" class="navbar-header" >
+    <div ng-controller="userMenuCtrl" class="navbar-header">
 
-      <button type="button" class="navbar-toggle collapsed " ng-show="isUserActive()"  data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+      <button type="button" class="navbar-toggle collapsed " ng-show="isUserActive()" data-toggle="collapse"
+              data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -72,7 +84,7 @@
       </button>
 
       <!-- Navbar brand-->
-      <a  class="navbar-brand" href="/">Perdigueros Tweet Manager</a>
+      <a class="navbar-brand" href="/">Perdigueros Tweet Manager</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -80,15 +92,16 @@
       <!-- Right list with user information and logout button-->
       <ul ng-show="isUserActive()" class="nav navbar-nav navbar-right">
         <!-- User drodown -->
-        <li class="dropdown ">
+        <li class="dropdown">
           <a class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><em>  {{currentUser}}  </em> <i class="fa fa-user fa-lg" ></i><span
+             aria-expanded="false"><em> {{currentUser}} </em> <i class="fa fa-user fa-lg"></i><span
                   class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="/dashboard/profile">Mi perfil</a></li>
             <li role="separator" class="divider"></li>
             <li><a href="">F.A.Q.</a></li>
-            <li><a ng-click="showModal()" >Cerrar sesión&nbsp;<i class="fa fa-sign-out fa-lg" aria-hidden="true"></i></a></li>
+            <li><a href="#" ng-click="showModal()">Cerrar sesión&nbsp;<i class="fa fa-sign-out fa-lg"
+                                                                         aria-hidden="true"></i></a></li>
           </ul>
         </li>
       </ul>

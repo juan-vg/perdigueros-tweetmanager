@@ -93,6 +93,30 @@ app.controller('tweetTableCtrl', function ( $rootScope, $http,AlertService) {
             console.log("Not user selected");
         }
     }
+    tweetCtrl.scheduleTweet = function(){
+        if($rootScope.activeAccount) {
+            var req = {
+                method: 'POST',
+                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                + localStorage.getItem('selectedAccount') + '/tweets/schedule',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': localStorage.getItem('token')
+                },
+                data: {
+                    'text': tweetCtrl.sTweet,
+                    'date' : tweetCtrl.sDate
+                }
+            };
+            $http(req).then(function (response) {
+                // Confirmation alert about schedule a tweet
+                AlertService.alert('Enhorabuena','El tweet se ha programado correctamente.','Cerrar');
+            });
+        }
+        else{
+            console.log("Not user selected");
+        }
+    }
     tweetCtrl.getMentions = function(){
         // if an account is selected
         if($rootScope.activeAccount) {
