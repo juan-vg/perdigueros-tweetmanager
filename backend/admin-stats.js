@@ -373,7 +373,7 @@ function resourcesByUser(results, callback){
                     result.push(entry);
                 }
                 
-                results.byCountry = result;
+                results.byUser = result;
                 callback(error);
                 
             } else {
