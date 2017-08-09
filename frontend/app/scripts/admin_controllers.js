@@ -16,15 +16,16 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 				'g-recaptcha-response': vcRecaptchaService.getResponse(),
 				'loginType' : 'local'
 			};
-			console.log(data);
 			$http.post(api+'/login/signin',data).then(successCallback, errorCallback);
 			function successCallback(response){
 				localStorage.setItem('token_admin', response.data.token);
 				$location.path('/admin-main-panel');
 			}
 			function errorCallback(error){
+				var error_msg = "Error " + error.status + ": " + error.data;
+				console.log(error_msg);
+				$scope.error = error_msg;
 				$scope.pwdError = true;
-				console.log("Error authentication");
 			}
 		}
     };
@@ -81,13 +82,15 @@ app_admin.controller('UserController', function($scope,$http) {
 			}
 			function errorCallback(error){
 				console.log("Error Removing User");
-				alert("Error eliminando usuario");
+				var error_msg = "Error " + error.status + ": " + error.data;
+				alert(error_msg);
 			}
 		}
 	}
 	function errorCallback(error){
 		console.log("Error getting Users list");
-		alert("Error Obteniendo datos de los usuarios");
+		var error_msg = "Error " + error.status + ": " + error.data;
+		alert(error_msg);
 	}
 });
 
@@ -95,7 +98,6 @@ app_admin.controller('UserController', function($scope,$http) {
 app_admin.controller('AccountController', function($scope,$http) {
 	// Get accounts data 
 	$http.get(api+'/twitter-accounts',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
-	
 	//Data Get Successfull
 	function successCallback(response){
 		$scope.accounts = response.data;
@@ -109,6 +111,7 @@ app_admin.controller('AccountController', function($scope,$http) {
 			function successCallbackHastags(hashtags){
 				var index = -1;
 				var comArr = eval( hashtags.data );
+				console.log(hashtags.data);
 				var result='';
 				// Format Hashtag list for the user
 				for( var i = 0; i < comArr.length; i++ ) {
@@ -118,7 +121,25 @@ app_admin.controller('AccountController', function($scope,$http) {
 			}
 			function errorCallbackHastags(error){
 				console.log("Error getting hashtags");
-				alert("Error Obteniendo datos de los hashtags");
+				var error_msg = "Error " + error.status + ": " + error.data;
+				alert(error_msg);
+			}
+			$http.get(api+'/twitter-accounts/'+account._id+'/followed-users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackFollowed, errorCallbackFollowed);
+			function successCallbackFollowed(twitter_accounts){
+				var index = -1;
+				var comArr = eval( twitter_accounts.data );
+				console.log(twitter_accounts.data);
+				var result='';
+				// Format Hashtag list for the user
+				for( var i = 0; i < comArr.length; i++ ) {
+					result=result+comArr[i].user+'\n';
+				}
+				$scope.followed_select=result;
+			}
+			function errorCallbackFollowed(error){
+				console.log("Error getting users followed");
+				var error_msg = "Error " + error.status + ": " + error.data;
+				alert(error_msg);
 			}
 		};
 		// RemoveAccount from the list
@@ -136,16 +157,16 @@ app_admin.controller('AccountController', function($scope,$http) {
 				$scope.accounts.splice( index, 1 );
 			}
 			function errorCallback(error){
-				$scope.pwdError = true;
 				console.log("Error Removing Account");
-				alert("Error eliminando cuenta");
+				var error_msg = "Error " + error.status + ": " + error.data;
+				alert(error_msg);
 			}
 		};
 	}
 	function errorCallback(error){
-		$scope.pwdError = true;
 		console.log("Error getting user accounts");
-		alert("Error Obteniendo datos de las cuentas");
+		var error_msg = "Error " + error.status + ": " + error.data;
+		alert(error_msg);
 	}
 });
 
@@ -250,7 +271,8 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
-		alert("Error Obteniendo datos de las estadisticas");
+		var error_msg = "Error " + error.status + ": " + error.data;
+		alert(error_msg);
 	}
 });
 
@@ -301,26 +323,24 @@ app_admin.controller('AccessDataController', function($scope,$http,DateService) 
 	}
 	}
 	function errorCallbackStats(error){
-		console.log("Error getting stats");
-		alert("Error Obteniendo datos de las estadisticas");
+		var error_msg = "Error " + error.status + ": " + error.data;
+		alert(error_msg);
 	}
 });
 
 // Stadistics Data Binding
 app_admin.controller('StadisticsController', function($scope,$http,DateService) {
 	$http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
-  
 	function successCallbackStats(stats){
 		// Map Information Bind
-		/*var location= stats.data.resources.byCountry;
+		var location= stats.data.resources.byCountry;
 		var locationArr = eval( location );
 		var mapData = [];
 		for ( var i = 0; i < locationArr.length; i++ ) {
-			mapData.push([locationArr[i].country,locationArr[i].count])
+			mapData.push([locationArr[i].country,locationArr[i].count]);
 		};
 		// Show Data on the map
-		new Chartkick.GeoChart("map",mapData ,{adapter: "google"});*/
-		
+		new Chartkick.GeoChart("map",mapData ,{adapter: "google"});
 		// Tweets/Day Data Bind
 		var label=[];
 		var data=[];
@@ -370,8 +390,8 @@ app_admin.controller('StadisticsController', function($scope,$http,DateService) 
 		};
 	}
 	function errorCallbackStats(error){
-		console.log("Error getting stats");
-		alert("Error Obteniendo datos de las estadisticas");
+		var error_msg = "Error " + error.status + ": " + error.data;
+		alert(error_msg);
 	}
 	$scope.onClick = function (points, evt) {
 		$http.get(api+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
@@ -385,7 +405,6 @@ app_admin.controller('StadisticsController', function($scope,$http,DateService) 
 		}
 		function errorCallbackInfo(error){
 			$scope.info="Error obteniendo datos";
-			console.log("Error getting info user");
 		}
 	};
 });
