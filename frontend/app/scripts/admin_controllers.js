@@ -2,10 +2,11 @@
 var api = "http://zaratech-ptm.ddns.net:8888";
 
 var app_admin = angular.module('app_admin');
+
 // Password Data and Check 
 app_admin.controller('PasswordController', function ($scope,$http,$location,vcRecaptchaService) {
     $scope.pwdError =false;
-	var vm = this;
+    var vm = this;
     $scope.checkPwd =function() {
 		if (vm.captchaResponse === "") { 
 			alert("Por favor, resuelva el captcha!");
@@ -29,7 +30,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 			}
 		}
     };
-  });
+});
 
 // List of Users Data
 app_admin.controller('UserController', function($scope,$http) {
@@ -416,45 +417,45 @@ app_admin.controller('adminMenuCtrl', function ($scope,$location) {
     $scope.isAdminActive = function () {
         // if admin active
         if(localStorage.getItem('token_admin')){
-			
+
             return true;
-			
+
         }
         //if not
         else{
-			
+
             return false;
         }
     };
-	 $scope.logout =function() {
-		localStorage.clear();
-		$location.url('/admin');
-	 };
+    $scope.logout =function() {
+        localStorage.clear();
+        $location.url('/admin');
+    };
 });
 
 // Return a format date for the user
 function formatDate(date) {
-	if (date==null) {
-		return "";
-	}
-	else  {
-		var monthNames = [
-			"Enero", "Febrero", "Marzo",
-			"Abril", "Mayo", "Junio", "Julio",
-			"Agosto", "Septiembre", "Octubre",
-			"Noviembre", "Diciembre"
-		];
-		var day = date.getDate();
-		var monthIndex = date.getMonth();
-		var year = date.getFullYear();
-		var hour = date.getHours();
-		if (hour<10) {
-			hour="0"+hour;
-		}
-		var minutes = date.getMinutes();
-		if (minutes<10) {
-			minutes="0"+minutes;
-		}
-		return day + '-' + monthNames[monthIndex] + '-' + year + '  ' + hour + ':' + minutes;
-	}
+    if (date==null) {
+        return "";
+    }
+    else  {
+        var monthNames = [
+            "Enero", "Febrero", "Marzo",
+            "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre",
+            "Noviembre", "Diciembre"
+        ];
+        var day = date.getDate();
+        var monthIndex = date.getMonth();
+        var year = date.getFullYear();
+        var hour = date.getHours();
+        if (hour<10) {
+            hour="0"+hour;
+        }
+        var minutes = date.getMinutes();
+        if (minutes<10) {
+            minutes="0"+minutes;
+        }
+        return day + '-' + monthNames[monthIndex] + '-' + year + '  ' + hour + ':' + minutes;
+    }
 }
