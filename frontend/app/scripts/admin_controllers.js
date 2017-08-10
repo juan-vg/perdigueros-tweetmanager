@@ -10,38 +10,29 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 		localStorage.removeItem('token_admin');
 	}
 	$scope.setWidgetId = function(widgetId) {
-		console.log("a:"+$scope.recaptchaId+"b");
 		if ($scope.recaptchaId==undefined) {
-			console.log("un");
 			$scope.recaptchaId=widgetId;
 		}
 	};
 	$scope.checkPwd =function() {
-		console.log(vcRecaptchaService.getResponse($scope.recaptchaId));
-		if (vcRecaptchaService.getResponse($scope.recaptchaId).length == 0) { 
-			alert("Por favor, resuelva el captcha!");
-		} else {
-				var data = {
-					'email': 'admin@admin.com',
-					'passwd': $scope.password,
-					'g-recaptcha-response': vcRecaptchaService.getResponse($scope.recaptchaId),
-					'loginType' : 'local'
-				};
-			
-			
-				$http.post(api+'/login/signin',data).then(successCallback, errorCallback);
-				function successCallback(response){
-					localStorage.setItem('token_admin', response.data.token);
-					$location.path('/admin-main-panel');
-				}
-				function errorCallback(error){
-					var error_msg = "Error " + error.status + ": " + error.data;
-					$scope.error = error_msg;
-					$scope.pwdError = true;
-				}
+		var data = {
+			'email': 'admin@admin.com',
+			'passwd': $scope.password,
+			'g-recaptcha-response': vcRecaptchaService.getResponse($scope.recaptchaId),
+			'loginType' : 'local'
+		};
+		$http.post(api+'/login/signin',data).then(successCallback, errorCallback);
+		function successCallback(response){
+			localStorage.setItem('token_admin', response.data.token);
+			$location.path('/admin-main-panel');
+		}
+		function errorCallback(error){
+			var error_msg = "Error " + error.status + ": " + error.data;
+			$scope.error = error_msg;
+			$scope.pwdError = true;
+		}
 				
 			
-		}
 	};
 	
     
@@ -49,11 +40,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 
 // List of Users Data
 app_admin.controller('UserController', function($scope,$http,$location,$window) {
-  if (typeof angular == 'undefined') {
-     window.location.replace("/main_url");
-  }
-	else {
-		$http.get(api+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+	$http.get(api+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 	function successCallback(response){
 		//Get response data
 		var users=response.data;
@@ -112,7 +99,7 @@ app_admin.controller('UserController', function($scope,$http,$location,$window) 
 		var error_msg = "Error " + error.status + ": " + error.data;
 		alert(error_msg);
 	}
-	}
+	
 	
 });
 
@@ -133,7 +120,6 @@ app_admin.controller('AccountController', function($scope,$http) {
 			function successCallbackHastags(hashtags){
 				var index = -1;
 				var comArr = eval( hashtags.data );
-				console.log(hashtags.data);
 				var result='';
 				// Format Hashtag list for the user
 				for( var i = 0; i < comArr.length; i++ ) {
@@ -150,7 +136,6 @@ app_admin.controller('AccountController', function($scope,$http) {
 			function successCallbackFollowed(twitter_accounts){
 				var index = -1;
 				var comArr = eval( twitter_accounts.data );
-				console.log(twitter_accounts.data);
 				var result='';
 				// Format Hashtag list for the user
 				for( var i = 0; i < comArr.length; i++ ) {
