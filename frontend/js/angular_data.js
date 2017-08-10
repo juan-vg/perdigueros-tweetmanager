@@ -1,39 +1,38 @@
 // Config API route
 var api = "http://zaratech-ptm.ddns.net:8888";
 
-var app_admin = angular.module('app_admin');
-// Password Data and Check
-app_admin.controller('PasswordController', function ($scope,$http,$location,vcRecaptchaService) {
+
+// Password Data and Check 
+var PwdCheck=angular.module('PwdCheck', ['ngStorage','vcRecaptcha']);
+PwdCheck.controller('PasswordController', function ($scope,$http,$window,$location,$localStorage,vcRecaptchaService) {
     $scope.pwdError =false;
-    var vm = this;
     $scope.checkPwd =function() {
-		if (vm.captchaResponse === "") { 
-			alert("Por favor, resuelva el captcha!");
+		if (vcRecaptchaService.getResponse() === "") { 
+			alert("Please resolve the captcha and submit!")
 		} else {
 			var data = {
 				'email': 'admin@admin.com',
 				'passwd': $scope.password,
-				'g-recaptcha-response': vcRecaptchaService.getResponse(),
-				'loginType' : 'local'
+				'g-recaptcha-response': vcRecaptchaService.getResponse()
 			};
 			$http.post(api+'/login/signin',data).then(successCallback, errorCallback);
 			function successCallback(response){
-				localStorage.setItem('token_admin', response.data.token);
-				$location.path('/admin-main-panel');
+				var dir = window.location.pathname;
+				$localStorage.token = response.data.token;
+				$window.location.href = dir.substring(0,dir.lastIndexOf('/'))+'/admin-main-panel.html';
 			}
 			function errorCallback(error){
-				var error_msg = "Error " + error.status + ": " + error.data;
-				console.log(error_msg);
-				$scope.error = error_msg;
 				$scope.pwdError = true;
+				console.log("Error authentication");
 			}
 		}
     };
-});
+  });
 
 // List of Users Data
-app_admin.controller('UserController', function($scope,$http) {
-	$http.get(api+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+var UsersData=angular.module('UsersData', ['ngStorage']);
+UsersData.controller('UserController', function($scope,$http,$localStorage) {
+	$http.get(api+'/users',{headers: {'token': $localStorage.token}}).then(successCallback, errorCallback);
 	function successCallback(response){
 		//Get response data
 		var users=response.data;
@@ -68,7 +67,7 @@ app_admin.controller('UserController', function($scope,$http) {
 		
 		// RemoveUser from the list
 		$scope.removeUser =function(user) {
-			$http.delete(api+'/users/'+user._id,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+			$http.delete(api+'/users/'+user._id,{headers: {'token': $localStorage.token}}).then(successCallback, errorCallback);
 			function successCallback(response){
 				var index = -1;		
 				var usersArr = eval( $scope.users );
@@ -81,23 +80,21 @@ app_admin.controller('UserController', function($scope,$http) {
 				$scope.users.splice( index, 1 );
 			}
 			function errorCallback(error){
-				console.log("Error Removing User");
-				var error_msg = "Error " + error.status + ": " + error.data;
-				alert(error_msg);
+				console.log("Error Removing Account");
 			}
 		}
 	}
 	function errorCallback(error){
 		console.log("Error getting Users list");
-		var error_msg = "Error " + error.status + ": " + error.data;
-		alert(error_msg);
 	}
 });
 
 // Accounts and Hastags Data Binding
-app_admin.controller('AccountController', function($scope,$http) {
+var ListAccounts=angular.module('ListAccounts', ['ngStorage']);
+ListAccounts.controller('AccountController', function($scope,$http,$localStorage) {
 	// Get accounts data 
-	$http.get(api+'/twitter-accounts',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+	$http.get(api+'/twitter-accounts',{headers: {'token': $localStorage.token}}).then(successCallback, errorCallback);
+	
 	//Data Get Successfull
 	function successCallback(response){
 		$scope.accounts = response.data;
@@ -107,11 +104,10 @@ app_admin.controller('AccountController', function($scope,$http) {
 			$scope.account_select=account.name;
 			$scope.account_description=account.description;
 			// Get Hashtag Data from the account
-			$http.get(api+'/twitter-accounts/'+account._id+'/hashtags',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackHastags, errorCallbackHastags);
+			$http.get(api+'/twitter-accounts/'+account._id+'/hashtags',{headers: {'token': $localStorage.token}}).then(successCallbackHastags, errorCallbackHastags);
 			function successCallbackHastags(hashtags){
 				var index = -1;
 				var comArr = eval( hashtags.data );
-				console.log(hashtags.data);
 				var result='';
 				// Format Hashtag list for the user
 				for( var i = 0; i < comArr.length; i++ ) {
@@ -121,30 +117,11 @@ app_admin.controller('AccountController', function($scope,$http) {
 			}
 			function errorCallbackHastags(error){
 				console.log("Error getting hashtags");
-				var error_msg = "Error " + error.status + ": " + error.data;
-				alert(error_msg);
-			}
-			$http.get(api+'/twitter-accounts/'+account._id+'/followed-users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackFollowed, errorCallbackFollowed);
-			function successCallbackFollowed(twitter_accounts){
-				var index = -1;
-				var comArr = eval( twitter_accounts.data );
-				console.log(twitter_accounts.data);
-				var result='';
-				// Format Hashtag list for the user
-				for( var i = 0; i < comArr.length; i++ ) {
-					result=result+comArr[i].user+'\n';
-				}
-				$scope.followed_select=result;
-			}
-			function errorCallbackFollowed(error){
-				console.log("Error getting users followed");
-				var error_msg = "Error " + error.status + ": " + error.data;
-				alert(error_msg);
 			}
 		};
 		// RemoveAccount from the list
 		$scope.removeAccount =function(account) {
-			$http.delete(api+'/twitter-accounts/'+account._id,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+			$http.delete(api+'/twitter-accounts/'+account._id,{headers: {'usertoken': $localStorage.token}}).then(successCallback, errorCallback);
 			function successCallback(response){
 				var index = -1;		
 				var accArr = eval( $scope.accounts );
@@ -157,55 +134,54 @@ app_admin.controller('AccountController', function($scope,$http) {
 				$scope.accounts.splice( index, 1 );
 			}
 			function errorCallback(error){
+				$scope.pwdError = true;
 				console.log("Error Removing Account");
-				var error_msg = "Error " + error.status + ": " + error.data;
-				alert(error_msg);
 			}
 		};
 	}
 	function errorCallback(error){
+		$scope.pwdError = true;
 		console.log("Error getting user accounts");
-		var error_msg = "Error " + error.status + ": " + error.data;
-		alert(error_msg);
 	}
 });
 
 // Stadistics Data
-
+var StadisticsData =angular.module('StadisticsData', ['ngStorage','chart.js']);
 // Support Functions for parsing dates
-app_admin.factory('DateService', function() {
-    return {
-        // Return String Name month corresponding to a number
-        getMonthName: function(date) {
-            var monthNames = [
-                "Enero", "Febrero", "Marzo",
-                "Abril", "Mayo", "Junio", "Julio",
-                "Agosto", "Septiembre", "Octubre",
-                "Noviembre", "Diciembre"
-            ];
-            return monthNames[date];
-        },
-        // Return an array with last 12 month dates of date. [month, year, data1,data2]
-        getArrayLastTwelve: function(date) {
-            var arr = [];
-            var month=date.getMonth();
-            var year=date.getFullYear();
-            for (var i = 12; i > 0; i--) {
-                arr[i-1]=[month,year,0,0];
-                month--;
-                if(month<0) {
-                    month=11;
-                    year--;
-                }
-            };
-            return arr;
-        }
-    };
+StadisticsData.factory('DateService', function() {
+	return {
+		// Return String Name month corresponding to a number
+		getMonthName: function(date) {
+			var monthNames = [
+				"Enero", "Febrero", "Marzo",
+				"Abril", "Mayo", "Junio", "Julio",
+				"Agosto", "Septiembre", "Octubre",
+				"Noviembre", "Diciembre"
+			];
+			return monthNames[date];
+		},
+		// Return an array with last 12 month dates of date. [month, year, data1,data2]
+		getArrayLastTwelve: function(date) {
+			var arr = [];
+			var month=date.getMonth();
+			var year=date.getFullYear();
+			for (var i = 12; i > 0; i--) {
+				arr[i-1]=[month,year,0,0];
+				month--;
+				if(month<0) {
+					month=11;
+					year--;
+				}
+			};
+			return arr;
+		}
+	};
 })
 // User Iputs and Outputs from the Application Data
-app_admin.controller('UserDoorController', function($scope,$http,DateService) {
+StadisticsData.controller('UserDoorController', function($scope,$http,$localStorage,DateService) {
+	$scope.token=$localStorage.token;
 	// Get data Stadistics from the server
-	$http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
+	$http.get(api+'/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackStats, errorCallbackStats);
 	function successCallbackStats(stats){ 
 		var registrationData= stats.data.ups;	// Registration Data
 		var downsData= stats.data.downs;					// Downs Data
@@ -271,16 +247,14 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
 	}
 	function errorCallbackStats(error){
 		console.log("Error getting stats");
-		var error_msg = "Error " + error.status + ": " + error.data;
-		alert(error_msg);
 	}
 });
 
 
 // User Last Connection Time Data
-app_admin.controller('AccessDataController', function($scope,$http,DateService) {
+StadisticsData.controller('AccessDataController', function($scope,$http,$localStorage,DateService) {
 	// Get last connection data stadistics from the server
-	$http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
+	$http.get(api+'/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackStats, errorCallbackStats);
 	function successCallbackStats(stats){
 		var accessData= stats.data.lastAccess;
 		var label=[];
@@ -323,24 +297,25 @@ app_admin.controller('AccessDataController', function($scope,$http,DateService) 
 	}
 	}
 	function errorCallbackStats(error){
-		var error_msg = "Error " + error.status + ": " + error.data;
-		alert(error_msg);
+		console.log("Error getting stats");
 	}
 });
 
 // Stadistics Data Binding
-app_admin.controller('StadisticsController', function($scope,$http,DateService) {
-	$http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
+StadisticsData.controller('StadisticsController', function($scope,$localStorage,$http,DateService) {
+	$http.get(api+'/stats/app',{headers: {'token': $localStorage.token}}).then(successCallbackStats, errorCallbackStats);
+  
 	function successCallbackStats(stats){
 		// Map Information Bind
 		var location= stats.data.resources.byCountry;
 		var locationArr = eval( location );
 		var mapData = [];
 		for ( var i = 0; i < locationArr.length; i++ ) {
-			mapData.push([locationArr[i].country,locationArr[i].count]);
+			mapData.push([locationArr[i].country,locationArr[i].count])
 		};
 		// Show Data on the map
 		new Chartkick.GeoChart("map",mapData ,{adapter: "google"});
+		
 		// Tweets/Day Data Bind
 		var label=[];
 		var data=[];
@@ -390,11 +365,10 @@ app_admin.controller('StadisticsController', function($scope,$http,DateService) 
 		};
 	}
 	function errorCallbackStats(error){
-		var error_msg = "Error " + error.status + ": " + error.data;
-		alert(error_msg);
+		console.log("Error getting stats");
 	}
 	$scope.onClick = function (points, evt) {
-		$http.get(api+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
+		$http.get(api+'/users/'+points[0]._view.label,{headers: {'token': $localStorage.token}}).then(successCallbackInfo, errorCallbackInfo);
 		function successCallbackInfo(info){
 			$scope.user_id=points[0]._view.label;
 			$scope.info="Email: " + info.data[0].email + "\n" +
@@ -405,56 +379,34 @@ app_admin.controller('StadisticsController', function($scope,$http,DateService) 
 		}
 		function errorCallbackInfo(error){
 			$scope.info="Error obteniendo datos";
+			console.log("Error getting info user");
 		}
 	};
 });
 
-/**
- * Controller to show or hide top admin dropdown menu and logout
- */
-app_admin.controller('adminMenuCtrl', function ($scope,$location) {
-    $scope.isAdminActive = function () {
-        // if admin active
-        if(localStorage.getItem('token_admin')){
-
-            return true;
-
-        }
-        //if not
-        else{
-
-            return false;
-        }
-    };
-    $scope.logout =function() {
-        localStorage.clear();
-        $location.url('/admin');
-    };
-});
-
 // Return a format date for the user
 function formatDate(date) {
-    if (date==null) {
-        return "";
-    }
-    else  {
-        var monthNames = [
-            "Enero", "Febrero", "Marzo",
-            "Abril", "Mayo", "Junio", "Julio",
-            "Agosto", "Septiembre", "Octubre",
-            "Noviembre", "Diciembre"
-        ];
-        var day = date.getDate();
-        var monthIndex = date.getMonth();
-        var year = date.getFullYear();
-        var hour = date.getHours();
-        if (hour<10) {
-            hour="0"+hour;
-        }
-        var minutes = date.getMinutes();
-        if (minutes<10) {
-            minutes="0"+minutes;
-        }
-        return day + '-' + monthNames[monthIndex] + '-' + year + '  ' + hour + ':' + minutes;
-    }
+	if (date==null) {
+		return "";
+	}
+	else  {
+		var monthNames = [
+			"Enero", "Febrero", "Marzo",
+			"Abril", "Mayo", "Junio", "Julio",
+			"Agosto", "Septiembre", "Octubre",
+			"Noviembre", "Diciembre"
+		];
+		var day = date.getDate();
+		var monthIndex = date.getMonth();
+		var year = date.getFullYear();
+		var hour = date.getHours();
+		if (hour<10) {
+			hour="0"+hour;
+		}
+		var minutes = date.getMinutes();
+		if (minutes<10) {
+			minutes="0"+minutes;
+		}
+		return day + '-' + monthNames[monthIndex] + '-' + year + '  ' + hour + ':' + minutes;
+	}
 }
