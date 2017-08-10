@@ -65,11 +65,6 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
             templateUrl: 'partials/login/forgot.html',
             controller: 'forgotPasswdCtrl'
         })
-  
-        //route for F.A.Q. page
-        .when('/faq',{
-            templateUrl : 'partials/login/faq.html'
-        })
 
         .when('/dashboard/profile',{
             templateUrl : 'partials/dashboard/profile.html',

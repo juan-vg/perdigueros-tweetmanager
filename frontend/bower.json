@@ -16,6 +16,11 @@
     "jquery": "^3.2.1",
     "angular-local-storage": "^0.6.0",
     "ngtweet": "^0.6.2",
-    "angularjs-datepicker": "^2.1.23"
+    "angularjs-datepicker": "^2.1.23",
+    "chartkick": "^2.2.4",
+    "angular-chart": "^0.5.0",
+    "chart.js": "^2.6.0",
+    "adm-dtp": "*",
+    "ui.bootstrap": "angular-ui-bootstrap#^2.5.0"
   }
 }

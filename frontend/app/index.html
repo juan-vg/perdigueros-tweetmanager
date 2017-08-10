@@ -31,7 +31,7 @@
   <!-- Font Awesome library load -->
   <link rel="stylesheet" href="css/font-awesome.min.css">
 
-  <!-- ADM Datepicker Styles -->
+  <!-- ADM bb Styles -->
   <link rel="stylesheet" href="bower_components/adm-dtp/dist/ADM-dateTimePicker.css"/>
 
   <!-- ngStore module for localStorage and sessionStorage -->
@@ -40,12 +40,13 @@
   <script src="bower_components/satellizer/dist/satellizer.min.js"></script>
   <script src="bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
 
-
   <!-- angular Resource module for creating objects which interacts with aPI REST -->
   <script src="scripts/app.js"></script>
   <script src="scripts/controllers.js"></script>
   <script src="scripts/dashboard/accountTable.js"></script>
   <script src="scripts/dashboard/tweetTable.js"></script>
+  <script src="scripts/modal/accountModal.js"></script>
+
 
   <script src="scripts/dashboard/profile.js"></script>
   <script src="scripts/modal/alert.js"></script>
@@ -65,6 +66,7 @@
   <script src="bower_components/d3/d3.js"></script>
   <script src="bower_components/chartkick/chartkick.js"></script>
   <script src="bower_components/adm-dtp/dist/ADM-dateTimePicker.js"></script>
+
 </head>
 
 <body>
@@ -94,14 +96,14 @@
         <!-- User drodown -->
         <li class="dropdown">
           <a class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true"
-             aria-expanded="false"><em> {{currentUser}} </em> <i class="fa fa-user fa-lg"></i><span
+             aria-expanded="false"><em> {{currentUser}} </em> <i id="userIcon" class="fa fa-user fa-lg"></i><span
                   class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="/dashboard/profile">Mi perfil</a></li>
+            <li><a href="/dashboard/profile"><i class="fa fa-user-circle fa-lg pull-right" aria-hidden="true"></i>Mi perfil
+            </a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="">F.A.Q.</a></li>
-            <li><a href="#" ng-click="showModal()">Cerrar sesión&nbsp;<i class="fa fa-sign-out fa-lg"
-                                                                         aria-hidden="true"></i></a></li>
+            <li><a href="#" ng-click="showModal()"><i class="fa fa-sign-out fa-lg pull-right"
+                                                      aria-hidden="true"></i>Cerrar sesión</a></li>
           </ul>
         </li>
       </ul>
@@ -130,7 +132,5 @@
 <!-- Bootstrap js library required -->
 <script src="js/bootstrap.min.js"></script>
 
-
 </body>
-
 </html>
