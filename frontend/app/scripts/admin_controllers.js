@@ -6,34 +6,54 @@ var app_admin = angular.module('app_admin');
 app_admin.controller('PasswordController', function ($scope,$http,$location,vcRecaptchaService) {
     $scope.pwdError =false;
     var vm = this;
-    $scope.checkPwd =function() {
-		if (vm.captchaResponse === "") { 
+	if (localStorage.getItem('token_admin')) {
+		localStorage.removeItem('token_admin');
+	}
+	$scope.setWidgetId = function(widgetId) {
+		console.log("a:"+$scope.recaptchaId+"b");
+		if ($scope.recaptchaId==undefined) {
+			console.log("un");
+			$scope.recaptchaId=widgetId;
+		}
+	};
+	$scope.checkPwd =function() {
+		console.log(vcRecaptchaService.getResponse($scope.recaptchaId));
+		if (vcRecaptchaService.getResponse($scope.recaptchaId).length == 0) { 
 			alert("Por favor, resuelva el captcha!");
 		} else {
-			var data = {
-				'email': 'admin@admin.com',
-				'passwd': $scope.password,
-				'g-recaptcha-response': vcRecaptchaService.getResponse(),
-				'loginType' : 'local'
-			};
-			$http.post(api+'/login/signin',data).then(successCallback, errorCallback);
-			function successCallback(response){
-				localStorage.setItem('token_admin', response.data.token);
-				$location.path('/admin-main-panel');
-			}
-			function errorCallback(error){
-				var error_msg = "Error " + error.status + ": " + error.data;
-				console.log(error_msg);
-				$scope.error = error_msg;
-				$scope.pwdError = true;
-			}
+				var data = {
+					'email': 'admin@admin.com',
+					'passwd': $scope.password,
+					'g-recaptcha-response': vcRecaptchaService.getResponse($scope.recaptchaId),
+					'loginType' : 'local'
+				};
+			
+			
+				$http.post(api+'/login/signin',data).then(successCallback, errorCallback);
+				function successCallback(response){
+					localStorage.setItem('token_admin', response.data.token);
+					$location.path('/admin-main-panel');
+				}
+				function errorCallback(error){
+					var error_msg = "Error " + error.status + ": " + error.data;
+					$scope.error = error_msg;
+					$scope.pwdError = true;
+				}
+				
+			
 		}
-    };
+	};
+	
+    
 });
 
 // List of Users Data
-app_admin.controller('UserController', function($scope,$http) {
-	$http.get(api+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+app_admin.controller('UserController', function($scope,$http,$location,$window) {
+  if (typeof angular == 'undefined') {
+     window.location.replace("/main_url");
+  }
+	else {
+		$http.get(api+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 	function successCallback(response){
 		//Get response data
 		var users=response.data;
@@ -92,6 +112,8 @@ app_admin.controller('UserController', function($scope,$http) {
 		var error_msg = "Error " + error.status + ": " + error.data;
 		alert(error_msg);
 	}
+	}
+	
 });
 
 // Accounts and Hastags Data Binding
@@ -428,7 +450,7 @@ app_admin.controller('adminMenuCtrl', function ($scope,$location) {
     };
     $scope.logout =function() {
         localStorage.clear();
-        $location.url('/admin');
+        $location.path('/admin');
     };
 });
 
