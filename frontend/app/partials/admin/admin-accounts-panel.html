@@ -1,6 +1,6 @@
 <!-- Content of list of accounts view-->
 
-<div class="container" ng-app="ListAccounts" ng-controller="AccountController">
+<div class="container">
     <div class="row" >
         <!-- List with users -->
         <div class="col-xs-12 col-md-6">
@@ -30,6 +30,7 @@
         	<table class="table table-bordered">
 				<thead>
 					<tr>
+						<th class="text-center">Seguidos de {{user_select}}</th>
 						<th class="text-center">Hashtags de {{user_select}}</th>
 						<th class="text-center">Descripción de {{account_select}}</th>
 					</tr>
@@ -37,6 +38,7 @@
 				</thead>
 				<tbody>
 					<tr>
+						<td class="text-center"><pre>{{followed_select}}</pre></td>
 						<td class="text-center"><pre>{{hashtags_select}}</pre></td>
 						<td class="text-center"><pre>{{account_description}}</pre></td>
 					</tr>
