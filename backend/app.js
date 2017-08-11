@@ -2898,7 +2898,7 @@ var appRouter = function(app) {
     
      /**
      * @swagger
-     * /stats/user:
+     * /stats/users:
      *   get:
      *     tags:
      *       - Statistics 
