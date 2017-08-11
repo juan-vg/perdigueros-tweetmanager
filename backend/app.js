@@ -13,6 +13,7 @@ var uploadImages = require('./upload-images.js');
 var formidable = require('formidable');
 var login = require('./login.js');
 var adminStats = require('./admin-stats.js');
+var userStats = require('./user-stats.js');
 var tweets = require('./tweets.js');
 var verifyCaptcha = require('./verify-captcha.js');
 
@@ -2859,20 +2860,25 @@ var appRouter = function(app) {
         
     });
     
-    //STATS
-    app.get("/stats/hashtags", function(request, response) {
-
-
-    });
-    
-    app.get("/stats/followed-users", function(request, response) {
-
-
-    });
-    
+    //STATS    
     app.get("/stats/users", function(request, response) {
-
-
+        console.log("APP-GET-USER-STATS: Request stats.");
+        var accountID = { "token" : request.headers.token };
+        
+        userStats.get(accountID, function(err, res){
+            if(!err){
+                console.log("APP-GET-USER-STATS: OK ");
+                
+                response.writeHead(200, {"Content-Type": "application/json"});
+                response.write(JSON.stringify(res));
+            } else {
+                console.log("APP-GET-USER-STATS: Forbidden!!!");
+                
+                response.writeHead(403, {"Content-Type": "text/html"});
+                response.write("Forbidden");
+            }
+            response.end();
+        });
     });
     
      /**
