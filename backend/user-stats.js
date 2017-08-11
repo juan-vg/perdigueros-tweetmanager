@@ -1,6 +1,6 @@
 var tweetStatsModel = require("./models/tweet-stats");
-var hashtags = require("./models/hashtags");
-var followedUsers = require("./models/followed-users");
+var hashtagsModel = require("./models/hashtags");
+var followedUsersModel = require("./models/followed-users");
 var accVerificator = require('./account-verifications.js');
 var dbVerificator = require("./db-verifications");
 var TwitterPackage = require('twitter');
@@ -94,8 +94,7 @@ function tweetLikes(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet,
-            count: 100-i
+            tweet: mockTweet
         };
         result.push(entry);
     }
@@ -116,8 +115,7 @@ function tweetRetweets(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet,
-            count: 100-i
+            tweet: mockTweet
         };
         result.push(entry);
     }
@@ -138,8 +136,7 @@ function tweetLikesPerMonth(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet,
-            count: 100-i
+            tweet: mockTweet
         };
         result.push(entry);
     }
@@ -160,8 +157,7 @@ function tweetRetweetsPerMonth(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet,
-            count: 100-i
+            tweet: mockTweet
         };
         result.push(entry);
     }
@@ -182,8 +178,7 @@ function tweetLikesPerDay(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet,
-            count: 100-i
+            tweet: mockTweet
         };
         result.push(entry);
     }
@@ -204,8 +199,7 @@ function tweetRetweetsPerDay(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet,
-            count: 100-i
+            tweet: mockTweet
         };
         result.push(entry);
     }
@@ -261,7 +255,7 @@ function accFollowers(resData, callback){
 function hashtags(resData, callback){
 	var error, result = [];
     
-    hashtags.aggregate([
+    hashtagsModel.aggregate([
         { $group:{_id:{'hashtag' : "$hashtag"}, count:{ $sum: 1}}},
         { $sort:{count:-1}},
         { $limit: 10}
@@ -275,7 +269,7 @@ function hashtags(resData, callback){
                 for(var i=0; i<data.length; i++){
                     
                     var entry = {
-                        userId: data[i]._id.userId,
+                        hashtag: data[i]._id.hashtag,
                         count: data[i].count
                     };
                     result.push(entry);

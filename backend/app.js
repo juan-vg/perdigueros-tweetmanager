@@ -225,15 +225,15 @@ var appRouter = function(app) {
      *       "accFollowers":
      *         type: array
      *         description: Top 10 twitter accounts having more followers
-     *         example: [ptm-twitter-accountID-1, ptm-twitter-accountID-2, ...]
+     *         example: [{ptmTwitterAccountID: "accountID-1", count: 3780}, {ptmTwitterAccountID: "accountID-2", count: 2811}, ...]
      *       "hashtags":
      *         type: array
      *         description: Top 10 hashtags most used in the PTM app
-     *         example: ["hashtag1", "hashtag2", ...]
+     *         example: [{hashtag: "hashtag1", count: 102}, {hashtag: "hashtag2", count: 84}, ...]
      *       "followed":
      *         type: array
      *         description: Top 10 followed-users most used in the PTM app
-     *         example: ["twitter-user-name-1", "twitter-user-name-2", ...]
+     *         example: [{twitterUserName: "name1", count: 67}, {twitterUserName: "name2", count: 46}, ...]
      * 
      */
 
