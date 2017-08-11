@@ -197,27 +197,27 @@ var appRouter = function(app) {
      *       "tweetLikes":
      *         type: array
      *         description: Top 10 tweets having more likes
-     *         example: [tweet1, tweet2, ...]
+     *         example: [{tweet: "tweet1", count: 1245}, {tweet: "tweet2", count: 469}, ...]
      *       "tweetRetweets":
      *         type: array
      *         description: Top 10 tweets having more retweets
-     *         example: [tweet1, tweet2, ...]
+     *         example: [{tweet: "tweet1", count: 1356}, {tweet: "tweet2", count: 765}, ...]
      *       "tweetLikesPerMonth":
      *         type: array
      *         description: Top 10 tweets having more likes per month
-     *         example: [tweet1, tweet2, ...]
+     *         example: [{tweet: "tweet1", count: 596}, {tweet: "tweet2", count: 214}, ...]
      *       "tweetRetweetsPerMonth":
      *         type: array
      *         description: Top 10 tweets having more retweets per month
-     *         example: [tweet1, tweet2, ...]
+     *         example: [{tweet: "tweet1", count: 443}, {tweet: "tweet2", count: 381}, ...]
      *       "tweetLikesPerDay":
      *         type: array
      *         description: Top 10 tweets having more likes per day
-     *         example: [tweet1, tweet2, ...]
+     *         example: [{tweet: "tweet1", count: 235}, {tweet: "tweet2", count: 124}, ...]
      *       "tweetRetweetsPerDay":
      *         type: array
      *         description: Top 10 tweets having more retweets per day
-     *         example: [tweet1, tweet2, ...]
+     *         example: [{tweet: "tweet1", count: 179}, {tweet: "tweet2", count: 145}, ...]
      *       "tweetsPerDay":
      *         type: array
      *         description: Numer of tweets per day in the current month (from the first day)
