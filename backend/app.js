@@ -191,6 +191,40 @@ var appRouter = function(app) {
      *         type: string
      *         description: "The google captcha response"
      * 
+     *   UserStats:
+     *     type: "object"
+     *     properties:
+     *       "tweetLikes":
+     *         type: array
+     *         description: Top 10 tweets having more likes
+     *       "tweetRetweets":
+     *         type: array
+     *         description: Top 10 tweets having more retweets
+     *       "tweetLikesPerMonth":
+     *         type: array
+     *         description: Top 10 tweets having more likes per month
+     *       "tweetRetweetsPerMonth":
+     *         type: array
+     *         description: Top 10 tweets having more retweets per month
+     *       "tweetLikesPerDay":
+     *         type: array
+     *         description: Top 10 tweets having more likes per day
+     *       "tweetRetweetsPerDay":
+     *         type: array
+     *         description: Top 10 tweets having more retweets per day
+     *       "tweetsPerDay":
+     *         type: array
+     *         description: Numer of tweets per day in the current month (from the first day)
+     *       "accFollowers":
+     *         type: array
+     *         description: Top 10 twitter accounts having more followers
+     *       "hashtags":
+     *         type: array
+     *         description: Top 10 hashtags most used in the PTM app
+     *       "followed":
+     *         type: array
+     *         description: Top 10 followed-users most used in the PTM app
+     * 
      */
 
 
@@ -1029,7 +1063,7 @@ var appRouter = function(app) {
      *       500:
      *         description: Error inserting the twitter account into the database
      *       503:
-     *         description: Twitter service unavailable OR Wrong twitter-autentication data
+     *         description: Twitter service (error OR unavailable) OR Wrong twitter-autentication data
      */
     app.post("/twitter-accounts", function(request, response) {
         
@@ -1067,7 +1101,7 @@ var appRouter = function(app) {
                     console.log("APP-POST-ACCOUNT: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable OR Wrong twitter-autentication data");
+                    response.write("Twitter service (error OR unavailable) OR Wrong twitter-autentication data");
                     
                 } else {
                     console.log("APP-POST-ACCOUNT: Already exists");
@@ -1259,7 +1293,7 @@ var appRouter = function(app) {
      *       404:
      *         description: Unable to find the requested twitter account {id}
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.post("/twitter-accounts/:id/tweets/publish", function(request, response) {
         
@@ -1305,7 +1339,7 @@ var appRouter = function(app) {
                     console.log("APP-POST-TWEET-PUBLISH: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-POST-TWEET-PUBLISH: DB ERROR!!!");
@@ -1353,7 +1387,7 @@ var appRouter = function(app) {
      *       500:
      *         description: Error saving scheduled tweet
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.post("/twitter-accounts/:id/tweets/schedule", function(request, response) {
         
@@ -1403,7 +1437,7 @@ var appRouter = function(app) {
                     console.log("APP-POST-TWEET-SCHEDULE: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-POST-TWEET-SCHEDULE: DB ERROR!!!");
@@ -1447,7 +1481,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/user-timeline", function(request, response) {
         
@@ -1486,7 +1520,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-USER-TIMELINE: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-USER-TIMELINE: DB ERROR!!!");
@@ -1530,7 +1564,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/home-timeline", function(request, response) {
         
@@ -1569,7 +1603,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-HOME-TIMELINE: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-HOME-TIMELINE: DB ERROR!!!");
@@ -1613,7 +1647,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/scheduled", function(request, response) {
         
@@ -1652,7 +1686,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-SCHEDULED: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-SCHEDULED: DB ERROR!!!");
@@ -1696,7 +1730,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/mentions", function(request, response) {
         
@@ -1735,7 +1769,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-MENTIONS: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
@@ -1779,7 +1813,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/retweeted", function(request, response) {
         
@@ -1818,7 +1852,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-RETWEETED: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
@@ -1862,7 +1896,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/favorited", function(request, response) {
         
@@ -1901,7 +1935,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-FAVORITED: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
@@ -2430,7 +2464,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.post("/twitter-accounts/:id/followed-users", function(request, response) {
         
@@ -2467,10 +2501,10 @@ var appRouter = function(app) {
                     response.write("Followed user already exists for the provided twitter account");    
                     
                 } else if (data == "TWITTER ERROR") {
-                    console.log("APP-POST-ACCOUNT: Twitter service unavailable");
+                    console.log("APP-POST-FOLLOWED-USERS: Twitter service error OR unavailable");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
@@ -2860,7 +2894,33 @@ var appRouter = function(app) {
         
     });
     
-    //STATS    
+    //STATS  
+    
+     /**
+     * @swagger
+     * /stats/user:
+     *   get:
+     *     tags:
+     *       - Statistics 
+     *     description: Get user statistics
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: App and twitter usage statistics
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/definitions/UserStats'
+     *       403:
+     *         description: Forbidden
+     */ 
     app.get("/stats/users", function(request, response) {
         console.log("APP-GET-USER-STATS: Request stats.");
         var accountID = { "token" : request.headers.token };
@@ -2887,7 +2947,7 @@ var appRouter = function(app) {
      *   get:
      *     tags:
      *       - Statistics 
-     *     description: Get application statistics (ADMIN)
+     *     description: Get application statistics (ADMIN ONLY)
      *     parameters:
      *       - name: token
      *         in: header
@@ -2898,7 +2958,7 @@ var appRouter = function(app) {
      *       - text/html
      *     responses:
      *       200:
-     *         description: Statistics of last accesses, registries and downs
+     *         description: App usage statistics (last accesses, registries, downs, ...)
      *       403:
      *         description: Forbidden
      */
@@ -3000,8 +3060,8 @@ var appRouter = function(app) {
             function (err, urlId){
                 if(!err){
                     console.log("APP-POST-URLS: Short URL saved!");
-                    response.writeHead(201, {"Content-Type": "text/html"});
-                    response.write("Short URL saved! (ID="+urlId+")");
+                    response.writeHead(201, {"Content-Type": "application/json"});
+                    response.write("{id: " + urlId + "}");
                 } else {
                     console.log("APP-POST-URLS: DB ERROR!!!");
                     response.writeHead(500, {"Content-Type": "text/html"});
@@ -3096,8 +3156,8 @@ var appRouter = function(app) {
                   if(!err){
                       console.log("APP-POST-IMAGE: Image saved.");
 
-                      response.writeHead(201, {"Content-Type": "text/html"});
-                      response.write("Image saved (" + res + ").");
+                      response.writeHead(201, {"Content-Type": "application/json"});
+                      response.write("{id: " + res + "}");
 
                   } else {
                       console.log("APP-POST-IMAGE: Error while saving the image.");
@@ -3132,7 +3192,7 @@ var appRouter = function(app) {
      *       400:
      *         description: Params error
      *       503:
-     *         description: Captcha service unavailable
+     *         description: Captcha service error OR unavailable
      */
     app.post("/verify-captcha", function(request, response){
         
@@ -3153,10 +3213,10 @@ var appRouter = function(app) {
                 } else {
                     
                     if(data == "CAPTCHA ERROR"){
-                        console.log("APP-VERIFY-CAPTCHA: Captcha service unavailable");
+                        console.log("APP-VERIFY-CAPTCHA: Captcha service error OR unavailable");
                         
                         response.writeHead(503, {"Content-Type": "text/html"});
-                        response.write("Captcha service unavailable");
+                        response.write("Captcha service error OR unavailable");
                         
                     } else {
                         console.log("APP-VERIFY-CAPTCHA: " + data);

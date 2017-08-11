@@ -184,6 +184,8 @@ exports.post = function (accountID, user, callback){
                                             callback(error, data);
                                         });
                                     } else {
+                                        console.log("FOLLOWED-USERS-POST-ID: Twitter error: " + JSON.stringify(err));
+                                        
                                         error = true;
                                         data = "TWITTER ERROR";
                                         callback(error, data);

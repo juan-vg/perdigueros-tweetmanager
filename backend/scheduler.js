@@ -94,7 +94,9 @@ function tweetScheduler(callback){
                                                 callback(error, data);
                                             }
                                         );
-                                    } else {                                        
+                                    } else {
+                                        console.log("TWEET-SCHEDULER: Twitter error: " + JSON.stringify(err));
+                                                                              
                                         error = true;
                                         data = "TWITTER ERROR: " + err[0].message;
                                         callback(error, data);

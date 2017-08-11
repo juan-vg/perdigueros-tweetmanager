@@ -1,4 +1,6 @@
 var tweetStatsModel = require("./models/tweet-stats");
+var hashtags = require("./models/hashtags");
+var followedUsers = require("./models/followed-users");
 var accVerificator = require('./account-verifications.js');
 var dbVerificator = require("./db-verifications");
 var TwitterPackage = require('twitter');
@@ -224,8 +226,8 @@ function tweetsPerDay(resData, callback){
 	for(var i=0; i<23; i++){
         
         var entry = {
-            day: i+1
-            count: Math.floor((Math.random() * 100) + 1);
+            day: i+1,
+            count: Math.floor((Math.random() * 100) + 1)
         };
         result.push(entry);
     }
@@ -259,9 +261,8 @@ function accFollowers(resData, callback){
 function hashtags(resData, callback){
 	var error, result = [];
     
-    tweetStatsModel.aggregate([
-		{ $match: },
-        { $group:{_id:{'userId' : "$userId"}, count:{ $sum: 1}}},
+    hashtags.aggregate([
+        { $group:{_id:{'hashtag' : "$hashtag"}, count:{ $sum: 1}}},
         { $sort:{count:-1}},
         { $limit: 10}
         ],  function(err, data) {

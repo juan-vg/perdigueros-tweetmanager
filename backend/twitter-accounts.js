@@ -197,6 +197,8 @@ exports.postAccount = function(userToken, newAccount, callback){
                                 });
                                 
                             } else {
+                                console.log("TWITTER-ACCOUNTS-POST-ACCOUNT: Twitter error: " + JSON.stringify(err));
+                                
                                 error = true;
                                 result = "TWITTER ERROR";
                                 callback(error, result);
