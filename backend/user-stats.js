@@ -94,7 +94,8 @@ function tweetLikes(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet
+            tweet: mockTweet,
+            count: 100-i
         };
         result.push(entry);
     }
@@ -115,7 +116,8 @@ function tweetRetweets(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet
+            tweet: mockTweet,
+            count: 100-i
         };
         result.push(entry);
     }
@@ -136,7 +138,8 @@ function tweetLikesPerMonth(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet
+            tweet: mockTweet,
+            count: 100-i
         };
         result.push(entry);
     }
@@ -157,7 +160,8 @@ function tweetRetweetsPerMonth(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet
+            tweet: mockTweet,
+            count: 100-i
         };
         result.push(entry);
     }
@@ -178,7 +182,8 @@ function tweetLikesPerDay(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet
+            tweet: mockTweet,
+            count: 100-i
         };
         result.push(entry);
     }
@@ -199,7 +204,8 @@ function tweetRetweetsPerDay(resData, callback){
 	for(var i=0; i<10; i++){
         
         var entry = {
-            tweet: mockTweet
+            tweet: mockTweet,
+            count: 100-i
         };
         result.push(entry);
     }
