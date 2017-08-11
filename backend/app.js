@@ -197,33 +197,43 @@ var appRouter = function(app) {
      *       "tweetLikes":
      *         type: array
      *         description: Top 10 tweets having more likes
+     *         example: [tweet1, tweet2, ...]
      *       "tweetRetweets":
      *         type: array
      *         description: Top 10 tweets having more retweets
+     *         example: [tweet1, tweet2, ...]
      *       "tweetLikesPerMonth":
      *         type: array
      *         description: Top 10 tweets having more likes per month
+     *         example: [tweet1, tweet2, ...]
      *       "tweetRetweetsPerMonth":
      *         type: array
      *         description: Top 10 tweets having more retweets per month
+     *         example: [tweet1, tweet2, ...]
      *       "tweetLikesPerDay":
      *         type: array
      *         description: Top 10 tweets having more likes per day
+     *         example: [tweet1, tweet2, ...]
      *       "tweetRetweetsPerDay":
      *         type: array
      *         description: Top 10 tweets having more retweets per day
+     *         example: [tweet1, tweet2, ...]
      *       "tweetsPerDay":
      *         type: array
      *         description: Numer of tweets per day in the current month (from the first day)
+     *         example: [3, 7, 45, 83, 12, 0, 11, ...]
      *       "accFollowers":
      *         type: array
      *         description: Top 10 twitter accounts having more followers
+     *         example: [ptm-twitter-accountID-1, ptm-twitter-accountID-2, ...]
      *       "hashtags":
      *         type: array
      *         description: Top 10 hashtags most used in the PTM app
+     *         example: ["hashtag1", "hashtag2", ...]
      *       "followed":
      *         type: array
      *         description: Top 10 followed-users most used in the PTM app
+     *         example: ["twitter-user-name-1", "twitter-user-name-2", ...]
      * 
      */
 
@@ -2914,18 +2924,15 @@ var appRouter = function(app) {
      *     responses:
      *       200:
      *         description: App and twitter usage statistics
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/definitions/UserStats'
+     *         schema:
+     *           $ref: '#/definitions/UserStats'
      *       403:
      *         description: Forbidden
      */ 
     app.get("/stats/users", function(request, response) {
         console.log("APP-GET-USER-STATS: Request stats.");
-        var accountID = { "token" : request.headers.token };
         
-        userStats.get(accountID, function(err, res){
+        userStats.get(request.headers.token, function(err, res){
             if(!err){
                 console.log("APP-GET-USER-STATS: OK ");
                 
