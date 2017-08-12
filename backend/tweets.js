@@ -49,7 +49,7 @@ exports.publish = function (accountID, text, ip, callback){
                                         var tweetData = {
                                             date: new Date(),
                                             country: country,
-                                            accountId: data._id
+                                            userId: data._id
                                         };
                                         adminStats.saveTweet(tweetData);
                                     }

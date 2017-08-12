@@ -221,11 +221,11 @@ var appRouter = function(app) {
      *       "tweetsPerDay":
      *         type: array
      *         description: Numer of tweets per day in the current month (from the first day)
-     *         example: [3, 7, 45, 83, 12, 0, 11, ...]
+     *         example: [{day:1, count:3}, {day:2, count:31}, {day:11, count:23}, {day:12, count:35}, {day:17, count:97}, {day:26, count:0}, {day:28, count:2}, ...]
      *       "accFollowers":
      *         type: array
      *         description: Top 10 twitter accounts having more followers
-     *         example: [{ptmTwitterAccountID: "accountID-1", count: 3780}, {ptmTwitterAccountID: "accountID-2", count: 2811}, ...]
+     *         example: [{accId: "ptmTwitterAccountID-1", count: 3780}, {accId: "ptmTwitterAccountID-2", count: 2811}, ...]
      *       "hashtags":
      *         type: array
      *         description: Top 10 hashtags most used in the PTM app
@@ -233,7 +233,7 @@ var appRouter = function(app) {
      *       "followed":
      *         type: array
      *         description: Top 10 followed-users most used in the PTM app
-     *         example: [{twitterUserName: "name1", count: 67}, {twitterUserName: "name2", count: 46}, ...]
+     *         example: [{followed: "twitterUserScreenName-1", count: 67}, {followed: "twitterUserScreenName-2", count: 46}, ...]
      * 
      */
 
@@ -271,7 +271,9 @@ var appRouter = function(app) {
      */
     app.post("/login/signup", function(request, response) {
         
-        if(!request.body.name || !request.body.surname || !request.body.email || !request.body['g-recaptcha-response']){
+        var emailValidator = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        
+        if(!request.body.name || !request.body.surname || !request.body.email || !request.body['g-recaptcha-response'] || !emailValidator.test(request.body.email)){
             return response.status(400).send("Parameters error!");
         }
         
@@ -2912,7 +2914,7 @@ var appRouter = function(app) {
      *   get:
      *     tags:
      *       - Statistics 
-     *     description: Get user statistics
+     *     description: Get user statistics (ADMIN)
      *     parameters:
      *       - name: token
      *         in: header
