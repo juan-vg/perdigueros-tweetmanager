@@ -21,13 +21,11 @@ exports.get = function(token, callback){
 	};
 
 	// check the token and the userId
-	/*accVerificator.verifyUser(accountID, function(success, reason){
+	accVerificator.verifyUser(accountID, function(success, reason){
 
 		if(success){
             
-            var email = reason;*/
-            
-            var email = "maketheking@gmail.com";
+            var email = reason;
 			
 			data = { 
 				"tweetLikes" : {},
@@ -79,13 +77,13 @@ exports.get = function(token, callback){
 			hashtags(data, callbackFunc);
 			followed(data, callbackFunc);
 
-		/*} else {
+		} else {
 			error = true;
 			data = "FORBIDDEN";
 
 			callback(error, data);
 		}
-	});*/
+	});
 };
 
 // Top 10 tweets having more likes
