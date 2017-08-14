@@ -132,7 +132,7 @@ function tweetRetweets(resData, email, callback){
     callback(error);
 }
 
-// Top 10 tweets having more likes per month
+// Top 10 tweets having more likes in the current month
 function tweetLikesPerMonth(resData, email, callback){
 	// MOCKUP
     
@@ -155,7 +155,7 @@ function tweetLikesPerMonth(resData, email, callback){
     callback(error);
 }
 
-// Top 10 tweets having more retweets per month
+// Top 10 tweets having more retweets in the current month
 function tweetRetweetsPerMonth(resData, email, callback){
 	// MOCKUP
     
@@ -178,7 +178,7 @@ function tweetRetweetsPerMonth(resData, email, callback){
     callback(error);
 }
 
-// Top 10 tweets having more likes per day
+// Top 10 tweets having more likes in the current day
 function tweetLikesPerDay(resData, email, callback){
 	// MOCKUP
     
@@ -201,7 +201,7 @@ function tweetLikesPerDay(resData, email, callback){
     callback(error);
 }
 
-// Top 10 tweets having more retweets per day
+// Top 10 tweets having more retweets in the current day
 function tweetRetweetsPerDay(resData, email, callback){
 	// MOCKUP
     
