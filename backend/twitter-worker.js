@@ -61,3 +61,9 @@ exports.loadAccounts = function(){
 }
 
 loadAccounts();
+
+
+
+// stats agregate
+// db.twitterstats.aggregate([{$match: {userId:"1", tweetIdStr:"1"}}, {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }, 'day':{ $dayOfMonth: "$date"}}, count: {$sum: '$favorites'}}},{$sort:{ _id:1 }}])
+// db.twitterstats.aggregate([{$match: {userId:"1", tweetIdStr:"1"}}, {$group:{'_id': '', count: {$sum: '$favorites'}}},{$sort:{ _id:1 }}])

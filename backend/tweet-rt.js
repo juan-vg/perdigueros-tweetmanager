@@ -75,10 +75,7 @@ function streamFunc(index, callback){
 
                                 stream.on('data', function(event) {
                                     tweet = {
-                                        created_at: event.created_at,
-                                        full_name: event.user.name,
-                                        name: event.user.screen_name,
-                                        text: event.text
+                                        id_str: event.id_str
                                     };
                                     error = false;
                                     callback(error, tweet);
@@ -135,10 +132,7 @@ function streamFunc(index, callback){
 
                                 stream.on('data', function(event) {
                                     tweet = {
-                                        created_at: event.created_at,
-                                        full_name: event.user.name,
-                                        name: event.user.screen_name,
-                                        text: event.text
+                                        id_str: event.id_str
                                     };
                                     error = false;
                                     callback(error, tweet);
@@ -201,7 +195,13 @@ wss.on('connection', function connection(ws, req) {
     // get twitter account id from url path
     var regexp = /\/twitter-accounts\/(.*)\/tweets\/.*/g;
     var match = regexp.exec(url);
-    twitterAccountId = match[1];
+    if(match && match[1]){
+        twitterAccountId = match[1];
+    } else {
+        twitterAccountId = null;
+    }
+    
+    console.log(">> [RT]: NEW CONNECTION (TwAcc: " + twitterAccountId + ", Func: " + strFunc + ")");
     
     // save client
     var c = {
@@ -216,6 +216,8 @@ wss.on('connection', function connection(ws, req) {
     
     // define onMessage
     ws.on('message', function incoming(message) {
+        
+        var index=-1;
         
         // search client
         for(var i=0; i<clients.length; i++){
@@ -254,22 +256,39 @@ wss.on('connection', function connection(ws, req) {
                                 streamFunc(index, function(err, tweet){
                                         
                                     if(!err){
-                                        ws.send(JSON.stringify(tweet));
+                                        ws.send(JSON.stringify(tweet), function ack(error) {
+                                            if(error){
+                                                console.log(">> [RT]: ERROR: Closed socket");
+                                                ws.close();
+                                            }
+                                        });
                                     } else {
-                                        ws.send(tweet);
+                                        ws.send(tweet, function ack(error) {
+                                            if(error){
+                                                console.log(">> [RT]: ERROR: Closed socket");
+                                            }
+                                        });
                                         ws.close();
                                     }
                                 });
                                 
                             } else {
                                 console.log(">> [RT]: VALIDATION ERROR");
-                                ws.send("VALIDATION-ERROR: " + data);
+                                ws.send("VALIDATION-ERROR: " + data, function ack(error) {
+                                    if(error){
+                                        console.log(">> [RT]: ERROR: Closed socket");
+                                    }
+                                });
                                 ws.close();
                             }
                         });
                     } else {
                         console.log(">> [RT]: TWITTER ID NOT VALID");
-                        ws.send("TWITTER ID NOT VALID");
+                        ws.send("TWITTER ID NOT VALID", function ack(error) {
+                            if(error){
+                                console.log(">> [RT]: ERROR: Closed socket");
+                            }
+                        });
                         ws.close();
                     }
                 });
@@ -299,6 +318,7 @@ wss.on('connection', function connection(ws, req) {
             if(clients[index].stream){
                 clients[index].stream.destroy();
             }
+            console.log(">> [RT]: CLOSED CONNECTION (TwAcc: " + clients[index].twitterAccountId + ", Func: " + clients[index].streamFunc + ")");
             clients.splice(index, 1);
             numClients--;
         }

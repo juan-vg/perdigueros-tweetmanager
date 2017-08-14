@@ -221,7 +221,7 @@ var appRouter = function(app) {
      *       "tweetsPerDay":
      *         type: array
      *         description: Numer of tweets per day in the current month (from the first day)
-     *         example: [{day:1, count:3}, {day:2, count:31}, {day:11, count:23}, {day:12, count:35}, {day:17, count:97}, {day:26, count:0}, {day:28, count:2}, ...]
+     *         example: [{day: 1, count: 3}, {day: 2, count: 31}, {day: 11, count: 23}, {day: 12, count: 35}, {day: 17, count: 97}, {day: 26, count: 0}, {day: 28, count: 2}, ...]
      *       "accFollowers":
      *         type: array
      *         description: Top 10 twitter accounts having more followers
