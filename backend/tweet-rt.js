@@ -21,8 +21,6 @@ const wss = new WebSocketServer.Server({ port: SERVER_PORT }, function(err){
 mongoose.connect('mongodb://localhost:27017/ptm');
 
 // global vars
-//var clients=[];
-var numClients = 0;
 var clients = new HashMap();
 
 
@@ -220,10 +218,21 @@ wss.on('connection', function connection(ws, req) {
     };
     clients.set(ws, c);
     
+    var util = require('util');
+    
+    //console.log("SET: " + JSON.stringify(util.inspect(ws)));
+    //console.log("------------------------------------");
+    
     // define onMessage
     ws.on('message', function incoming(message) {
         
-        var client = clients.search(ws);
+        // custom search
+        var client = null;
+        clients.forEach(function(v, k){
+            if(k === ws){
+                client = v;
+            }
+        });
         
         // if exists & not validated yet
         if(client && !client.validated){
@@ -304,7 +313,13 @@ wss.on('connection', function connection(ws, req) {
     // define onClose
     ws.on('close', function incoming(message) {
         
-        var client = clients.search(ws);
+        // custom search
+        var client = null;
+        clients.forEach(function(v, k){
+            if(k === ws){
+                client = v;
+            }
+        });
         
         // if exists -> close stream & delete
         if(client){
@@ -319,7 +334,13 @@ wss.on('connection', function connection(ws, req) {
     // define onError
     ws.on('error', function incoming(message) {
         
-        var client = clients.search(ws);
+        // custom search
+        var client = null;
+        clients.forEach(function(v, k){
+            if(k === ws){
+                client = v;
+            }
+        });
         
         // if exists -> close stream & delete
         if(client){
