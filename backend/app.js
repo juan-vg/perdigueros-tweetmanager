@@ -2000,7 +2000,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.getAll(accountID,  function (err, data){
             
@@ -2079,7 +2079,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-GET-HASHTAGS: Retrieving a hashtag for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-HASHTAGS: Retrieving a hashtag for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.get(accountID, request.params.hashtag, function (err, data){
             
@@ -2170,7 +2170,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.post(accountID, request.body.hashtag, function (err, data){
             
@@ -2260,7 +2260,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-DELETE-HASHTAG: Deleting hashtag " + request.params.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-DELETE-HASHTAG: Deleting hashtag " + request.params.hashtag + " for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.delete(accountID, request.params.hashtag, function (err, data){
             
@@ -2337,7 +2337,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for twitterAccountId: " + accountID.twitterAccountId);
 
         followedUsers.getAll(accountID,  function (err, data){
 
@@ -2405,7 +2405,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-GET-FOLLOWED-USERS: Retrieving a followed user for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-FOLLOWED-USERS: Retrieving a followed user for twitterAccountId: " + accountID.twitterAccountId);
         
         followedUsers.get(accountID, request.params.user, function (err, data){
             
@@ -2489,7 +2489,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for twitterAccountId: " + accountID.twitterAccountId);
             
         followedUsers.post(accountID, request.body.newuser, function (err, data){
             
@@ -2568,7 +2568,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user + " for twitterAccountId: " + accountID.twitterAccountId);
 
         followedUsers.delete(accountID, request.params.user, function (err, data){
 
