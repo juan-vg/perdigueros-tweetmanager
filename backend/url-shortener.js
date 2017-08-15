@@ -5,27 +5,51 @@ var objectID = require('mongodb').ObjectID;
 exports.post = function (urlStr, callback){
 	
 	var error, data;
+    
+    urlsModel.find({url: urlStr}, function(err, dbData){
+        if(!err){
+            
+            if(dbData.length > 0){
+                console.log("URL-SHORTENER-POST: Existing URL Id: " + dbData[0]._id);
+                error = false;
+                data = dbData[0]._id;
+                
+                callback(error, data);
+                
+            } else {
+                
+                // Define data to insert
+                var dbUrls = new urlsModel();
+                dbUrls.url = urlStr;
+                
+                // Insert on MongoDB
+                dbUrls.save(function(err, result) {
+                    
+                    if (!err) {
+                        console.log("URL-SHORTENER-POST: Inserted URL Id: " + result._id);
+                        error = false;
+                        data = result._id;
+                        
+                    } else {
+                        console.log("URL-SHORTENER-POST: ERROR while inserting on DB!!!");
+                        error = true;
+                        data = null;
+                    }
+                    
+                    callback(error, data);
+                });
+            }
+            
+        } else {
+            console.log("URL-SHORTENER-POST: ERROR while finding on DB!!!");
+            error = true;
+            data = null;
+            
+            callback(error, data);
+        }
+    });
 	
-	// Define data to insert
-	var dbUrls = new urlsModel();
-	dbUrls.url = urlStr;
 	
-	// Insert on MongoDB
-	dbUrls.save(function(err, result) {
-		
-		if (!err) {
-			console.log("URL-SHORTENER-POST: Inserted URL Id: " + result._id);
-			error = false;
-			data = result._id;
-			
-		} else {
-			console.log("URL-SHORTENER-POST: ERROR while inserting on DB!!!");
-			error = true;
-			data = null;
-		}
-		
-		callback(error, data);
-	});
 };
 
 exports.get = function (urlId, callback){

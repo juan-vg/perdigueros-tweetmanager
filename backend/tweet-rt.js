@@ -243,7 +243,16 @@ wss.on('connection', function connection(ws, req) {
             if(message.search("token:") === 0 && message.length > 6){
                 
                 var token = message.substr(6);
-                console.log(">> [RT]: validating token " + token);
+                
+                var censoredToken;
+        
+                if(token && token.length > 10){
+                    censoredToken = "**********" + token.substr(10);
+                } else {
+                    censoredToken = token;
+                }
+                
+                console.log(">> [RT]: validating token " + censoredToken);
                 
                 // Check if ID is valid
                 dbVerificator.verifyDbId(twitterAccountId, function(success){

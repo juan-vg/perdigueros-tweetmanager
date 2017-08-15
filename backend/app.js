@@ -3007,6 +3007,7 @@ var appRouter = function(app) {
      *         description: The short URL-ID
      *         type: string
      *     produces:
+     *       - application/json
      *       - text/html
      *     responses:
      *       307:
@@ -3020,8 +3021,9 @@ var appRouter = function(app) {
             function (err, url){
                 if(!err){
                     console.log("APP-GET-URLS-ID: Requested URL is: " + url);
-                    response.writeHead(307, {"Content-Type": "text/html", Location: url});
-                    response.write("Redirecting to " + url);
+                    response.writeHead(307, {"Content-Type": "application/json", Location: url});
+                    var resp = {url: url}
+                    response.write(JSON.stringify(resp));
                 } else {
                     console.log("APP-GET-URLS-ID: Requested URL-ID not found!!!");
                     response.writeHead(404, {"Content-Type": "text/html"});
@@ -3050,6 +3052,7 @@ var appRouter = function(app) {
      *           $ref: "#/definitions/Urls"
      *     produces:
      *       - application/json
+     *       - text/html
      *     responses:
      *       201:
      *         description: The short URL was created successfully
@@ -3070,7 +3073,8 @@ var appRouter = function(app) {
                 if(!err){
                     console.log("APP-POST-URLS: Short URL saved!");
                     response.writeHead(201, {"Content-Type": "application/json"});
-                    response.write("{id: " + urlId + "}");
+                    var resp = {id: urlId}
+                    response.write(JSON.stringify(resp));
                 } else {
                     console.log("APP-POST-URLS: DB ERROR!!!");
                     response.writeHead(500, {"Content-Type": "text/html"});

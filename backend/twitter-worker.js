@@ -4,12 +4,23 @@ var twStatsModel = require("./models/twitter-stats");
 var twWorkerModel = require("./models/twitter-worker");
 var TwitterPackage = require('twitter');
 var objectID = require('mongodb').ObjectID;
-
+const BigInteger = require('./utilities/biginteger').BigInteger;
 
 
 var mongoose = require("mongoose");
 //database connection
 mongoose.connect('mongodb://localhost:27017/ptm');
+
+
+// global vars & consts
+
+// number of tweets to retrieve on every Twitter API request
+const COUNT = 20;
+
+// number of accounts analyzed at the same time (same thread)
+const LIMIT = 50;
+
+
 
 exports.loadAccounts = function(){
     
@@ -61,9 +72,7 @@ exports.loadAccounts = function(){
 }
 
 function start(ini){
-    
-    const LIMIT = 50;
-    
+
     twWorkerModel.find({}, {}, { skip: ini, limit: LIMIT }, function(err, dbData){
         if(!err){
             
@@ -115,7 +124,6 @@ function twitterWorker(dbData){
         
         var favorites = new HashMap();
         var retweets = new HashMap();
-        var query = {'count': COUNT};
         
         // create auth set
         var secret = {
@@ -126,7 +134,29 @@ function twitterWorker(dbData){
         };
         var Twitter = new TwitterPackage(secret);
         
-        twitterReqWorker(dbData, Twitter, favorites, retweets, query);
+        
+        var query;
+        var data = dbData[i];
+        
+        if(data.action === "ready"){
+            query = {'count': COUNT};
+            
+            // set working
+            twWorkerModel.update({'_id': data._id}, {$set: {action: "working"}}, function(err, dbData2){
+                if(!err){
+                    twitterReqWorker(data, Twitter, favorites, retweets, query);
+                } else {
+                    console.log("TWITTER-WORKER-TW-WORKER: DB ERROR (twWorker)");
+                }
+            });
+            
+        } else {
+            var max_id = BigInteger(data.oldestTweetId);
+            max_id = max_id.subtract(1);
+            query = {'count': COUNT, 'max_id': max_id.toString()};
+            
+            twitterReqWorker(data, Twitter, favorites, retweets, query);
+        }
     }
 }
 //module.exports.worker = worker;
@@ -139,7 +169,7 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query){
         
         if(!err){
 
-            //count = body.length;
+            
             
             for(var i=0; i<body.length; i++){
 
@@ -152,9 +182,17 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query){
             //save worker progress?
             
             //nueva query
+            //count = body.length;
+            // si count < COUNT preparar query para recorrer la parte superior del timeline
+            // si no, seguir bajando
+            
+            
             //twitterReqWorker(dbData, Twitter, favorites, retweets, query)
             
         } else {
+            // rate limit
+            
+            
             // save stats?
             // save worker progress
         }
