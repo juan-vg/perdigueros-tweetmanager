@@ -7,7 +7,7 @@ var app = angular.module('app');
 /**
  *  Controller for handle account table information.
  */
-app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService) {
+app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService, $location) {
     var accountCtrl = this;
     accountCtrl.active = false;
     $rootScope.activeAccount = accountCtrl.active;
@@ -29,6 +29,9 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
     })
         .catch(function (response) {
             if (response.status == 403) {
+                if (!localStorage.getItem('token')) {
+                    localStorage.clear();
+                }
                 AlertService.alert('Error', 'El usuario no tiene permiso para listar cuentas de Twitter.', 'Cerrar');
             }
             else if (response.status == 500) {
@@ -41,17 +44,15 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
      * @param account
      */
     accountCtrl.selectAccount = function (account) {
-        accountCtrl.active = !accountCtrl.active;
+        accountCtrl.active = account._id;
         $rootScope.activeAccount = accountCtrl.active;
         localStorage.setItem('selectedAccount', account._id);
     };
 
-    accountCtrl.createAccountModal = function () {
-        var modalInstance = $uibModal.open({
-            templateUrl: 'partials/modal/addAccount.html',
-            controller: 'accountModalCtrl',
-        });
+    accountCtrl.setClickedRow = function(index){
+        accountCtrl.selectedRow = index;
     }
+
 
     /**
      * SHOWS DELETE MODAL
@@ -91,8 +92,8 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
                 else if (response.status == 404) {
                     AlertService.alert('Error', 'No se encuentra el id de la cuenta a borrar.', 'Cerrar');
                 }
-                else if(response.status == 500){
-                    AlertService.alert('Error','Error borrando la cuenta de Twitter de la base de datos.','Cerrar');
+                else if (response.status == 500) {
+                    AlertService.alert('Error', 'Error borrando la cuenta de Twitter de la base de datos.', 'Cerrar');
                 }
             });
     }
@@ -122,18 +123,18 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
             AlertService.alert("La cuenta se ha reactivado correctamente", "La cuenta se ha reactivado correctamente", "Cerrar");
             $route.reload();
         })
-            .catch(function(response){
-                if(response.status==400){
+            .catch(function (response) {
+                if (response.status == 400) {
                     AlertService.alert('Error', "La cuenta seleccionada no es valida para realizar esta operación.", "Cerrar");
                 }
-                else if(response.status==403){
+                else if (response.status == 403) {
                     AlertService.alert("Error", "El usuario no es propietario de esta cuenta.", "Cerrar");
                 }
-                else if(response.status==404){
+                else if (response.status == 404) {
                     AlertService.alert("Error", "El sistema no encuentra el id de la cuenta seleccionada.", "Cerrar");
                 }
-                else if(response.status==500){
-                    AlertService.alert('Error',"Error reactivando la cuenta de Twitter seleccionada.", "Cerrar");
+                else if (response.status == 500) {
+                    AlertService.alert('Error', "Error reactivando la cuenta de Twitter seleccionada.", "Cerrar");
                 }
             });
     }

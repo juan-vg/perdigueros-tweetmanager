@@ -7,36 +7,36 @@
         <div class="form-group row">
             <label for="consumerKey" class="col-sm-2 col-form-label">Consumer key: </label>
             <div class="col-sm-10">
-                <input class=form-control" id="consumerKey" type="password" ng-model="$scope.consumerKey">
+                <input class=form-control" id="consumerKey" type="text" ng-model="consumerKey">
             </div>
         </div>
         <div class="form-group row">
             <label for="consumerSecret" class="col-sm-2 col-form-label"> Consumer secret: </label>
             <div class="col-sm-10">
-                 <input class=form-control" id="consumerSecret" type="password" ng-model="$scope.consumerSecret">
+                 <input class=form-control" id="consumerSecret" type="text" ng-model="consumerSecret">
             </div>
         </div>
         <div class="form-group row">
             <label for="accessToken" class="col-sm-2 col-form-label"> Access token: </label>
             <div class="col-sm-10">
-                <input class=form-control" id="accessToken" type="password" ng-model="$scope.accessToken">
+                <input class=form-control" id="accessToken" type="text" ng-model="accessToken">
             </div>
         </div>
         <div class="form-group row">
             <label for="accessTokenSecret" class="col-sm-2 col-form-label"> Access token secret: </label>
             <div class="col-sm-10">
-                <input class=form-control" id="accessTokenSecret" type="password" ng-model="$scope.accessTokenSecret">
+                <input class=form-control" id="accessTokenSecret" type="text" ng-model="accessTokenSecret">
             </div>
         </div>
         <div class="form-group row">
             <label for="description" class="col-sm-2 col-form-label">Añade una descripción: </label>
             <div class="col-sm-10">
-                <input class=form-control" id="description" type="text" ng-model="$scope.description">
+                <input class=form-control" id="description" type="text" ng-model="description">
             </div>
         </div>
         <div class="btn-group">
-            <button class="btn btn-primary" type="submit">Añadir cuenta</button>
-            <button class="btn btn-default" type="button" ng-click="cancel()" >Cancelar</button>
+            <button class="btn btn-primary" type="submit" >Crear cuenta</button>
+            <button class="btn btn-default" type="button" ng-click="cancel()" >Cerrar</button>
         </div>
     </form>
     </div>

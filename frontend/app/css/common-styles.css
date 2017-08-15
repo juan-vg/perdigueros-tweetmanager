@@ -145,3 +145,27 @@ body {
 #trashIcon {
     color: #91c5d6
 }
+#reactivateIcon {
+    color: #91c5d6
+}
+
+#reactivateView {
+    margin-top: 5em;
+}
+
+.limited {
+    background-color: #fdda7c;
+}
+
+.serious {
+    background-color: #fab567;
+}
+
+.catastrophic {
+    background-color: #f2635d;
+}
+
+.selected{
+    background-color : #337ab7;
+    color: white;
+}

@@ -9,7 +9,7 @@
        				<input type="password" id="password" name="password" ng-model="password" ng-minlength="8" ng-maxlength="20" required  />
    					<span ng-show="!myForm.password.$error.required && (myForm.password.$error.minlength || myForm.password.$error.maxlength) && myForm.password.$dirty"><br />Contraseña minimo 8 caracteres y maximo de 20<br /></span>
 					<div id="captcha" vc-recaptcha key="'6LcU-iEUAAAAANZLuIw0e1txZeTH1VAVSIl8RPKx'"></div>
-   					<span ng-show="pwdError"><br />{{error}}<br /></span>
+   					<span ng-show="pwdError"><br />Contraseña incorrecta<br /></span>
        				<br/>
    					<button id="button" type="submit" class="btn btn-primary btn-lg center-block" ng-disabled="!myForm.$valid"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Entrar</button>
 				</form>
