@@ -154,6 +154,7 @@ exports.post = function (accountID, hashtag, callback){
                 
                 if(success){
                     
+                    // remove '#' char
                     hashtag = hashtag.replace("#","");
                     hashtag = hashtag.replace("%23","");
                     

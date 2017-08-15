@@ -7,6 +7,7 @@ var accVerificator = require("./account-verifications.js");
 var dbVerificator = require("./db-verifications.js");
 var mongoose = require("mongoose");
 var objectID = require('mongodb').ObjectID;
+var HashMap = require('hashmap');
 
 const SERVER_PORT = 8889;
 
@@ -20,15 +21,16 @@ const wss = new WebSocketServer.Server({ port: SERVER_PORT }, function(err){
 mongoose.connect('mongodb://localhost:27017/ptm');
 
 // global vars
-var clients=[];
+//var clients=[];
 var numClients = 0;
+var clients = new HashMap();
 
 
-function streamFunc(index, callback){
+function streamFunc(client, callback){
     
     var error, tweet;
     
-    var twitterAccountId = clients[index].twitterAccountId;
+    var twitterAccountId = client.twitterAccountId;
     
     twiAccModel.find({"_id": new objectID(twitterAccountId)}, function(err, dbData){
         if(!err){
@@ -43,7 +45,7 @@ function streamFunc(index, callback){
             
             var Twitter = new TwitterPackage(secret);
             
-            if(clients[index].streamFunc == "hashtags"){
+            if(client.streamFunc == "hashtags"){
                 
                 hashtagsModel.find({"twitterAccountId":twitterAccountId}, function(err, dbData){
                     if(!err){
@@ -69,8 +71,9 @@ function streamFunc(index, callback){
                             Twitter.stream('statuses/filter', {track: query}, function(stream) {
                             
                                 // save stream handler
-                                if(!clients[index].stream){
-                                    clients[index].stream = stream;
+                                if(!client.stream){
+                                    client.stream = stream;
+                                    clients.set(client.ws, client);
                                 }
 
                                 stream.on('data', function(event) {
@@ -116,6 +119,9 @@ function streamFunc(index, callback){
                         // generate followed users list
                         for(var i=0; i<dbData.length; i++){
                             var userId = dbData[i].userId;
+                            userId = userId.replace("@","");
+                            userId = userId.replace("%40","");
+                            
                             list.push(userId);
                         }
                         
@@ -126,8 +132,9 @@ function streamFunc(index, callback){
                             Twitter.stream('statuses/filter', {follow: query}, function(stream) {
                             
                                 // save stream handler
-                                if(!clients[index].stream){
-                                    clients[index].stream = stream;
+                                if(!client.stream){
+                                    client.stream = stream;
+                                    clients.set(client.ws, client);
                                 }
 
                                 stream.on('data', function(event) {
@@ -211,25 +218,17 @@ wss.on('connection', function connection(ws, req) {
         'twitterAccountId': twitterAccountId, 
         'validated': false
     };
-    clients.push(c);
-    var numClient = numClients++;
+    clients.set(ws, c);
     
     // define onMessage
     ws.on('message', function incoming(message) {
         
-        var index=-1;
-        
-        // search client
-        for(var i=0; i<clients.length; i++){
-            if(ws === clients[i].ws){
-                index = i;
-            }
-        }
+        var client = clients.search(ws);
         
         // if exists & not validated yet
-        if(index >= 0 && !clients[index].validated){
+        if(client && !client.validated){
             
-            var twitterAccountId = clients[index].twitterAccountId;
+            var twitterAccountId = client.twitterAccountId;
             
             // if it is a validation message
             if(message.search("token:") === 0 && message.length > 6){
@@ -251,9 +250,10 @@ wss.on('connection', function connection(ws, req) {
                             if(success){
                                 console.log(">> [RT]: VALIDATION OK");
                                 
-                                clients[index].validated = true;
+                                client.validated = true;
+                                clients.set(client.ws, client);
                                 
-                                streamFunc(index, function(err, tweet){
+                                streamFunc(client, function(err, tweet){
                                         
                                     if(!err){
                                         ws.send(JSON.stringify(tweet), function ack(error) {
@@ -304,23 +304,31 @@ wss.on('connection', function connection(ws, req) {
     // define onClose
     ws.on('close', function incoming(message) {
         
-        var index=-1;
-        
-        // search client
-        for(var i=0; i<clients.length; i++){
-            if(ws === clients[i].ws){
-                index = i;
-            }
-        }
+        var client = clients.search(ws);
         
         // if exists -> close stream & delete
-        if(index >= 0){
-            if(clients[index].stream){
-                clients[index].stream.destroy();
+        if(client){
+            if(client.stream){
+                client.stream.destroy();
             }
-            console.log(">> [RT]: CLOSED CONNECTION (TwAcc: " + clients[index].twitterAccountId + ", Func: " + clients[index].streamFunc + ")");
-            clients.splice(index, 1);
-            numClients--;
+            console.log(">> [RT]: CLOSED CONNECTION (TwAcc: " + client.twitterAccountId + ", Func: " + client.streamFunc + ")");
+            clients.remove(client.ws);
+        }
+    });
+    
+    // define onError
+    ws.on('error', function incoming(message) {
+        
+        var client = clients.search(ws);
+        
+        // if exists -> close stream & delete
+        if(client){
+            if(client.stream){
+                client.stream.destroy();
+            }
+            console.log(">> [RT]: ONERROR: CLOSED CONNECTION (TwAcc: " + client.twitterAccountId + ", Func: " + client.streamFunc + ")");
+            clients.remove(client.ws);
+            ws.close();
         }
     });
 });
