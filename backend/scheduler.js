@@ -2,6 +2,9 @@ var TwitterPackage = require('twitter');
 var schedTweetsModel = require("./models/scheduled-tweets");
 var twiAccModel = require("./models/twitter-accounts");
 var userAccModel = require("./models/user-accounts");
+
+var twitterWorker = require("./twitter-worker.js");
+
 var objectID = require('mongodb').ObjectID;
  
 exports.tweetSchedulerUpdate = function(){
@@ -161,4 +164,14 @@ function userAccountsCleaning(callback){
             callback(error, data);
         }
     );
+}
+
+function twitterLoader(){
+    console.log("TWITER-LOADER: Start AT: " + new Date());
+    twitterWorker.loadAccounts();
+}
+
+function twitterTracker(){
+    console.log("TWITER-TRACKER: Start AT: " + new Date());
+    twitterWorker.start();
 }

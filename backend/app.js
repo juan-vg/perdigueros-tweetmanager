@@ -28,6 +28,17 @@ var dailyCleaningScheduling = schedule.scheduleJob('0 0 0 * * *', function(){
   scheduler.userAccountsCleaningUpdate();
 });
 
+/*
+// scheduler every 15 minutes
+var twitterLoaderScheduling = schedule.scheduleJob('0 0,15,30,45 * * * *', function(){
+  scheduler.twitterLoader();
+});
+
+// scheduler every 15 minutes (5 minutes offset)
+var twitterTrackerScheduling = schedule.scheduleJob('0 5,20,35,50 * * * *', function(){
+  scheduler.twitterTracker();
+});
+*/
 var appRouter = function(app) {
     
     /**

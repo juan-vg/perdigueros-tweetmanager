@@ -226,13 +226,7 @@ wss.on('connection', function connection(ws, req) {
     // define onMessage
     ws.on('message', function incoming(message) {
         
-        // custom search
-        var client = null;
-        clients.forEach(function(v, k){
-            if(k === ws){
-                client = v;
-            }
-        });
+        var client = clients.get(ws);
         
         // if exists & not validated yet
         if(client && !client.validated){
@@ -322,13 +316,7 @@ wss.on('connection', function connection(ws, req) {
     // define onClose
     ws.on('close', function incoming(message) {
         
-        // custom search
-        var client = null;
-        clients.forEach(function(v, k){
-            if(k === ws){
-                client = v;
-            }
-        });
+        var client = clients.get(ws);
         
         // if exists -> close stream & delete
         if(client){
@@ -343,13 +331,7 @@ wss.on('connection', function connection(ws, req) {
     // define onError
     ws.on('error', function incoming(message) {
         
-        // custom search
-        var client = null;
-        clients.forEach(function(v, k){
-            if(k === ws){
-                client = v;
-            }
-        });
+        var client = clients.get(ws);
         
         // if exists -> close stream & delete
         if(client){

@@ -5,24 +5,31 @@ var twWorkerModel = require("./models/twitter-worker");
 var TwitterPackage = require('twitter');
 var objectID = require('mongodb').ObjectID;
 const BigInteger = require('./utilities/biginteger').BigInteger;
-
-
-var mongoose = require("mongoose");
-//database connection
-mongoose.connect('mongodb://localhost:27017/ptm');
-
+var HashMap = require('hashmap');
 
 // global vars & consts
 
 // number of tweets to retrieve on every Twitter API request
 const COUNT = 20;
 
+// number of requests to be made to the Twitter API
+const REQ_COUNT = 5;
+
 // number of accounts analyzed at the same time (same thread)
 const LIMIT = 50;
 
 
 
-exports.loadAccounts = function(){
+/////////////////////// BORRAR
+var mongoose = require("mongoose");
+//database connection
+mongoose.connect('mongodb://localhost:27017/ptm');
+//loadAccounts();
+//start();
+////////////////////////
+
+
+function loadAccounts(){
     
     // get all tracked twitter account ids
     twWorkerModel.find({}, {accId:1, _id:0}, function(err, dbData){
@@ -70,15 +77,21 @@ exports.loadAccounts = function(){
         }
     });
 }
+module.exports.loadAccounts = loadAccounts;
+
 
 function start(ini){
 
+    // get batch
     twWorkerModel.find({}, {}, { skip: ini, limit: LIMIT }, function(err, dbData){
         if(!err){
             
             var count = dbData.length-1;
+            
+            // parse From mongoose schema To JSON
             var data = JSON.parse(JSON.stringify(dbData));
             
+            // CALLBACK -> send batch to async worker
             var callbackFunc = function(){
                 
                 if(count == 0){
@@ -87,7 +100,8 @@ function start(ini){
                     count--;
                 }
             };
-
+            
+            // get Twitter credentials
             for (var i=0; i<dbData.length; i++){
                 
                 data[i].info = {};
@@ -108,7 +122,7 @@ function start(ini){
             console.log("TWITTER-WORKER-START: DB ERROR (twWorker)");
         }
         
-        // recursive call
+        // If there are more entries in DB -> recursive call -> get another batch
         if(dbData.length == LIMIT){
             start(ini + LIMIT);
         }
@@ -135,74 +149,222 @@ function twitterWorker(dbData){
         var Twitter = new TwitterPackage(secret);
         
         
+        // make Twitter query
         var query;
         var data = dbData[i];
         
         if(data.action === "ready"){
             query = {'count': COUNT};
-            
-            // set working
-            twWorkerModel.update({'_id': data._id}, {$set: {action: "working"}}, function(err, dbData2){
-                if(!err){
-                    twitterReqWorker(data, Twitter, favorites, retweets, query);
-                } else {
-                    console.log("TWITTER-WORKER-TW-WORKER: DB ERROR (twWorker)");
-                }
-            });
+            data.action = "working";
             
         } else {
-            var max_id = BigInteger(data.oldestTweetId);
-            max_id = max_id.subtract(1);
-            query = {'count': COUNT, 'max_id': max_id.toString()};
+            // worker has not finished last time
             
-            twitterReqWorker(data, Twitter, favorites, retweets, query);
+            if(data.newestTweetId !== "-1" && data.newestTweetId === "-1"){
+                
+                // going up
+                var since_id = BigInteger(data.newestTweetId);
+                since_id = since_id.add(1);
+                query = {'count': COUNT, 'since_id': since_id.toString()};
+                
+            } else {
+                
+                // going down
+                var max_id = BigInteger(data.oldestTweetId);
+                max_id = max_id.subtract(1);
+                query = {'count': COUNT, 'max_id': max_id.toString()};
+            }
+
         }
+        
+        // send batch to Req-Worker
+        var numReq = 0;
+        twitterReqWorker(data, Twitter, favorites, retweets, query, numReq);
     }
 }
-//module.exports.worker = worker;
 
-
-
-function twitterReqWorker(dbData, Twitter, favorites, retweets, query){
+function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
     
-    Twitter.get('statuses/home_timeline', query, function(err, body){
+    // max REQ_COUNT recursive calls
+    if(numReq < REQ_COUNT){
         
-        if(!err){
-
+        // get tweet batch
+        Twitter.get('statuses/home_timeline', query, function(err, body){
             
-            
-            for(var i=0; i<body.length; i++){
+            if(!err){
+                
+                // save data avoiding repeated tweet IDs (fixes Twitter API error)
+                for(var i=0; i<body.length; i++){
 
-                favorites.set(body[i].id_str, body[i].favorite_count);
-                retweets.set(body[i].id_str, body[i].retweet_count);
+                    favorites.set(body[i].id_str, body[i].favorite_count);
+                    retweets.set(body[i].id_str, body[i].retweet_count);
+                }
+
+                count = body.length;
+                var progress = {action: "working"};
+                
+                if(count > 0){
+                    //save stats
+                    saveStats(dbData, favorites, retweets);
+                    
+                    // if first iteration -> save top tweet id
+                    if(dbData.oldestTweetId === "-1" && dbData.newestTweetId === "-1"){
+                        
+                        dbData.newestTweetId = body[0].id_str;
+                        progress.newestTweetId = body[0].id_str;
+                    }
+                }
+                
+                /////////////////////////
+                // If !query.max_id && !query.since_id && count < COUNT -> start going up
+                // else If !query.max_id && !query.since_id -> keep going down -> lastId = body[body.length].id_str;
+                
+                // If query.max_id && count < COUNT -> start going up
+                // else If query.max_id, keep going down -> lastId = body[body.length].id_str;
+                
+                // If query.since_id && count < COUNT -> Job end -> action: ready
+                // else If query.since_id, keep going up -> lastId = body[0].id_str;
+                /////////////////////////
+                
+                
+                // if it is the end of the timeline
+                if(count < COUNT){
+                    
+                    if(!query.since_id){
+                        //start going up
+                        
+                        delete query["max_id"];
+                        
+                        var since_id = BigInteger(dbData.newestTweetId);
+                        since_id = since_id.add(1);
+                        query.since_id = since_id;
+                        
+                        dbData.oldestTweetId = "-1";
+                        progress.oldestTweetId = "-1";
+                        
+                    } else {
+                        // change to ready status
+                        progress.action = "ready";
+                        progress.newestTweetId = "-1";
+                        progress.oldestTweetId = "-1";
+                    }
+                    
+                } else {
+                    
+                    if(!query.since_id){
+                        
+                        //keep going down -> lastId = body[body.length-1].id_str;
+                        var max_id = BigInteger(body[body.length-1].id_str);
+                        max_id = max_id.subtract(1);
+                        query.max_id = max_id;
+                        
+                        dbData.oldestTweetId = body[body.length-1].id_str;
+                        progress.oldestTweetId = body[body.length-1].id_str;
+                        
+                    } else {
+                        
+                        //keep going up -> lastId = body[0].id_str;
+                        var since_id = BigInteger(body[0].id_str);
+                        since_id = since_id.add(1);
+                        query.since_id = since_id;
+                        
+                        dbData.newestTweetId = body[0].id_str;
+                        progress.newestTweetId = body[0].id_str;
+                    }
+                }
+                
+                //save worker progress
+                twWorkerModel.update({'_id': dbData._id}, {$set: progress}, function(err, dbData2){
+                    if(err){
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: DB ERROR (twWorker)");
+                    }
+                });
+                
+                
+                // recursive call
+                if(progress.action !== "ready"){
+                    console.log("TWITTER-WORKER-TW-REQ-WORKER: Recursive call");
+                    twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq+1);
+                }
+                
+                
+            } else {
+                // rate limit -> stop
             }
-            
-            //save stats
-            
-            //save worker progress?
-            
-            //nueva query
-            //count = body.length;
-            // si count < COUNT preparar query para recorrer la parte superior del timeline
-            // si no, seguir bajando
-            
-            
-            //twitterReqWorker(dbData, Twitter, favorites, retweets, query)
-            
-        } else {
-            // rate limit
-            
-            
-            // save stats?
-            // save worker progress
-        }
-    });
+        });
+    }
 }
 
-exports.saveStats = function(){
+function saveStats(dbData, favorites, retweets){
     
-    
-};
+    // for each tweet
+    favorites.forEach(function(favs, id_str){
+        
+        
+        var retws = retweets.get(id_str);
+        
+        // get last (total) values
+        twStatsModel.aggregate([
+            {$match: {userId: dbData.userId, tweetIdStr: id_str}}, 
+            {$group:{'_id': '', countfavs: {$sum: '$favorites'}, countretws: {$sum: '$retweets'}}}], 
+            
+            function(err, dbData2){
+                
+                if(!err){
+                    
+                    // if there is previous data
+                    if(dbData2.length > 0){
+                        
+                        // get diff
+                        favs = favs - dbData2[0].countfavs;
+                        retws = retws - dbData2[0].countretws;
+                        
+                        // if there are differences between previous data and current data 
+                        if(favs > 0 || retws > 0){
+                            
+                            // insert
+                            var db = new twStatsModel();
+                            db.userId = dbData.userId;
+                            db.tweetIdStr = id_str;
+                            db.favorites = favs;
+                            db.retweets = retws;
+                            db.date = new Date();
+                            
+                            db.save(function(err, dbData2){
+                                if(err){
+                                    console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-save-1)");
+                                }
+                            });
+                        }
+
+                    } else {
+                        
+                        // if there is data
+                        if(favs > 0 || retws > 0){
+                            
+                            // insert
+                            var db = new twStatsModel();
+                            db.userId = dbData.userId;
+                            db.tweetIdStr = id_str;
+                            db.favorites = favs;
+                            db.retweets = retws;
+                            db.date = new Date();
+                            
+                            db.save(function(err, dbData2){
+                                if(err){
+                                    console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-save-2)");
+                                }
+                            });
+                        }
+                    }
+                    
+                } else {
+                    console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-aggregate)");
+                }
+            }
+        );
+    });
+}
 // stats agregate
 // db.twitterstats.aggregate([{$match: {userId:"1", tweetIdStr:"1"}}, {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }, 'day':{ $dayOfMonth: "$date"}}, count: {$sum: '$favorites'}}},{$sort:{ _id:1 }}])
-// db.twitterstats.aggregate([{$match: {userId:"1", tweetIdStr:"1"}}, {$group:{'_id': '', count: {$sum: '$favorites'}}},{$sort:{ _id:1 }}])
+// db.twitterstats.aggregate([{$match: {userId:"1", tweetIdStr:"1"}}, {$group:{'_id': '', countfavs: {$sum: '$favorites'}, countretws: {$sum: '$retweets'}}},{$sort:{ _id:1 }}])
