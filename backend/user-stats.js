@@ -101,18 +101,14 @@ function tweetLikes(resData, email, callback){
             if(email === "ADMIN"){
                 query = {};
             } else {
-                query = {userId: dbData[0]._id.valueOf()};
+                query = {userId: dbData[0]._id.toString()};
             }
-            
-            console.log("DBDATA2: " + JSON.stringify(query));
             
             twitterStatsModel.aggregate([
                 {$match: query}, 
                 {$group:{'_id': {tweetId: '$tweetIdStr'}, count: {$sum: '$favorites'}}},
                 {$sort:{ count:-1 }},{ $limit: 10}],
                 function(err, dbData2){
-                    
-                    console.log("DBDATA2: " + JSON.stringify(dbData2));
                     
                     if(!err){
                         for(var i=0; i<dbData2.length; i++){
@@ -123,8 +119,6 @@ function tweetLikes(resData, email, callback){
                                 count: dbData2[i].count
                             };
                             result.push(entry);
-                            
-                            console.log("RESULT: " + JSON.stringify(result));
                         }
                         
                         console.log("USER-STATS-tweetLikes: Stats obtained");
@@ -169,7 +163,7 @@ function tweetRetweets(resData, email, callback){
             if(email === "ADMIN"){
                 query = {};
             } else {
-                query = {userId: dbData[0]._id};
+                query = {userId: dbData[0]._id.toString()};
             }
             
             twitterStatsModel.aggregate([
@@ -238,7 +232,7 @@ function tweetLikesPerMonth(resData, email, callback){
             if(email === "ADMIN"){
                 query = {"date": {$lte: maxDate, $gte: minDate}};
             } else {
-                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+                query = {userId: dbData[0]._id.toString(), "date": {$lte: maxDate, $gte: minDate}};
             }
             
             twitterStatsModel.aggregate([
@@ -307,7 +301,7 @@ function tweetRetweetsPerMonth(resData, email, callback){
             if(email === "ADMIN"){
                 query = {"date": {$lte: maxDate, $gte: minDate}};
             } else {
-                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+                query = {userId: dbData[0]._id.toString(), "date": {$lte: maxDate, $gte: minDate}};
             }
             
             twitterStatsModel.aggregate([
@@ -374,7 +368,7 @@ function tweetLikesPerDay(resData, email, callback){
             if(email === "ADMIN"){
                 query = {"date": {$lte: maxDate, $gte: minDate}};
             } else {
-                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+                query = {userId: dbData[0]._id.toString(), "date": {$lte: maxDate, $gte: minDate}};
             }
             
             twitterStatsModel.aggregate([
@@ -441,7 +435,7 @@ function tweetRetweetsPerDay(resData, email, callback){
             if(email === "ADMIN"){
                 query = {"date": {$lte: maxDate, $gte: minDate}};
             } else {
-                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+                query = {userId: dbData[0]._id.toString(), "date": {$lte: maxDate, $gte: minDate}};
             }
             
             twitterStatsModel.aggregate([
@@ -510,7 +504,7 @@ function tweetsPerDay(resData, email, callback){
             if(email === "ADMIN"){
                 query = {"date": {$lte: maxDate, $gte: minDate}};
             } else {
-                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+                query = {userId: dbData[0]._id.toString(), "date": {$lte: maxDate, $gte: minDate}};
             }
             
             tweetStatsModel.aggregate([
