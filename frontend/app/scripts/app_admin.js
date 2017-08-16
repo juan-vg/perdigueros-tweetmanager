@@ -1,7 +1,7 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app_admin', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule']);
+angular.module('app_admin', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule','chart.js']);
 
 //variable for manage the main module
 var app_admin = angular.module("app_admin");
