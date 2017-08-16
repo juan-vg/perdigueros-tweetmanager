@@ -102,6 +102,7 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
         }
         // else redirects to signin view
         else {
+            localStorage.clear();
             $location.url('/');
         }
 
@@ -113,7 +114,7 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
  * Otherwise, treat posibble errors.
  */
 
-app.controller('signupCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+app.controller('signupCtrl', ['$scope', '$http', '$location','AlertService', function ($scope, $http, $location,AlertService) {
     $scope.postData = function () {
         var data = {
             'name': $scope.name,
@@ -149,7 +150,7 @@ app.controller('signupCtrl', ['$scope', '$http', '$location', function ($scope, 
 /**
  * Create the validateCtrl, verify the e-mail and the code and redirect to 'first-login' page
  */
-app.controller('validateCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+app.controller('validateCtrl', ['$scope', '$http', '$location','AlertService', function ($scope, $http, $location,AlertService) {
     var mail = "";
     $scope.validate = function () {
         var data = {
@@ -207,7 +208,7 @@ app.controller('validateCtrl', ['$scope', '$http', '$location', function ($scope
 /**
  * Create the firstLoginCtrl, verify the e-mail and update passwords
  */
-app.controller('firstLoginCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+app.controller('firstLoginCtrl', ['$scope', '$http', '$location','AlertService', function ($scope, $http, $location,AlertService) {
     $scope.firstlogin = function () {
         var data = {
             'email': $scope.email,
@@ -240,13 +241,14 @@ app.controller('firstLoginCtrl', ['$scope', '$http', '$location', function ($sco
 /**
  * Create the forgotPasswdCtrl, that manages the forgotView .
  */
-app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location', function ($scope, $http, $location) {
+app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location','AlertService', function ($scope, $http, $location,AlertService) {
     $scope.remember = function () {
         var data = {
             'email': $scope.emailForgot
         };
         $http.post('http://zaratech-ptm.ddns.net:8888/login/remember', data
         ).then(function (response) {
+            AlertService.alert('Enhorabuena','Se ha enviado su nueva contraseña por correo','Cerrar');
                 $location.url('/');
             },
             //status code errors
@@ -279,8 +281,9 @@ app.controller('dashboardCtrl', function ($rootScope, $location, $scope, $http, 
     };
     $http(req).then(function (response) {
         var name = response.data[0].email.substring(0, response.data[0].email.lastIndexOf("@"));
-        console.log(name);
         $rootScope.currentUser = name;
+        console.log(response);
+        $rootScope.currentUserId = "";
     })
     //error
         .catch(function (response) {
@@ -319,6 +322,64 @@ app.controller('userMenuCtrl', function ($scope, AlertService, $location) {
     }
 
 });
+/**
+ * Angular controller which reactives an user account
+ */
+app.controller('reactivateCtrl',function($http,AlertService,$auth) {
+    var vm = this;
 
+    // Local Login function
+    this.reactivate = function (provider) {
+        var data = {
+            'email': vm.email,
+            'passwd': vm.passwd,
+            'g-recaptcha-response': vm.captchaResponse,
+            'loginType': provider,
+            'code': ''
+        };
+        if (data.loginType != 'local') {
+            $auth.authenticate(provider).then(function(response){
+                console.log(response);
+                data.code = response.access_token;
+                $http.post('http://zaratech-ptm.ddns.net:8888/login/reactivate', data)
+                    .then(function (response) {
+                        AlertService.alert('Enhorabuena', 'Se ha reactivado tu cuenta correctamente', 'Cerrar');
+                    });
+            });
+        }
+        else {
+            // Sends 'code' and 'loginType' to backend
+            $http.post('http://zaratech-ptm.ddns.net:8888/login/reactivate', data)
+                .then(function (response) {
+                    AlertService.alert('Enhorabuena', 'Se ha reactivado tu cuenta correctamente', 'Cerrar');
+                })
+                .catch(function (response) {
+                    if (response.status == 400) {
+                        AlertService.alert('Captcha', 'No se ha validado correctamente el captcha.Repita el proceso.', 'Cerrar');
+                    }
+                    else if (response.status == 401) {
+                        AlertService.alert('Datos incorrectos', 'Revise los datos ingresados en el formulario de logueo.', 'Cerrar');
+                    }
+                    else if (response.status == 409) {
+                        AlertService.alert('Validar la cuenta', 'La cuenta esta pendiente de ser validada. Por favor valídela. ', 'Cerrar');
+                    }
+                    else if (response.status == 459) {
+                        AlertService.alert('Cambie su contraseña', 'Todavía no ha cambiado la contraseña generada por defecto.', 'Cerrar');
+                    }
+                    else if (response.status == 460) {
+
+                        AlertService.alert('Datos incorrectos', 'Revise los datos ingresados en el formulario de logueo.', 'Cerrar');
+                    }
+                    else if (response.status == 500) {
+                        AlertService.alert('DB error', 'Error en la base de datos.Disculpe las molestias.', 'Cerrar');
+                    }
+                    else if (response.status == 503) {
+                        AlertService.alert('Error externo', 'Error de logueo por causas externas(Facebook,Google,OpenID).', 'Cerrar');
+                    }
+                });
+        }
+    }
+
+});
 
 

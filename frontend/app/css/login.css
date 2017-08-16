@@ -7,6 +7,7 @@
         margin-left: 25%;
     }
 }
+
 /*Title styles(Inicia sesión o registrate)*/
 .omb_login .omb_authTitle {
     text-align: center;
@@ -17,16 +18,26 @@
 .omb_login .omb_socialButtons a {
     font-size: 16px;
     text-align: center;
-    color: white; // In yourUse @body-bg
-    opacity:0.9;
+    color: white;
+/ / In yourUse @body-bg opacity: 0.9;
 }
+
 .omb_login .omb_socialButtons a:hover {
     color: white;
-    opacity:1;
+    opacity: 1;
 }
-.omb_login .omb_socialButtons .omb_btn-facebook {background: #3b5998;}
-.omb_login .omb_socialButtons .omb_btn-openid {background: #f7931e;}
-.omb_login .omb_socialButtons .omb_btn-google {background: #c32f10;}
+
+.omb_login .omb_socialButtons .omb_btn-facebook {
+    background: #3b5998;
+}
+
+.omb_login .omb_socialButtons .omb_btn-openid {
+    background: #f7931e;
+}
+
+.omb_login .omb_socialButtons .omb_btn-google {
+    background: #c32f10;
+}
 
 /*Styles for login selector(social networks or system credentials)*/
 .omb_login .omb_loginOr {
@@ -38,12 +49,14 @@
     padding-top: 0.5em;
     padding-bottom: 0.5em;
 }
+
 .omb_login .omb_loginOr .omb_hrOr {
     background-color: #cdcdcd;
     height: 1px;
     margin-top: 0px !important;
     margin-bottom: 0px !important;
 }
+
 .omb_login .omb_loginOr .omb_spanOr {
     display: block;
     position: absolute;
@@ -59,36 +72,28 @@
 .omb_login .omb_loginForm .input-group.i {
     width: 10em;
 }
+
 /*Stles for login form help-block */
-.omb_login .omb_loginForm  .help-block {
+.omb_login .omb_loginForm .help-block {
     color: red;
 }
 
 /*Media query for sizes greater than 768px(tablet or pc) -- forgot password component */
 @media (min-width: 768px) {
-    .omb_login .omb_forgotPwd  {
-        font-size:13px;
-        margin-top:10px;
+    .omb_login .omb_forgotPwd {
+        font-size: 13px;
+        margin-top: 10px;
         margin-bottom: 30px;
     }
 }
-
 
 @media (max-width: 768px) {
     .omb_login {
         padding-top: 50px;
     }
-    #welcomeHeader{
-        background-color:#337ab7;
-        color:white;
+
+    #welcomeHeader {
+        background-color: #337ab7;
+        color: white;
     }
 }
-
-
-
-
-
-
-
-
-
