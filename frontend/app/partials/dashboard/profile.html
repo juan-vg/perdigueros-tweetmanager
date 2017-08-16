@@ -59,7 +59,7 @@
                                 </strong>
                             </td>
                             <td class="text-primary">
-                                {{myInfo[0].registrationDate.toLocaleDateString("es-ES")}}
+                                {{myInfo[0].registrationDate | date:"dd/MM/yyyy 'a las' h:mma" }}
                             </td>
                         </tr>
                         <tr>
@@ -72,7 +72,7 @@
                                 <hr>
                             </td>
                             <td class="text-primary">
-                                {{myInfo[0].lastAccess}}
+                                {{myInfo[0].lastAccess | date:"dd/MM/yyyy 'a las' h:mma"}}
                             </td>
                         </tr>
                         <tr>
@@ -91,8 +91,13 @@
                                     </strong>
                                     <input type="text" ng-model="newPasswd" >
                                     <br>
-                                    <button type="submit" class="btn-primary">Cambiar contraseña</button>
+                                    <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
                                 </form>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button ng-click="showDeleteModal()" class="btn btn-danger">Borrar cuenta</button>
                             </td>
                         </tr>
                         </tbody>

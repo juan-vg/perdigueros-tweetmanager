@@ -1,7 +1,7 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app_admin', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule','chart.js']);
+angular.module('app_admin', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule']);
 
 //variable for manage the main module
 var app_admin = angular.module("app_admin");
@@ -50,5 +50,6 @@ app_admin.config(function ($routeProvider, $locationProvider) {
 
     /* */
     ;
+
     $locationProvider.html5Mode(true);
 });

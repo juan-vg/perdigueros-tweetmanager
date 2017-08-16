@@ -1,11 +1,12 @@
 /* Validate view styles
 -------------------------------------------------- */
-.input-validate{
+.input-validate {
     display: block;
     margin-left: 2em;
     margin-top: 2em;
 }
-.validate-form{
+
+.validate-form {
     display: block;
     margin-left: auto;
     margin-top: auto;
@@ -15,29 +16,32 @@
 /*Media query for sizes less than 768px(tablet or pc) -- remember me component */
 /* Dispositivos pequeños (tablets, anchura mayor o igual a 768px) */
 @media (min-width: 768px) {
-    .input-validate{
+    .input-validate {
         display: block;
         margin-left: 7em;
         margin-top: 2em;
-        padding-right:10em;
+        padding-right: 10em;
     }
 }
 
 /* Dispositivos medianos (ordenadores, anchura mayor o igual a 992px) */
 @media (min-width: 992px) {
-    #validateTitle{
+    #validateTitle {
         margin-top: 0em;
     }
-    #firstloginTitle{
-        margin-top:5em;
+
+    #firstloginTitle {
+        margin-top: 5em;
     }
-    .input-validate{
+
+    .input-validate {
         display: block;
         margin-left: 20em;
         margin-right: auto;
-        padding-right:3em;
+        padding-right: 3em;
     }
-    .validate-form{
+
+    .validate-form {
         display: block;
         margin-left: auto;
         margin-right: auto;
@@ -45,13 +49,14 @@
 }
 
 @media (min-width: 1200px) {
-    .input-validate{
+    .input-validate {
         display: block;
         margin-left: 26em;
         margin-right: auto;
-        padding-right:10em;
+        padding-right: 10em;
     }
-    .validate-form{
+
+    .validate-form {
         display: block;
         margin-left: auto;
         margin-right: auto;
