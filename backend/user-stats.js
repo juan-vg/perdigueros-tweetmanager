@@ -1,4 +1,5 @@
 var tweetStatsModel = require("./models/tweet-stats");
+var twitterStatsModel = require("./models/twitter-stats");
 var twitterAccModel = require("./models/twitter-accounts");
 var hashtagsModel = require("./models/hashtags");
 var followedUsersModel = require("./models/followed-users");
@@ -88,140 +89,404 @@ exports.get = function(token, callback){
 
 // Top 10 tweets having more likes
 function tweetLikes(resData, email, callback){
-	// MOCKUP
     
     var error, result = [];
     
-    console.log("USER-STATS-tweetLikes: Stats obtained");
-    
     error = false;
     
-	for(var i=0; i<10; i++){
-        
-        var entry = {
-            tweet: JSON.parse(mockTweet),
-            count: 100-i
-        };
-        result.push(entry);
-    }
-    
-    resData.tweetLikes = result;
-    callback(error);
+    usersModel.find({email: email}, function(err, dbData){
+        if(!err && (dbData.length > 0 || email === "ADMIN")){
+            
+            var query;
+            if(email === "ADMIN"){
+                query = {};
+            } else {
+                query = {userId: dbData[0]._id.valueOf()};
+            }
+            
+            console.log("DBDATA2: " + JSON.stringify(query));
+            
+            twitterStatsModel.aggregate([
+                {$match: query}, 
+                {$group:{'_id': {tweetId: '$tweetIdStr'}, count: {$sum: '$favorites'}}},
+                {$sort:{ count:-1 }},{ $limit: 10}],
+                function(err, dbData2){
+                    
+                    console.log("DBDATA2: " + JSON.stringify(dbData2));
+                    
+                    if(!err){
+                        for(var i=0; i<dbData2.length; i++){
+                            var entry = {
+                                tweet: {
+                                        id_str: dbData2[i]._id.tweetId
+                                },
+                                count: dbData2[i].count
+                            };
+                            result.push(entry);
+                            
+                            console.log("RESULT: " + JSON.stringify(result));
+                        }
+                        
+                        console.log("USER-STATS-tweetLikes: Stats obtained");
+                        resData.tweetLikes = result;
+                        callback(error);
+                        
+                    } else {
+                        console.log("USER-STATS-tweetLikes: DB Error (TwitterStats)");
+                    
+                        error = true;
+                        resData.tweetLikes = [];
+                        callback(error); 
+                    }
+                });
+            
+        } else {
+            
+            if(!err) {
+                console.log("USER-STATS-tweetLikes: Not Found");
+            } else {
+                console.log("USER-STATS-tweetLikes: DB Error (Users)");
+            }
+
+            error = true;
+            resData.tweetLikes = [];
+            callback(error);
+        }
+    });
 }
 
 // Top 10 tweets having more retweets
 function tweetRetweets(resData, email, callback){
-	// MOCKUP
-    
+	
     var error, result = [];
-    
-    console.log("USER-STATS-tweetRetweets: Stats obtained");
     
     error = false;
     
-	for(var i=0; i<10; i++){
-        
-        var entry = {
-            tweet: JSON.parse(mockTweet),
-            count: 100-i
-        };
-        result.push(entry);
-    }
-    
-    resData.tweetRetweets = result;
-    callback(error);
+    usersModel.find({email: email}, function(err, dbData){
+        if(!err && (dbData.length > 0 || email === "ADMIN")){
+            
+            var query;
+            if(email === "ADMIN"){
+                query = {};
+            } else {
+                query = {userId: dbData[0]._id};
+            }
+            
+            twitterStatsModel.aggregate([
+                {$match: query}, 
+                {$group:{'_id': {tweetId: '$tweetIdStr'}, count: {$sum: '$retweets'}}},
+                {$sort:{ count:-1 }},{ $limit: 10}],
+                function(err, dbData2){
+                    
+                    if(!err){
+                        for(var i=0; i<dbData2.length; i++){
+                            var entry = {
+                                tweet: {
+                                        id_str: dbData2[i]._id.tweetId
+                                },
+                                count: dbData2[i].count
+                            };
+                            result.push(entry);
+                        }
+                        
+                        console.log("USER-STATS-tweetRetweets: Stats obtained");
+                        resData.tweetRetweets = result;
+                        callback(error);
+                        
+                    } else {
+                        console.log("USER-STATS-tweetRetweets: DB Error (TwitterStats)");
+                    
+                        error = true;
+                        resData.tweetRetweets = [];
+                        callback(error); 
+                    }
+                });
+            
+        } else {
+            
+            if(!err) {
+                console.log("USER-STATS-tweetRetweets: Not Found");
+            } else {
+                console.log("USER-STATS-tweetRetweets: DB Error (Users)");
+            }
+
+            error = true;
+            resData.tweetRetweets = [];
+            callback(error);
+        }
+    });
 }
 
 // Top 10 tweets having more likes in the current month
 function tweetLikesPerMonth(resData, email, callback){
-	// MOCKUP
-    
+	
     var error, result = [];
-    
-    console.log("USER-STATS-tweetLikesPerMonth: Stats obtained");
     
     error = false;
     
-	for(var i=0; i<10; i++){
-        
-        var entry = {
-            tweet: JSON.parse(mockTweet),
-            count: 100-i
-        };
-        result.push(entry);
-    }
-    
-    resData.tweetLikesPerMonth = result;
-    callback(error);
+    usersModel.find({email: email}, function(err, dbData){
+        if(!err && (dbData.length > 0 || email === "ADMIN")){
+            
+            var maxDate = new Date();
+            var minDate = new Date();
+            minDate = minDate.setUTCHours(0,0,0,0);
+            minDate = new Date(minDate);
+            minDate = minDate.setUTCDate(1);
+            minDate = new Date(minDate);
+            
+            var query;
+            if(email === "ADMIN"){
+                query = {"date": {$lte: maxDate, $gte: minDate}};
+            } else {
+                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+            }
+            
+            twitterStatsModel.aggregate([
+                {$match: query}, 
+                {$group:{'_id': {tweetId: '$tweetIdStr'}, count: {$sum: '$favorites'}}},
+                {$sort:{ count:-1 }},{ $limit: 10}],
+                function(err, dbData2){
+                    
+                    if(!err){
+                        for(var i=0; i<dbData2.length; i++){
+                            var entry = {
+                                tweet: {
+                                        id_str: dbData2[i]._id.tweetId
+                                },
+                                count: dbData2[i].count
+                            };
+                            result.push(entry);
+                        }
+                        
+                        console.log("USER-STATS-tweetLikesPerMonth: Stats obtained");
+                        resData.tweetLikesPerMonth = result;
+                        callback(error);
+                        
+                    } else {
+                        console.log("USER-STATS-tweetLikesPerMonth: DB Error (TwitterStats)");
+                    
+                        error = true;
+                        resData.tweetLikesPerMonth = [];
+                        callback(error); 
+                    }
+                });
+            
+        } else {
+            
+            if(!err) {
+                console.log("USER-STATS-tweetLikesPerMonth: Not Found");
+            } else {
+                console.log("USER-STATS-tweetLikesPerMonth: DB Error (Users)");
+            }
+
+            error = true;
+            resData.tweetLikesPerMonth = [];
+            callback(error);
+        }
+    });
 }
 
 // Top 10 tweets having more retweets in the current month
 function tweetRetweetsPerMonth(resData, email, callback){
-	// MOCKUP
-    
+	
     var error, result = [];
-    
-    console.log("USER-STATS-tweetRetweetsPerMonth: Stats obtained");
     
     error = false;
     
-	for(var i=0; i<10; i++){
-        
-        var entry = {
-            tweet: JSON.parse(mockTweet),
-            count: 100-i
-        };
-        result.push(entry);
-    }
-    
-    resData.tweetRetweetsPerMonth = result;
-    callback(error);
+    usersModel.find({email: email}, function(err, dbData){
+        if(!err && (dbData.length > 0 || email === "ADMIN")){
+            
+            var maxDate = new Date();
+            var minDate = new Date();
+            minDate = minDate.setUTCHours(0,0,0,0);
+            minDate = new Date(minDate);
+            minDate = minDate.setUTCDate(1);
+            minDate = new Date(minDate);
+            
+            var query;
+            if(email === "ADMIN"){
+                query = {"date": {$lte: maxDate, $gte: minDate}};
+            } else {
+                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+            }
+            
+            twitterStatsModel.aggregate([
+                {$match: query}, 
+                {$group:{'_id': {tweetId: '$tweetIdStr'}, count: {$sum: '$retweets'}}},
+                {$sort:{ count:-1 }},{ $limit: 10}],
+                function(err, dbData2){
+                    
+                    if(!err){
+                        for(var i=0; i<dbData2.length; i++){
+                            var entry = {
+                                tweet: {
+                                        id_str: dbData2[i]._id.tweetId
+                                },
+                                count: dbData2[i].count
+                            };
+                            result.push(entry);
+                        }
+                        
+                        console.log("USER-STATS-tweetRetweetsPerMonth: Stats obtained");
+                        resData.tweetRetweetsPerMonth = result;
+                        callback(error);
+                        
+                    } else {
+                        console.log("USER-STATS-tweetRetweetsPerMonth: DB Error (TwitterStats)");
+                    
+                        error = true;
+                        resData.tweetRetweetsPerMonth = [];
+                        callback(error); 
+                    }
+                });
+            
+        } else {
+            
+            if(!err) {
+                console.log("USER-STATS-tweetRetweetsPerMonth: Not Found");
+            } else {
+                console.log("USER-STATS-tweetRetweetsPerMonth: DB Error (Users)");
+            }
+
+            error = true;
+            resData.tweetRetweetsPerMonth = [];
+            callback(error);
+        }
+    });
 }
 
 // Top 10 tweets having more likes in the current day
 function tweetLikesPerDay(resData, email, callback){
-	// MOCKUP
-    
+	
     var error, result = [];
-    
-    console.log("USER-STATS-tweetLikesPerDay: Stats obtained");
     
     error = false;
     
-	for(var i=0; i<10; i++){
-        
-        var entry = {
-            tweet: JSON.parse(mockTweet),
-            count: 100-i
-        };
-        result.push(entry);
-    }
-    
-    resData.tweetLikesPerDay = result;
-    callback(error);
+    usersModel.find({email: email}, function(err, dbData){
+        if(!err && (dbData.length > 0 || email === "ADMIN")){
+            
+            var maxDate = new Date();
+            var minDate = new Date();
+            minDate = minDate.setUTCHours(0,0,0,0);
+            minDate = new Date(minDate);
+            
+            var query;
+            if(email === "ADMIN"){
+                query = {"date": {$lte: maxDate, $gte: minDate}};
+            } else {
+                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+            }
+            
+            twitterStatsModel.aggregate([
+                {$match: query}, 
+                {$group:{'_id': {tweetId: '$tweetIdStr'}, count: {$sum: '$favorites'}}},
+                {$sort:{ count:-1 }},{ $limit: 10}],
+                function(err, dbData2){
+                    
+                    if(!err){
+                        for(var i=0; i<dbData2.length; i++){
+                            var entry = {
+                                tweet: {
+                                        id_str: dbData2[i]._id.tweetId
+                                },
+                                count: dbData2[i].count
+                            };
+                            result.push(entry);
+                        }
+                        
+                        console.log("USER-STATS-tweetLikesPerDay: Stats obtained");
+                        resData.tweetLikesPerDay = result;
+                        callback(error);
+                        
+                    } else {
+                        console.log("USER-STATS-tweetLikesPerDay: DB Error (TwitterStats)");
+                    
+                        error = true;
+                        resData.tweetLikesPerDay = [];
+                        callback(error); 
+                    }
+                });
+            
+        } else {
+            
+            if(!err) {
+                console.log("USER-STATS-tweetLikesPerDay: Not Found");
+            } else {
+                console.log("USER-STATS-tweetLikesPerDay: DB Error (Users)");
+            }
+
+            error = true;
+            resData.tweetLikesPerDay = [];
+            callback(error);
+        }
+    });
 }
 
 // Top 10 tweets having more retweets in the current day
 function tweetRetweetsPerDay(resData, email, callback){
-	// MOCKUP
-    
+	
     var error, result = [];
-    
-    console.log("USER-STATS-tweetRetweetsPerDay: Stats obtained");
     
     error = false;
     
-	for(var i=0; i<10; i++){
-        
-        var entry = {
-            tweet: JSON.parse(mockTweet),
-            count: 100-i
-        };
-        result.push(entry);
-    }
-    
-    resData.tweetRetweetsPerDay = result;
-    callback(error);
+    usersModel.find({email: email}, function(err, dbData){
+        if(!err && (dbData.length > 0 || email === "ADMIN")){
+            
+            var maxDate = new Date();
+            var minDate = new Date()
+            minDate = minDate.setUTCHours(0,0,0,0);
+            minDate = new Date(minDate);
+            
+            var query;
+            if(email === "ADMIN"){
+                query = {"date": {$lte: maxDate, $gte: minDate}};
+            } else {
+                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
+            }
+            
+            twitterStatsModel.aggregate([
+                {$match: query}, 
+                {$group:{'_id': {tweetId: '$tweetIdStr'}, count: {$sum: '$retweets'}}},
+                {$sort:{ count:-1 }},{ $limit: 10}],
+                function(err, dbData2){
+                    
+                    if(!err){
+                        for(var i=0; i<dbData2.length; i++){
+                            var entry = {
+                                tweet: {
+                                        id_str: dbData2[i]._id.tweetId
+                                },
+                                count: dbData2[i].count
+                            };
+                            result.push(entry);
+                        }
+                        
+                        console.log("USER-STATS-tweetRetweetsPerDay: Stats obtained");
+                        resData.tweetRetweetsPerDay = result;
+                        callback(error);
+                        
+                    } else {
+                        console.log("USER-STATS-tweetRetweetsPerDay: DB Error (TwitterStats)");
+                    
+                        error = true;
+                        resData.tweetRetweetsPerDay = [];
+                        callback(error); 
+                    }
+                });
+            
+        } else {
+            
+            if(!err) {
+                console.log("USER-STATS-tweetRetweetsPerDay: Not Found");
+            } else {
+                console.log("USER-STATS-tweetRetweetsPerDay: DB Error (Users)");
+            }
+
+            error = true;
+            resData.tweetRetweetsPerDay = [];
+            callback(error);
+        }
+    });
 }
 
 // Number of tweets per day in the current month (from the first day)
@@ -235,13 +500,17 @@ function tweetsPerDay(resData, email, callback){
         if(!err && (dbData.length > 0 || email === "ADMIN")){
             
             var maxDate = new Date();
-            var minDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+            var minDate = new Date();
+            minDate = minDate.setUTCHours(0,0,0,0);
+            minDate = new Date(minDate);
+            minDate = minDate.setUTCDate(1);
+            minDate = new Date(minDate);
             
             var query;
             if(email === "ADMIN"){
-                query = {"date": {$lte: maxDate}, "date": {$gte: minDate}};
+                query = {"date": {$lte: maxDate, $gte: minDate}};
             } else {
-                query = {userId: dbData[0]._id, "date": {$lte: maxDate}, "date": {$gte: minDate}};
+                query = {userId: dbData[0]._id, "date": {$lte: maxDate, $gte: minDate}};
             }
             
             tweetStatsModel.aggregate([

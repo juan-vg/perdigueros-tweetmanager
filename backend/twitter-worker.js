@@ -21,9 +21,9 @@ const LIMIT = 50;
 
 
 /////////////////////// BORRAR
-var mongoose = require("mongoose");
+//var mongoose = require("mongoose");
 //database connection
-mongoose.connect('mongodb://localhost:27017/ptm');
+//mongoose.connect('mongodb://localhost:27017/ptm');
 //loadAccounts();
 //start();
 ////////////////////////
@@ -81,6 +81,12 @@ module.exports.loadAccounts = loadAccounts;
 
 
 function start(ini){
+    
+    if(!ini){
+        ini = 0;
+    }
+    
+    console.log("TWITTER-WORKER-START: " + ini);
 
     // get batch
     twWorkerModel.find({}, {}, { skip: ini, limit: LIMIT }, function(err, dbData){
@@ -124,6 +130,7 @@ function start(ini){
         
         // If there are more entries in DB -> recursive call -> get another batch
         if(dbData.length == LIMIT){
+            console.log("TWITTER-WORKER-START: Recursive call");
             start(ini + LIMIT);
         }
     });
@@ -132,6 +139,8 @@ module.exports.start = start;
 
 
 function twitterWorker(dbData){
+    
+    console.log("TWITTER-WORKER-TW-WORKER: Num Acc: " + dbData.length);
     
     // for each twitter account
     for (var i=0; i<dbData.length; i++){
@@ -177,6 +186,8 @@ function twitterWorker(dbData){
 
         }
         
+        console.log("TWITTER-WORKER-TW-WORKER: AccId: " + dbData[i].accId + " | Query: " + JSON.stringify(query));
+        
         // send batch to Req-Worker
         var numReq = 0;
         twitterReqWorker(data, Twitter, favorites, retweets, query, numReq);
@@ -187,6 +198,8 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
     
     // max REQ_COUNT recursive calls
     if(numReq < REQ_COUNT){
+        
+        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " | Query: " + JSON.stringify(query));
         
         // get tweet batch
         Twitter.get('statuses/home_timeline', query, function(err, body){
@@ -212,6 +225,8 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                         
                         dbData.newestTweetId = body[0].id_str;
                         progress.newestTweetId = body[0].id_str;
+                        
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> First");
                     }
                 }
                 
@@ -230,46 +245,58 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                 // if it is the end of the timeline
                 if(count < COUNT){
                     
-                    if(!query.since_id){
+                    if(!query.since_id && dbData.newestTweetId !== "-1"){
                         //start going up
                         
                         delete query["max_id"];
                         
                         var since_id = BigInteger(dbData.newestTweetId);
                         since_id = since_id.add(1);
-                        query.since_id = since_id;
+                        query.since_id = since_id.toString();
                         
                         dbData.oldestTweetId = "-1";
                         progress.oldestTweetId = "-1";
                         
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Start up");
+
                     } else {
                         // change to ready status
                         progress.action = "ready";
                         progress.newestTweetId = "-1";
                         progress.oldestTweetId = "-1";
+                        
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Finish");
                     }
                     
                 } else {
                     
                     if(!query.since_id){
                         
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " | IdStr: " + body[body.length-1].id_str);
+                        
                         //keep going down -> lastId = body[body.length-1].id_str;
                         var max_id = BigInteger(body[body.length-1].id_str);
                         max_id = max_id.subtract(1);
-                        query.max_id = max_id;
+                        query.max_id = max_id.toString();
+                        
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " | Query: " + JSON.stringify(query));
                         
                         dbData.oldestTweetId = body[body.length-1].id_str;
                         progress.oldestTweetId = body[body.length-1].id_str;
+                        
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Keep down");
                         
                     } else {
                         
                         //keep going up -> lastId = body[0].id_str;
                         var since_id = BigInteger(body[0].id_str);
                         since_id = since_id.add(1);
-                        query.since_id = since_id;
+                        query.since_id = since_id.toString();
                         
                         dbData.newestTweetId = body[0].id_str;
                         progress.newestTweetId = body[0].id_str;
+                        
+                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Keep up");
                     }
                 }
                 
@@ -290,8 +317,11 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                 
             } else {
                 // rate limit -> stop
+                console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> LIMIT : " + JSON.stringify(err));
             }
         });
+    } else {
+        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> RECURSION LIMIT");
     }
 }
 
