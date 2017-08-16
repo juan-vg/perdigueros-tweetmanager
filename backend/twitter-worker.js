@@ -192,7 +192,7 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
         console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " | Query: " + JSON.stringify(query));
         
         // get tweet batch
-        Twitter.get('statuses/home_timeline', query, function(err, body){
+        Twitter.get('statuses/user_timeline', query, function(err, body){
             
             if(!err){
                 
