@@ -92,7 +92,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 tweetCtrl.myTweets = response.data;
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'El id proveído no es váido o hay un error en los parametros. ', 'Cerrar');
+                    AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
                 }
                 else if (response.status == 403) {
                     AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
@@ -133,7 +133,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 tweetCtrl.scheduledTweets = response.data;
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'El id proveído no es váido o hay un error en los parametros. ', 'Cerrar');
+                    AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
                 }
                 else if (response.status == 403) {
                     AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
@@ -178,7 +178,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id proveído no es váido o el tweet es demasiado largo para ser publicado.Reviselo antes ', 'Cerrar');
+                        AlertService.alert('Error', 'El id provisto no es válido o el tweet es demasiado largo para ser publicado. Revíselo antes ', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
@@ -218,7 +218,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 AlertService.alert('Enhorabuena', 'El tweet se ha programado correctamente.', 'Cerrar');
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'El id proveído no es váido o hay un error en los parametros. ', 'Cerrar');
+                    AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
                 }
                 else if (response.status == 403) {
                     AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
@@ -256,7 +256,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id proveído no es váido o hay un error en los parametros. ', 'Cerrar');
+                        AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
@@ -298,7 +298,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id proveído no es váido o hay un error en los parametros. ', 'Cerrar');
+                        AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
@@ -341,7 +341,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id proveído no es váido o hay un error en los parametros. ', 'Cerrar');
+                        AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
