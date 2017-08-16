@@ -6,17 +6,20 @@
     margin-left: auto;
     margin-right: auto;
 }
-.input-signup{
+
+.input-signup {
     display: block;
     margin-left: 2em;
     margin-top: 2em;
 }
-.signup-form{
+
+.signup-form {
     display: block;
     margin-left: auto;
     margin-top: auto;
 }
-.perdiguero_signup{
+
+.perdiguero_signup {
     padding-top: 50px;
 }
 
@@ -29,11 +32,12 @@
         margin-left: auto;
         margin-right: auto;
     }
-    .input-signup{
+
+    .input-signup {
         display: block;
         margin-left: 7em;
         margin-top: 2em;
-        padding-right:10em;
+        padding-right: 10em;
     }
 }
 
@@ -43,15 +47,17 @@
         display: block;
         margin-left: 18em;
         margin-right: auto;
-        margin-top:2em;
+        margin-top: 2em;
     }
-    .input-signup{
+
+    .input-signup {
         display: block;
         margin-left: auto;
         margin-right: auto;
-        padding-right:3em;
+        padding-right: 3em;
     }
-    .signup-form{
+
+    .signup-form {
         display: block;
         margin-left: auto;
         margin-right: auto;
@@ -63,22 +69,19 @@
         display: block;
         margin-left: 24em;
         margin-right: auto;
-        margin-top:2em;
+        margin-top: 2em;
     }
-    .input-signup{
+
+    .input-signup {
         display: block;
         margin-left: auto;
         margin-right: auto;
-        padding-right:10em;
+        padding-right: 10em;
     }
-    .signup-form{
+
+    .signup-form {
         display: block;
         margin-left: auto;
         margin-right: auto;
     }
 }
-
-
-
-
-

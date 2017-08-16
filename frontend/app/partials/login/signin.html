@@ -55,7 +55,7 @@
                 </div>
 
                 <div class="form-group" id="captcha">
-                    <div style="transform:scale(1.00);transform-origin:0 0" theme="light"  vc-recaptcha key="'6LcU-iEUAAAAANZLuIw0e1txZeTH1VAVSIl8RPKx'" ng-model="login.captchaResponse"></div>
+                    <div  theme="light"  vc-recaptcha key="'6LcU-iEUAAAAANZLuIw0e1txZeTH1VAVSIl8RPKx'" ng-model="login.captchaResponse"></div>
                 </div>
 
                 <button  class="btn btn-lg btn-primary btn-block" type="submit">Inicia sesión</button>
@@ -63,13 +63,19 @@
         </div>
     </div>
     <div class="row omb_row-sm-offset-3">
-        <div class=" col-xs-12 col-sm-3">
-            <p class="omb_forgotPwd">
+        <div class=" col-xs-12 col">
+            <div>
                 <a href="/forgot-password">¿Olvidaste la contraseña?</a>
-            </p>
-            <div class="omb_forgotPwd">
+            </div>
+            <br>
+            <div>
                 <a href="/validate">¿Todavía no has validado tu cuenta?</a>
             </div>
+            <br>
+            <div>
+                <a href="/reactivate">Reactiva tu cuenta ahora</a>
+            </div>
+            <br>
         </div>
     </div>
 </div>
