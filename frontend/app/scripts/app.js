@@ -5,7 +5,7 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute','vcRecaptcha', 'satellizer','LocalStorageModule','ngtweet','ui.bootstrap','ADM-dateTimePicker','ngclipboard','ngWebSocket']);
+angular.module('app', ['ngRoute','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet','ui.bootstrap','ADM-dateTimePicker','ngclipboard','ngWebSocket']);
 
 //variable for manage the main module
 var app = angular.module("app");
@@ -67,6 +67,10 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         .when('/forgot-password', {
             templateUrl: 'partials/login/forgot.html',
             controller: 'forgotPasswdCtrl'
+        })
+        .when('/stadistics',{
+            templateUrl: 'partials/stadistics/stats.html',
+            controller:'stadisticsController'
         })
 
         .when('/dashboard/profile',{

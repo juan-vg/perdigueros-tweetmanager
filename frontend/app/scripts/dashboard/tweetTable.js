@@ -4,7 +4,7 @@ var app = angular.module('app');
 /**
  * Controller for tweet table information
  */
-app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal, $websocket) {
+app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal, $websocket,$route) {
     var tweetCtrl = this;
 
     if (localStorage.getItem('selectedAccount')) {
@@ -459,6 +459,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         };
         $http(req).then(function (response) {
             AlertService.alert('Enhorabuena', 'El hashtag se ha añadido correctamente', 'Cerrar');
+            tweetCtrl.getAllHashtags();
         })
             .catch(function (response) {
 
@@ -488,6 +489,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         };
         $http(req).then(function (response) {
             AlertService.alert('Enhorabuena', 'El hashtag a seguir se ha eliminado correctamente', 'Cerrar');
+            tweetCtrl.getAllHashtags();
         })
             .catch(function (response) {
 
@@ -533,9 +535,11 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             data: {
                 'newuser': tweetCtrl.followedUser
             }
+
         };
         $http(req).then(function (response) {
             AlertService.alert('Enhorabuena', 'El usuario a seguir se ha añadido correctamente', 'Cerrar');
+            tweetCtrl.getAllFollowed();
         })
             .catch(function (response) {
 
@@ -565,6 +569,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         };
         $http(req).then(function (response) {
             AlertService.alert('Enhorabuena', 'El usuario a seguir se ha eliminado correctamente', 'Cerrar');
+            tweetCtrl.getAllFollowed();
         })
             .catch(function (response) {
 

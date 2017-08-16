@@ -1,5 +1,6 @@
 <!-- Content of home logged user view-->
 <div class="container">
+
     <div class="row">
         <!-- Account panel -->
         <div ng-controller="accountTableCtrl as accountCtrl" id="account-panel" class="col-md-5">
@@ -169,8 +170,11 @@
                                                 </tbody>
                                             </table>
                                             <form ng-submit="tweetCtrl.postHashtag()">
-                                                <input type="text" placeholder="Introduce un hashtag" ng-model="tweetCtrl.hashtag">
-                                                <button class="btn btn-primary" type="submit">Añadir #hashtag</button>
+                                                <div class="pull-right">
+                                                    <input type="text" placeholder="Introduce un hashtag" ng-model="tweetCtrl.hashtag">
+                                                    <hr>
+                                                    <button class=" btn btn-success pull-right " type="submit">Añadir</button>
+                                                </div>
                                             </form>
 
                                             <table class="table table-bordered">
@@ -192,8 +196,11 @@
                                             </table>
 
                                             <form ng-submit="tweetCtrl.postFollowed()">
+                                                <div class="pull-right">
                                                 <input type="text" placeholder="Usuario a seguir" ng-model="tweetCtrl.followedUser">
-                                                <button class="btn btn-primary">Añadir usuario a seguir</button>
+                                                <hr>
+                                                <button class="btn btn-success pull-right">Añadir</button>
+                                                </div>
                                             </form>
                                         </div>
                                     </uib-tab>
@@ -282,6 +289,7 @@
                                 Acortar URL&nbsp;<i class="fa fa-cut fa-lg"></i>
                             </button>
                         </div>
+
                     </uib-tab-body>
                 </uib-tab>
             </uib-tabset>
