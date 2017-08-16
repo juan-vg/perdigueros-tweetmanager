@@ -18,7 +18,7 @@
 						<td class="text-center">{{i.email}}</td>
 						<td class="text-center">{{i.last}}</td>
 						<td class="text-center">{{i.registrationDate}}</td>
-                        <td><button class="btn btn-danger center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
+                        <td><button class="icon-button center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
 					</tr>
 					<tr ng-if="toggle[$index]">
 						<td colspan="4"><h5 align="center">¿Estas seguro que deseas eliminarlo?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="removeUser(i)">Si</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
