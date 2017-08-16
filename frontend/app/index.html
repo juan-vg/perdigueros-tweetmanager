@@ -24,47 +24,46 @@
   <link href="css/sign-up.css" rel="stylesheet">
   <link href="css/validate.css" rel="stylesheet">
   <link href="css/profile.css" rel="stylesheet">
-
   <link href="css/dashboard.css" rel="stylesheet">
   <link href="css/scheduleForm.css" rel="stylesheet"/>
-
   <!-- Font Awesome library load -->
   <link rel="stylesheet" href="css/font-awesome.min.css">
-
   <!-- ADM bb Styles -->
-  <link rel="stylesheet" href="bower_components/adm-dtp/dist/ADM-dateTimePicker.css"/>
+  <link rel="stylesheet" href="css/ADM-dateTimePicker.css"/>
 
   <!-- ngStore module for localStorage and sessionStorage -->
   <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/angular-route/angular-route.js"></script>
   <script src="bower_components/satellizer/dist/satellizer.min.js"></script>
+  <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
   <script src="bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
-
   <!-- angular Resource module for creating objects which interacts with aPI REST -->
   <script src="scripts/app.js"></script>
   <script src="scripts/controllers.js"></script>
+  <script src="scripts/stadistics/stadistics.js"></script>
   <script src="scripts/dashboard/accountTable.js"></script>
   <script src="scripts/dashboard/tweetTable.js"></script>
   <script src="scripts/modal/accountModal.js"></script>
-
-
+  <script src="scripts/modal/urlModal.js"></script>
+  <script src="https://cdn.rawgit.com/zenorocha/clipboard.js/master/dist/clipboard.min.js"></script>
+  <script src="bower_components/ngclipboard/dist/ngclipboard.min.js"></script>
   <script src="scripts/dashboard/profile.js"></script>
   <script src="scripts/modal/alert.js"></script>
   <script src="scripts/dashboard/scheduleForm.js"></script>
-
   <!-- Captcha library -->
   <script type="text/javascript " src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
   <script type="text/javascript" src="js/ui-bootstrap-tpls-2.5.0.min.js"></script>
   <!-- Ng Tweet -->
   <script src="bower_components/ngtweet/dist/ngtweet.min.js"></script>
+  <script src="scripts/dashboard/hasfolTable.js"></script>
+  <script src="bower_components/angular-websocket/dist/angular-websocket.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js"></script>
+  <script src="js/chartkick.js"></script>
 
-
-  <script src="bower_components/angular-chart/angular-chart.min.js"></script>
-  <script src="bower_components/chart.js/dist/Chart.bundle.min.js"></script>
-  <script src="bower_components/angular-chart/angular-chart.min.js"></script>
   <script src="bower_components/c3/c3.js"></script>
   <script src="bower_components/d3/d3.js"></script>
-  <script src="bower_components/chartkick/chartkick.js"></script>
+  <script src="js/chartkick.js"></script>
   <script src="bower_components/adm-dtp/dist/ADM-dateTimePicker.js"></script>
 
 </head>
@@ -102,6 +101,8 @@
             <li><a href="/dashboard/profile"><i class="fa fa-user-circle fa-lg pull-right" aria-hidden="true"></i>Mi perfil
             </a></li>
             <li role="separator" class="divider"></li>
+            <li><a href="/stadistics"><i class="fa fa-percent fa-lg pull-right"></i>Estadisticas</a></li>
+            <li role="separator" class="divider"></li>
             <li><a href="#" ng-click="showModal()"><i class="fa fa-sign-out fa-lg pull-right"
                                                       aria-hidden="true"></i>Cerrar sesión</a></li>
           </ul>
@@ -120,11 +121,12 @@
 
 </div>
 
-<footer class="footer">
+<footer class="footer" >
   <div class="container text-center">
     <p class=text-muted">@Copyright PTM</p>
   </div>
 </footer>
+
 
 <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

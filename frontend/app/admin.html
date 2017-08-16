@@ -35,7 +35,6 @@
     <script src="js/angular-chart.min.js"></script>
     <!-- Captcha library -->
     <script type="text/javascript "src="bower_components/angular-recaptcha/release/angular-recaptcha.js"></script>
-
 </head>
 
 <body >
@@ -56,10 +55,10 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right"  ng-show="isAdminActive()">
+				<!-- Users link -->
+                <li><a href="/admin-main-panel"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Usuarios</a></li>
                 <!-- Accounts link -->
                 <li><a href="/admin-accounts-panel"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Cuentas de Twitter</a></li>
-                <!-- Users link -->
-                <li><a href="/admin-main-panel"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Usuarios</a></li>
                 <!-- Stadistics link -->
                 <li><a href="/admin-door-panel"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Estadísticas</a></li>
                 <!-- Right list with logout button-->

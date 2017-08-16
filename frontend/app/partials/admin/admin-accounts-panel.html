@@ -1,6 +1,6 @@
 <!-- Content of list of accounts view-->
 
-<div class="container">
+<div class="container" ng-app="ListAccounts" ng-controller="AccountController">
     <div class="row" >
         <!-- List with users -->
         <div class="col-xs-12 col-md-6">
@@ -18,7 +18,7 @@
 						<td class="text-center">{{i.name}}</td>
 						<td class="text-center">{{i.email}}</td>
 						<td class="text-center"><button type="button" ng-click="showInfo(i)" class="btn btn-info">Información</button>
-						<td><button class="btn btn-danger center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
+						<td><button class="icon-button center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
 					</tr>
 					<tr ng-if="toggle[$index]">
 						<td colspan="4"><h5 align="center">¿Estas seguro que deseas eliminarla?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="removeAccount(i)">Si</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
@@ -30,7 +30,6 @@
         	<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th class="text-center">Seguidos de {{user_select}}</th>
 						<th class="text-center">Hashtags de {{user_select}}</th>
 						<th class="text-center">Descripción de {{account_select}}</th>
 					</tr>
@@ -38,7 +37,6 @@
 				</thead>
 				<tbody>
 					<tr>
-						<td class="text-center"><pre>{{followed_select}}</pre></td>
 						<td class="text-center"><pre>{{hashtags_select}}</pre></td>
 						<td class="text-center"><pre>{{account_description}}</pre></td>
 					</tr>
