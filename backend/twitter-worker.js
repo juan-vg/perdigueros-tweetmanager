@@ -19,16 +19,6 @@ const REQ_COUNT = 5;
 const LIMIT = 50;
 
 
-
-/////////////////////// BORRAR
-//var mongoose = require("mongoose");
-//database connection
-//mongoose.connect('mongodb://localhost:27017/ptm');
-//loadAccounts();
-//start();
-////////////////////////
-
-
 function loadAccounts(){
     
     // get all tracked twitter account ids
@@ -86,7 +76,7 @@ function start(ini){
         ini = 0;
     }
     
-    console.log("TWITTER-WORKER-START: " + ini);
+    console.log("TWITTER-WORKER-START");
 
     // get batch
     twWorkerModel.find({}, {}, { skip: ini, limit: LIMIT }, function(err, dbData){
@@ -395,6 +385,3 @@ function saveStats(dbData, favorites, retweets){
         );
     });
 }
-// stats agregate
-// db.twitterstats.aggregate([{$match: {userId:"1", tweetIdStr:"1"}}, {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }, 'day':{ $dayOfMonth: "$date"}}, count: {$sum: '$favorites'}}},{$sort:{ _id:1 }}])
-// db.twitterstats.aggregate([{$match: {userId:"1", tweetIdStr:"1"}}, {$group:{'_id': '', countfavs: {$sum: '$favorites'}, countretws: {$sum: '$retweets'}}},{$sort:{ _id:1 }}])

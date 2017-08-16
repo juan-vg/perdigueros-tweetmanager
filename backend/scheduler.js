@@ -166,12 +166,12 @@ function userAccountsCleaning(callback){
     );
 }
 
-function twitterLoader(){
+exports.twitterLoader = function(){
     console.log("TWITER-LOADER: Start AT: " + new Date());
     twitterWorker.loadAccounts();
-}
+};
 
-function twitterTracker(){
+exports.twitterTracker = function(){
     console.log("TWITER-TRACKER: Start AT: " + new Date());
     twitterWorker.start();
 }
