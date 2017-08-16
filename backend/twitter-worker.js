@@ -198,9 +198,14 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                 
                 // save data avoiding repeated tweet IDs (fixes Twitter API error)
                 for(var i=0; i<body.length; i++){
-
-                    favorites.set(body[i].id_str, body[i].favorite_count);
-                    retweets.set(body[i].id_str, body[i].retweet_count);
+                    
+                    if(body[i].retweeted_status){
+                        favorites.set(body[i].id_str, body[i].retweeted_status.favorite_count);
+                        retweets.set(body[i].id_str, body[i].retweeted_status.retweet_count);
+                    } else {
+                        favorites.set(body[i].id_str, body[i].favorite_count);
+                        retweets.set(body[i].id_str, body[i].retweet_count);
+                    }
                 }
 
                 count = body.length;
@@ -340,7 +345,7 @@ function saveStats(dbData, favorites, retweets){
                         retws = retws - dbData2[0].countretws;
                         
                         // if there are differences between previous data and current data 
-                        if(favs > 0 || retws > 0){
+                        if(favs != 0 || retws != 0){
                             
                             // insert
                             var db = new twStatsModel();
@@ -360,7 +365,7 @@ function saveStats(dbData, favorites, retweets){
                     } else {
                         
                         // if there is data
-                        if(favs > 0 || retws > 0){
+                        if(favs != 0 || retws != 0){
                             
                             // insert
                             var db = new twStatsModel();
