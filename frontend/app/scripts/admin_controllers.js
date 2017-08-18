@@ -338,14 +338,14 @@ app_admin.controller('StadisticsController', function($scope,$http,DateService) 
 
     function successCallbackStats(stats){
         // Map Information Bind
-		/*var location= stats.data.resources.byCountry;
+		var location= stats.data.resources.byCountry;
 		 var locationArr = eval( location );
 		 var mapData = [];
 		 for ( var i = 0; i < locationArr.length; i++ ) {
 		 mapData.push([locationArr[i].country,locationArr[i].count])
 		 };
 		 // Show Data on the map
-		 new Chartkick.GeoChart("map",mapData ,{adapter: "google"});*/
+		 new Chartkick.GeoChart("map",mapData ,{adapter: "google"});
 
         // Tweets/Day Data Bind
         var label=[];
