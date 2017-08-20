@@ -120,7 +120,7 @@ function start(ini){
         
         // If there are more entries in DB -> recursive call -> get another batch
         if(dbData.length == LIMIT){
-            console.log("TWITTER-WORKER-START: Recursive call");
+            //console.log("TWITTER-WORKER-START: Recursive call");
             start(ini + LIMIT);
         }
     });
@@ -176,8 +176,6 @@ function twitterWorker(dbData){
 
         }
         
-        console.log("TWITTER-WORKER-TW-WORKER: AccId: " + dbData[i].accId + " | Query: " + JSON.stringify(query));
-        
         // send batch to Req-Worker
         var numReq = 0;
         twitterReqWorker(data, Twitter, favorites, retweets, query, numReq);
@@ -188,8 +186,6 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
     
     // max REQ_COUNT recursive calls
     if(numReq < REQ_COUNT){
-        
-        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " | Query: " + JSON.stringify(query));
         
         // get tweet batch
         Twitter.get('statuses/user_timeline', query, function(err, body){
@@ -267,14 +263,10 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                     
                     if(!query.since_id){
                         
-                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " | IdStr: " + body[body.length-1].id_str);
-                        
                         //keep going down -> lastId = body[body.length-1].id_str;
                         var max_id = BigInteger(body[body.length-1].id_str);
                         max_id = max_id.subtract(1);
                         query.max_id = max_id.toString();
-                        
-                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " | Query: " + JSON.stringify(query));
                         
                         dbData.oldestTweetId = body[body.length-1].id_str;
                         progress.oldestTweetId = body[body.length-1].id_str;
@@ -305,13 +297,13 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                 
                 // recursive call
                 if(progress.action !== "ready"){
-                    console.log("TWITTER-WORKER-TW-REQ-WORKER: Recursive call");
+                    //console.log("TWITTER-WORKER-TW-REQ-WORKER: Recursive call");
                     twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq+1);
                 }
                 
                 
             } else {
-                // rate limit -> stop
+                // Twitter rate limit? -> stop
                 console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> LIMIT : " + JSON.stringify(err));
             }
         });

@@ -118,7 +118,10 @@ function tweetLikes(resData, email, callback){
                                 },
                                 count: dbData2[i].count
                             };
-                            result.push(entry);
+                            
+                            if(entry.count >= 0){
+								result.push(entry);
+							}
                         }
                         
                         console.log("USER-STATS-tweetLikes: Stats obtained");
@@ -180,7 +183,10 @@ function tweetRetweets(resData, email, callback){
                                 },
                                 count: dbData2[i].count
                             };
-                            result.push(entry);
+                            
+                            if(entry.count >= 0){
+								result.push(entry);
+							}
                         }
                         
                         console.log("USER-STATS-tweetRetweets: Stats obtained");
@@ -249,7 +255,10 @@ function tweetLikesPerMonth(resData, email, callback){
                                 },
                                 count: dbData2[i].count
                             };
-                            result.push(entry);
+                            
+                            if(entry.count >= 0){
+								result.push(entry);
+							}
                         }
                         
                         console.log("USER-STATS-tweetLikesPerMonth: Stats obtained");
@@ -318,7 +327,10 @@ function tweetRetweetsPerMonth(resData, email, callback){
                                 },
                                 count: dbData2[i].count
                             };
-                            result.push(entry);
+                            
+                            if(entry.count >= 0){
+								result.push(entry);
+							}
                         }
                         
                         console.log("USER-STATS-tweetRetweetsPerMonth: Stats obtained");
@@ -385,7 +397,10 @@ function tweetLikesPerDay(resData, email, callback){
                                 },
                                 count: dbData2[i].count
                             };
-                            result.push(entry);
+                            
+                            if(entry.count >= 0){
+								result.push(entry);
+							}
                         }
                         
                         console.log("USER-STATS-tweetLikesPerDay: Stats obtained");
@@ -452,7 +467,10 @@ function tweetRetweetsPerDay(resData, email, callback){
                                 },
                                 count: dbData2[i].count
                             };
-                            result.push(entry);
+                            
+                            if(entry.count >= 0){
+								result.push(entry);
+							}
                         }
                         
                         console.log("USER-STATS-tweetRetweetsPerDay: Stats obtained");
