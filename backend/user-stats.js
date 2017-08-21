@@ -17,74 +17,74 @@ exports.get = function(token, callback){
     var error, data;
     
     var accountID = {
-		token: token,
-		lookingForEmail: true
-	};
+        token: token,
+        lookingForEmail: true
+    };
 
-	// check the token and the userId
-	accVerificator.verifyUser(accountID, function(success, reason){
+    // check the token and the userId
+    accVerificator.verifyUser(accountID, function(success, reason){
 
-		if(success){
+        if(success){
             
             var email = reason;
-			
-			data = { 
-				"tweetLikes" : {},
-				"tweetRetweets" : {},
+            
+            data = { 
+                "tweetLikes" : {},
+                "tweetRetweets" : {},
                 
                 "tweetLikesPerMonth" : {},
-				"tweetRetweetsPerMonth" : {},
+                "tweetRetweetsPerMonth" : {},
                 
                 "tweetLikesPerDay" : {},
-				"tweetRetweetsPerDay" : {},
+                "tweetRetweetsPerDay" : {},
 
-				"tweetsPerDay" : {},
+                "tweetsPerDay" : {},
                 
-				"accFollowers" : {},
+                "accFollowers" : {},
                 
                 "hashtags" : {},
-				"followed" : {}
-			};
-			error = false;
+                "followed" : {}
+            };
+            error = false;
 
-			var count = Object.keys(data).length-1;
-			
-			var callbackFunc = function(err){
-				
-				if(err){
-					error = true;
-				}
-				
-				if(count == 0){
-					callback(error, data);
-				} else {
-					count--;
-				}
-			};
-			
-			tweetLikes(data, email, callbackFunc);
-			tweetRetweets(data, email, callbackFunc);
+            var count = Object.keys(data).length-1;
             
-			tweetLikesPerMonth(data, email, callbackFunc);
-			tweetRetweetsPerMonth(data, email, callbackFunc);
+            var callbackFunc = function(err){
+                
+                if(err){
+                    error = true;
+                }
+                
+                if(count == 0){
+                    callback(error, data);
+                } else {
+                    count--;
+                }
+            };
             
-			tweetLikesPerDay(data, email, callbackFunc);
-			tweetRetweetsPerDay(data, email, callbackFunc);
+            tweetLikes(data, email, callbackFunc);
+            tweetRetweets(data, email, callbackFunc);
             
-			tweetsPerDay(data, email, callbackFunc);
+            tweetLikesPerMonth(data, email, callbackFunc);
+            tweetRetweetsPerMonth(data, email, callbackFunc);
             
-			accFollowers(data, email, callbackFunc);
+            tweetLikesPerDay(data, email, callbackFunc);
+            tweetRetweetsPerDay(data, email, callbackFunc);
             
-			hashtags(data, callbackFunc);
-			followed(data, callbackFunc);
+            tweetsPerDay(data, email, callbackFunc);
+            
+            accFollowers(data, email, callbackFunc);
+            
+            hashtags(data, callbackFunc);
+            followed(data, callbackFunc);
 
-		} else {
-			error = true;
-			data = "FORBIDDEN";
+        } else {
+            error = true;
+            data = "FORBIDDEN";
 
-			callback(error, data);
-		}
-	});
+            callback(error, data);
+        }
+    });
 };
 
 // Top 10 tweets having more likes
@@ -120,8 +120,8 @@ function tweetLikes(resData, email, callback){
                             };
                             
                             if(entry.count >= 0){
-								result.push(entry);
-							}
+                                result.push(entry);
+                            }
                         }
                         
                         console.log("USER-STATS-tweetLikes: Stats obtained");
@@ -154,7 +154,7 @@ function tweetLikes(resData, email, callback){
 
 // Top 10 tweets having more retweets
 function tweetRetweets(resData, email, callback){
-	
+    
     var error, result = [];
     
     error = false;
@@ -185,8 +185,8 @@ function tweetRetweets(resData, email, callback){
                             };
                             
                             if(entry.count >= 0){
-								result.push(entry);
-							}
+                                result.push(entry);
+                            }
                         }
                         
                         console.log("USER-STATS-tweetRetweets: Stats obtained");
@@ -219,7 +219,7 @@ function tweetRetweets(resData, email, callback){
 
 // Top 10 tweets having more likes in the current month
 function tweetLikesPerMonth(resData, email, callback){
-	
+    
     var error, result = [];
     
     error = false;
@@ -257,8 +257,8 @@ function tweetLikesPerMonth(resData, email, callback){
                             };
                             
                             if(entry.count >= 0){
-								result.push(entry);
-							}
+                                result.push(entry);
+                            }
                         }
                         
                         console.log("USER-STATS-tweetLikesPerMonth: Stats obtained");
@@ -291,7 +291,7 @@ function tweetLikesPerMonth(resData, email, callback){
 
 // Top 10 tweets having more retweets in the current month
 function tweetRetweetsPerMonth(resData, email, callback){
-	
+    
     var error, result = [];
     
     error = false;
@@ -329,8 +329,8 @@ function tweetRetweetsPerMonth(resData, email, callback){
                             };
                             
                             if(entry.count >= 0){
-								result.push(entry);
-							}
+                                result.push(entry);
+                            }
                         }
                         
                         console.log("USER-STATS-tweetRetweetsPerMonth: Stats obtained");
@@ -363,7 +363,7 @@ function tweetRetweetsPerMonth(resData, email, callback){
 
 // Top 10 tweets having more likes in the current day
 function tweetLikesPerDay(resData, email, callback){
-	
+    
     var error, result = [];
     
     error = false;
@@ -399,8 +399,8 @@ function tweetLikesPerDay(resData, email, callback){
                             };
                             
                             if(entry.count >= 0){
-								result.push(entry);
-							}
+                                result.push(entry);
+                            }
                         }
                         
                         console.log("USER-STATS-tweetLikesPerDay: Stats obtained");
@@ -433,7 +433,7 @@ function tweetLikesPerDay(resData, email, callback){
 
 // Top 10 tweets having more retweets in the current day
 function tweetRetweetsPerDay(resData, email, callback){
-	
+    
     var error, result = [];
     
     error = false;
@@ -469,8 +469,8 @@ function tweetRetweetsPerDay(resData, email, callback){
                             };
                             
                             if(entry.count >= 0){
-								result.push(entry);
-							}
+                                result.push(entry);
+                            }
                         }
                         
                         console.log("USER-STATS-tweetRetweetsPerDay: Stats obtained");
@@ -580,7 +580,7 @@ function accFollowers(resData, email, callback){
         query = {email: email, activated: true};
     }
     
-	twitterAccModel.find(query, function(err, dbData){
+    twitterAccModel.find(query, function(err, dbData){
         if(!err){
             
             // callback func -> wait for all requests
@@ -662,7 +662,7 @@ function accFollowers(resData, email, callback){
 
 // Top 10 hashtags most used in the PTM app
 function hashtags(resData, callback){
-	var error, result = [];
+    var error, result = [];
     
     hashtagsModel.aggregate([
         { $group:{_id:{'hashtag' : "$hashtag"}, count:{ $sum: 1}}},

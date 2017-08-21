@@ -40,12 +40,12 @@ var options = {
 // initialize swagger-jsdoc
 var swaggerSpec = swaggerJSDoc(options);
 
-//Acepta JSON y valores codificados en la propia URL
+// enables JSON support & URL encoded values
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ "extended": true }));
 app.use(cors());
 
-//Previene mostrar info sensible por errores del body parser
+// avoid displaying sensitive data to end users because body parser syntax errors
 app.use(function (error, req, res, next) {
     if (error instanceof SyntaxError) {
         console.log("SERVER-ERROR: Syntax error");
@@ -57,7 +57,7 @@ app.use(function (error, req, res, next) {
     }
 });
 
-// Todos los endpoint del API se encuentran en este fichero
+// specify API endpoints location
 var routes = require("./app.js")(app);
 
 // swagger
@@ -66,8 +66,11 @@ app.get('/swagger.json', function(req, res) {
     res.send(swaggerSpec);
 });
 
-// hace publica la carpeta "public"
+// makes public the 'public' dir 
 app.use(express.static('./public'));
+
+// disables the 'X-Powered-By: Express' message
+app.disable('x-powered-by');
 
 var server = app.listen(8888, function () {
     console.log("Backend API server listening on port %s...", server.address().port);
