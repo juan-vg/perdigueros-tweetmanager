@@ -47,33 +47,53 @@ exports.post = function (image , callback){
     console.log("UPLOAD-IMAGES-POST: Trying to store image.");
 
     var dbImages = new imagesModel();
-    dbImages.hash = crypto.randomBytes(20).toString('hex');
+    
+    var hash = crypto.createHash('md5').update(JSON.stringify(image)).digest('hex');
+    dbImages.hash = hash + crypto.randomBytes(10).toString('hex');
 
     // Store the image on the server
     fs.rename(image.path, "img/" + dbImages.hash + ".png", function(error) {
-        if (error) {
-            fs.unlink("img/" + dbImages.hash + ".png");
-            dbImages.hash = crypto.randomBytes(20).toString('hex');
-            fs.rename(image.path, "img/" + dbImages.hash + ".png");
-        }
-    });
-    dbImages.route = "img/" + dbImages.hash + ".png";
-
-    // Store hash and route on db
-    dbImages.save(function(err, res){
-        if (!err){
-            console.log("UPLOAD-IMAGES-POST: Image stored successfully (" + dbImages.route + ").");
-
-            error = false;
-            data = res.hash; 
-            callback(error, data);
-
-        } else {
-            console.log("UPLOAD-IMAGES-POST: Error while storing the image");
+        if(error) {
+            
+            fs.unlink(image.path, function(error){ 
+                // ignore
+            });
+            
+            fs.unlink("img/" + dbImages.hash + ".png", function(error){ 
+                // ignore
+            });
+            
+            console.log("UPLOAD-IMAGES-POST: Error while renaming the image");
 
             error = true;
             data = null;
             callback(error, data);
+                    
+        } else {
+            
+            fs.unlink(image.path, function(error){ 
+                // ignore
+            });
+            
+            dbImages.route = "img/" + dbImages.hash + ".png";
+
+            // Store hash and route on db
+            dbImages.save(function(err, res){
+                if (!err){
+                    console.log("UPLOAD-IMAGES-POST: Image stored successfully (" + dbImages.route + ").");
+
+                    error = false;
+                    data = res.hash; 
+                    callback(error, data);
+
+                } else {
+                    console.log("UPLOAD-IMAGES-POST: Error while storing the image");
+
+                    error = true;
+                    data = null;
+                    callback(error, data);
+                }
+            });
         }
     });
 };

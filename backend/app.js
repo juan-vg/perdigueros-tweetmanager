@@ -3108,7 +3108,7 @@ var appRouter = function(app) {
      *       - name: id
      *         in: path
      *         required: true
-     *         description: The image name
+     *         description: The image hash
      *         type: string
      *     produces:
      *       - image/png
@@ -3164,6 +3164,7 @@ var appRouter = function(app) {
      *         type: file
      *     produces:
      *       - text/html
+     *       - application/json
      *     responses:
      *       201:
      *         description: Image saved on the server
@@ -3181,7 +3182,10 @@ var appRouter = function(app) {
                       console.log("APP-POST-IMAGE: Image saved.");
 
                       response.writeHead(201, {"Content-Type": "application/json"});
-                      response.write("{id: " + res + "}");
+                      var result = {
+                          id: res
+                      }
+                      response.write(JSON.stringify(result));
 
                   } else {
                       console.log("APP-POST-IMAGE: Error while saving the image.");
