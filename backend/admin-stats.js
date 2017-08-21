@@ -145,19 +145,17 @@ function storeTweetStats(tweetData, callback){
 
 // STATS PROC
 
-function groupBy(array, callback){
+function groupByYear(array, callback){
 
     var result = {};
-    var number = 0;
     
-    // group by year and month, and limit to 12 months
-    for(var i = 0; i < array.length && number <= 11 ; i++){
+    // group by year
+    for(var i = 0; i < array.length; i++){
         var year = array[i]._id.year;
         if(!result[year]){
             result[year] = [];
         }
         result[year].push({ month: array[i]._id.month, data: array[i].count});
-        number += array[i].count;
     }
     callback(result); 
 }
@@ -166,16 +164,20 @@ function upsStats(data, callback){
     
     var error;
     
+    var minDate = new Date();
+    minDate.setMonth(minDate.getMonth()-12);
+    
     // REGISTRATION DATES
     regsDownsModel.aggregate([
-        {$match:{'regDown':true}},
-        {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }}, count: {$sum:1}}}
+        {$match:{'regDown':true, 'date': {$gte: minDate}}},
+        {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }}, count: {$sum:1}}},
+        {$sort: {_id: 1}}
         ], function(errReg, regs){
             if(!errReg) {
                 console.log("ADMIN-STATS-UPS: Stats of the registration dates obtained.");
 
                 // group by year
-                groupBy(regs, function(res){ 
+                groupByYear(regs, function(res){ 
                     error = false;
                     data.ups = res;
                     callback(error);
@@ -197,16 +199,20 @@ function downsStats(data, callback){
     
     var error;
     
+    var minDate = new Date();
+    minDate.setMonth(minDate.getMonth()-12);
+    
     // DOWNS
     regsDownsModel.aggregate([
-        {$match:{'regDown':false}},
-        {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }}, count: {$sum:1}}}
+        {$match:{'regDown':false, 'date': {$gte: minDate}}},
+        {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }}, count: {$sum:1}}},
+        {$sort: {_id: 1}}
         ], function(errDown, downs){
             if(!errDown) {
                 console.log("ADMIN-STATS-DOWNS: Stats of the registry down dates obtained.");
 
                 // group by year
-                groupBy(downs, function(res){
+                groupByYear(downs, function(res){
                     error = false;
                     data.downs = res;
                     callback(error);
@@ -227,16 +233,20 @@ function lastAccessStats(data, callback){
     
     var error;
     
+    var minDate = new Date();
+    minDate.setMonth(minDate.getMonth()-12);
+    
     // LAST ACCESSES
     loginStatsModel.aggregate([
+        {$match:{'date': {$gte: minDate}}},
         { $group:{'_id':{'year':{ $year: "$date" },'month':{ $month: "$date" }}, count:{ $sum: 1}}},
-        { $sort: { _id:-1 }}
+        { $sort: { _id: 1 }}
         ],  function(errLastAcc, lastAcc) {
             if (!errLastAcc){
                 console.log("ADMIN-STATS-LASTACCESS: Stats of the last accesses obtained.");
                   
                 // group by year
-                groupBy(lastAcc, function(res){
+                groupByYear(lastAcc, function(res){
                     error = false;
                     data.lastAccess = res;
                     callback(error);
