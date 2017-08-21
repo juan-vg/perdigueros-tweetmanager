@@ -3162,6 +3162,8 @@ var appRouter = function(app) {
      *         required: true
      *         description: The image file
      *         type: file
+     *     consumes:
+     *       - multipart/form-data
      *     produces:
      *       - text/html
      *       - application/json
