@@ -174,10 +174,10 @@ function upsStats(data, callback){
         {$sort: {_id: 1}}
         ], function(errReg, regs){
             if(!errReg) {
-                console.log("ADMIN-STATS-UPS: Stats of the registration dates obtained.");
 
                 // group by year
-                groupByYear(regs, function(res){ 
+                groupByYear(regs, function(res){
+                    console.log("ADMIN-STATS-UPS: Stats of the registration dates obtained.");
                     error = false;
                     data.ups = res;
                     callback(error);
@@ -209,10 +209,10 @@ function downsStats(data, callback){
         {$sort: {_id: 1}}
         ], function(errDown, downs){
             if(!errDown) {
-                console.log("ADMIN-STATS-DOWNS: Stats of the registry down dates obtained.");
-
+                
                 // group by year
                 groupByYear(downs, function(res){
+                    console.log("ADMIN-STATS-DOWNS: Stats of the registry down dates obtained.");
                     error = false;
                     data.downs = res;
                     callback(error);
@@ -243,10 +243,10 @@ function lastAccessStats(data, callback){
         { $sort: { _id: 1 }}
         ],  function(errLastAcc, lastAcc) {
             if (!errLastAcc){
-                console.log("ADMIN-STATS-LASTACCESS: Stats of the last accesses obtained.");
                   
                 // group by year
                 groupByYear(lastAcc, function(res){
+                    console.log("ADMIN-STATS-LASTACCESS: Stats of the last accesses obtained.");
                     error = false;
                     data.lastAccess = res;
                     callback(error);
@@ -272,9 +272,6 @@ function resourcesByCountry(results, callback){
         { $group:{_id:{'country' : "$country"}, count:{ $sum: 1}}}
         ],  function(err, data) {
             if (!err){
-                console.log("ADMIN-STATS-ResByCOUNTRY: Stats obtained");
-                  
-                error = false;
                 
                 for(var i=0; i<data.length; i++){
                     
@@ -285,6 +282,8 @@ function resourcesByCountry(results, callback){
                     result.push(entry);
                 }
                 
+                console.log("ADMIN-STATS-ResByCOUNTRY: Stats obtained");
+                error = false;
                 results.byCountry = result;
                 callback(error);
                 
@@ -301,62 +300,44 @@ function resourcesByCountry(results, callback){
 
 function resourcesByDay(results, callback){
     
-    const dayInMinutes = 24 * 60;
-    var error;
+    var error, result = [];
     
-    var currDate = new Date();
+    // get the first day and the first hour and minute from the current month
     var pastDate = new Date();
-    pastDate.setMinutes(pastDate.getMinutes() - 15*dayInMinutes);
+    pastDate.setMonth(pastDate.getMonth()-1);
     
-    tweetStatsModel.find({"date": {$lte: currDate, $gte: pastDate}}, function(err, data){
-        if(!err){
-            console.log("ADMIN-STATS-ResByDAY: Stats obtained");
+    tweetStatsModel.aggregate([
+        {$match: {"date": {$gte: pastDate}}},
+        {$group:{'_id': {'year':{ $year: "$date" },'month':{ $month: "$date" }, 'day':{ $dayOfMonth: "$date"}}, count: {$sum:1}}},
+        {$sort:{_id: 1}}
+        ],  function(err, data) {
             
-            error = false;
-            
-            var resources = [], result = [];
-            
-            //count
-            for(var i=0; i<data.length; i++){
-                var date = new Date(data[i].date);
-                if(resources[date.getMonth()+1] && resources[date.getMonth()+1][date.getDate()]){
-                    resources[date.getMonth()+1][date.getDate()]++;
-                } else if(resources[date.getMonth()+1]){
-                    resources[date.getMonth()+1][date.getDate()] = 1;
-                } else {
-                    resources[date.getMonth()+1] = [];
-                    resources[date.getMonth()+1][date.getDate()] = 1;
-                }
-            }
-            
-            //discard null results & parse to {key:value} format
-            for(var month=1; month<resources.length; month++){
-                if(resources[month]){
-                    for(var day=1; day<resources[month].length; day++){
-                        if(resources[month][day]){
-                            
-                            var entry = {
-                                month: month,
-                                day: day,
-                                count: resources[month][day]
-                            };
-                            result.push(entry);
-                        }
+                if(!err){
+                    
+                    for(var i=0; i<data.length; i++){
+                        
+                        var entry = {
+                            month: data[i]._id.month,
+                            day: data[i]._id.day,
+                            count: data[i].count
+                        };
+                        result.push(entry);
                     }
+                    
+                    console.log("ADMIN-STATS-ResByDAY: Stats obtained");
+                    error = false;
+                    results.byDay = result;
+                    callback(error);
+                    
+                } else {
+                    console.log("ADMIN-STATS-ResByDAY: Error");
+                        
+                    error = true;
+                    results.byDay = [];
+                    callback(error);
                 }
-            }
-
-            results.byDay = result;
-            callback(error);
-            
-        } else {
-            console.log("ADMIN-STATS-ResByDAY: Error");
-                
-            error = true;
-            results.byDay = [];
-            callback(error);
         }
-    });
+    );
 }
 
 function resourcesByUser(results, callback){
@@ -364,15 +345,12 @@ function resourcesByUser(results, callback){
     var error, result = [];
     
     tweetStatsModel.aggregate([
-        { $group:{_id:{'userId' : "$userId"}, count:{ $sum: 1}}},
+        {$group:{_id:{'userId' : "$userId"}, count:{ $sum: 1}}},
         {$sort:{count:-1}},
         {$limit: 10}
         ],  function(err, data) {
             
             if(!err){
-                console.log("ADMIN-STATS-ResByUSER: Stats obtained");
-                  
-                error = false;
                 
                 for(var i=0; i<data.length; i++){
                     
@@ -383,6 +361,8 @@ function resourcesByUser(results, callback){
                     result.push(entry);
                 }
                 
+                console.log("ADMIN-STATS-ResByUSER: Stats obtained");
+                error = false;
                 results.byUser = result;
                 callback(error);
                 
@@ -429,7 +409,7 @@ function resourcesStats(data, callback){
 }
 
 
-exports.get= function(accountID, callback){
+exports.get = function(accountID, callback){
     var error, data;
 
     // check if the token has access admin permissions

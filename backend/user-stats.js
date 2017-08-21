@@ -9,10 +9,6 @@ var dbVerificator = require("./db-verifications");
 var TwitterPackage = require('twitter');
 var objectID = require('mongodb').ObjectID;
 
-
-var mockTweet = '{"created_at":"Fri Aug 11 16:30:26 +0000 2017","id":896046157243305984,"id_str":"896046157243305984","text":"this is a tweet test","truncated":false,"entities":{"hashtags":[],"symbols":[],"user_mentions":[],"urls":[]},"source":"\u003ca href=\\\"http:\/\/twitter.com\\\" rel=\\\"nofollow\\\"\u003eTwitter Web Client\u003c\/a\u003e","in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":808011183794126848,"id_str":"808011183794126848","name":"Juan Vela","screen_name":"JuanVelaG","location":"","description":"","url":null,"entities":{"description":{"urls":[]}},"protected":false,"followers_count":1,"friends_count":2,"listed_count":0,"created_at":"Sun Dec 11 18:10:53 +0000 2016","favourites_count":0,"utc_offset":null,"time_zone":null,"geo_enabled":false,"verified":false,"statuses_count":1,"lang":"es","contributors_enabled":false,"is_translator":false,"is_translation_enabled":false,"profile_background_color":"F5F8FA","profile_background_image_url":null,"profile_background_image_url_https":null,"profile_background_tile":false,"profile_image_url":"http:\/\/pbs.twimg.com\/profile_images\/808012667554242562\/BFT8Z-5M_normal.jpg","profile_image_url_https":"https:\/\/pbs.twimg.com\/profile_images\/808012667554242562\/BFT8Z-5M_normal.jpg","profile_link_color":"1DA1F2","profile_sidebar_border_color":"C0DEED","profile_sidebar_fill_color":"DDEEF6","profile_text_color":"333333","profile_use_background_image":true,"has_extended_profile":false,"default_profile":true,"default_profile_image":false,"following":false,"follow_request_sent":false,"notifications":false,"translator_type":"none"},"geo":null,"coordinates":null,"place":null,"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"favorited":false,"retweeted":false,"lang":"en"}';
-
-
 exports.get = function(token, callback){
     var error, data;
     
@@ -228,11 +224,11 @@ function tweetLikesPerMonth(resData, email, callback){
         if(!err && (dbData.length > 0 || email === "ADMIN")){
             
             var maxDate = new Date();
+            
+            // get the first day and the first hour and minute from the current month
             var minDate = new Date();
-            minDate = minDate.setUTCHours(0,0,0,0);
-            minDate = new Date(minDate);
-            minDate = minDate.setUTCDate(1);
-            minDate = new Date(minDate);
+            minDate = new Date(minDate.setUTCHours(0,0,0,0));
+            minDate = new Date(minDate.setUTCDate(1));
             
             var query;
             if(email === "ADMIN"){
@@ -300,11 +296,11 @@ function tweetRetweetsPerMonth(resData, email, callback){
         if(!err && (dbData.length > 0 || email === "ADMIN")){
             
             var maxDate = new Date();
+            
+            // get the first day and the first hour and minute from the current month
             var minDate = new Date();
-            minDate = minDate.setUTCHours(0,0,0,0);
-            minDate = new Date(minDate);
-            minDate = minDate.setUTCDate(1);
-            minDate = new Date(minDate);
+            minDate = new Date(minDate.setUTCHours(0,0,0,0));
+            minDate = new Date(minDate.setUTCDate(1));
             
             var query;
             if(email === "ADMIN"){
@@ -372,9 +368,10 @@ function tweetLikesPerDay(resData, email, callback){
         if(!err && (dbData.length > 0 || email === "ADMIN")){
             
             var maxDate = new Date();
+            
+            // get the first hour and minute from the current day
             var minDate = new Date();
-            minDate = minDate.setUTCHours(0,0,0,0);
-            minDate = new Date(minDate);
+            minDate = new Date(minDate.setUTCHours(0,0,0,0));
             
             var query;
             if(email === "ADMIN"){
@@ -442,9 +439,10 @@ function tweetRetweetsPerDay(resData, email, callback){
         if(!err && (dbData.length > 0 || email === "ADMIN")){
             
             var maxDate = new Date();
-            var minDate = new Date()
-            minDate = minDate.setUTCHours(0,0,0,0);
-            minDate = new Date(minDate);
+            
+            // get the first hour and minute from the current day
+            var minDate = new Date();
+            minDate = new Date(minDate.setUTCHours(0,0,0,0));
             
             var query;
             if(email === "ADMIN"){
@@ -512,11 +510,11 @@ function tweetsPerDay(resData, email, callback){
         if(!err && (dbData.length > 0 || email === "ADMIN")){
             
             var maxDate = new Date();
+            
+            // get the first day and the first hour and minute from the current month
             var minDate = new Date();
-            minDate = minDate.setUTCHours(0,0,0,0);
-            minDate = new Date(minDate);
-            minDate = minDate.setUTCDate(1);
-            minDate = new Date(minDate);
+            minDate = new Date(minDate.setUTCHours(0,0,0,0));
+            minDate = new Date(minDate.setUTCDate(1));
             
             var query;
             if(email === "ADMIN"){
