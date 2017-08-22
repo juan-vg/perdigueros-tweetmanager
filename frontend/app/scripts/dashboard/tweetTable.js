@@ -8,6 +8,57 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     var tweetCtrl = this;
 
     if (localStorage.getItem('selectedAccount')) {
+
+        var req = {
+            method: 'GET',
+            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            + localStorage.getItem('selectedAccount') + '/hashtags',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': localStorage.getItem('token')
+            }
+        }
+        
+        $http(req).then(function (response) {
+            tweetCtrl.allHashtags = response.data;
+        })
+            .catch(function (response) {
+                if (response.status == 400) {
+                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
+                }
+            });
+        var req = {
+            method: 'GET',
+            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            + localStorage.getItem('selectedAccount') + '/followed-users',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': localStorage.getItem('token')
+            }
+        }
+        $http(req).then(function (response) {
+            tweetCtrl.allFollowedUsers = response.data;
+        })
+            .catch(function (response) {
+
+            });
+
+
+
+            var req = {
+                method: 'GET',
+                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                + localStorage.getItem('selectedAccount') + '/tweets/home-timeline',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': localStorage.getItem('token')
+                }
+            }
+            $http(req).then(function (response) {
+                tweetCtrl.homeTimeLineTweetsList = response.data;
+            });
+
+
         /**
          * GET HASHTAGS
          * @type {{method: string, url: string, headers: {Content-Type: string, token}}}
@@ -472,7 +523,11 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             tweetCtrl.getAllHashtags();
         })
             .catch(function (response) {
-
+                if(response.status==403){
+                    localStorage.clear();
+                    AlertService.alert('Error','No tienes permiso para realizar esta acción','Cerrar');
+                    $location.url('/');
+                }
             });
 
     }
@@ -506,6 +561,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             });
     }
 
+    tweetCtrl.getSeguimiento= function (){
+        tweetCtrl.getAllHashtags();
+        tweetCtrl.getAllFollowed();
+    }
 
     /**
      * GETS ALL FOLLOWED USERS

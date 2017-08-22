@@ -159,7 +159,7 @@
                                                     <th class="text-center col-md-1">¿Eliminar?</th>
                                                 </tr>
                                                 </thead>
-                                                <tbody ng-repeat="i in scopeHashtags">
+                                                <tbody ng-repeat="i in tweetCtrl.allHashtags">
                                                 <tr>
                                                     <td class="text-center">#{{i.hashtag}}</td>
                                                     <td><button class="btn btn-primary center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
@@ -184,7 +184,7 @@
                                                     <th class="text-center col-md-1">¿Eliminar?</th>
                                                 </tr>
                                                 </thead>
-                                                <tbody ng-repeat="i in scopeFollowedUsers">
+                                                <tbody ng-repeat="i in tweetCtrl.allFollowedUsers">
                                                 <tr>
                                                     <td class="text-center">{{i.user}}</td>
                                                     <td><button class="btn btn-primary center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>

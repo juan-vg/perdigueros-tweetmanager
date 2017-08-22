@@ -2,7 +2,7 @@ var app = angular.module('app');
 
 var api = "http://zaratech-ptm.ddns.net:8888";
 // Stadistics Data Binding
-app.controller('statisticsController', function($http,$scope) {
+app.controller('statisticsController', function($http,$scope,$location,AlertService) {
 
     var req = {
         method: 'GET',
@@ -386,7 +386,14 @@ app.controller('statisticsController', function($http,$scope) {
                 $scope.emptyFollowed=true;
             }
 
-        });
+        })
+    .catch(function(response){
+        if(response.status==403){
+            localStorage.clear();
+            AlertService.alert('Error','No tienes permiso para acceder a esta zona.','Cerrar');
+            $location.url('/');
+        }
+    });
     //Request stadistics data
 
     function successCallbackStatsUser(stats){

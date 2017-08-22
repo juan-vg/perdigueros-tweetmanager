@@ -288,7 +288,13 @@ app.controller('dashboardCtrl', function ($rootScope, $location, $scope, $http, 
     //error
         .catch(function (response) {
             // Handle login errors
-            if (response.status == 403) {
+            if (response.status == 400) {
+                localStorage.clear();
+                AlertService.alert('Error','No tienes permiso para acceder a esta zona.','Cerrar');
+                $location.url('/');
+
+            }
+            else if(response.status==403){
                 localStorage.clear();
                 AlertService.alert('Tiempo de inactividad', 'Debido a periodo de inactividad se ha cerrado la sesion por seguridad.', 'Cerrar');
                 $location.url('/');

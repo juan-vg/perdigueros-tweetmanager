@@ -19,7 +19,14 @@ app.controller("profileCtrl", function ($http, $scope, AlertService, $location) 
     }
     $http(req).then(function (response) {
         $scope.myInfo = response.data;
-    });
+    })
+        .catch(function (response) {
+            if(response.status==400){
+                localStorage.clear();
+                AlertService.alert('Error','No tienes permiso para acceder a esta zona.','Cerrar');
+                $location.url('/');
+            }
+        });
 
     /**
      * CHANGES THE CURRENT USER PASSWORD
