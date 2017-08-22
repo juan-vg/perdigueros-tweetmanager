@@ -383,3 +383,8 @@ app.controller('reactivateCtrl',function($http,AlertService,$auth) {
 });
 
 
+app.controller('404Ctrl',function(){
+
+});
+
+

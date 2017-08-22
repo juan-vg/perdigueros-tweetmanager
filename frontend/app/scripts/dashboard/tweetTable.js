@@ -374,6 +374,16 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         });
     }
     /**
+     * Show upload image modal
+     */
+
+    tweetCtrl.uploadImageModal = function () {
+        var modalInstance = $uibModal.open({
+            templateUrl : 'partials/modal/uploadImage.html',
+            controller : 'uploadImageCtrl'
+        });
+    }
+    /**
      * Function that get all hashtags added by twitter account
      */
     tweetCtrl.getAllHashtags = function () {
