@@ -1,0 +1,167 @@
+<!-- Stadistics-->
+<div class="container">
+    <div id="statsPanel" class="row">
+        <h1 class="text-center">Estadísticas</h1>
+        <hr>
+        <!--List of stats-->
+        <div class="col-xs-12">
+            <!--Tweets/likes stat-->
+            <h2 align="center">Top Tweets con mas likes</h2>
+            <div ng-if="!emptytweetlikes" class="col-xs-12">
+                <div class="col-xs-12">
+                    <canvas id="tweetlikes" class="chart chart-bar"
+                            chart-data="dataTl" chart-labels="labelTl" chart-options="optionsTl" chart-colors="colors">
+                    </canvas>
+                </div>
+                <div class="col-xs-12">
+                    <div class="col-xs-4" ng-repeat="tweet in arr_tl track by $index">
+                        <h4 align="center">Numero #{{$index + 1}}</h4>
+                        <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    </div>
+                </div>
+
+            </div>
+            <h3 align="center" ng-if="emptytweetlikes">No existen datos todavía</h3>
+
+        </div>
+
+        <!--Tweets/retweets stat-->
+        <h2 align="center">Top Tweets con mas retweets</h2>
+        <div ng-if="!emptytweetretweets" class="col-xs-12">
+            <div class="col-xs-12">
+                <canvas id="tweetretweets" class="chart chart-bar"
+                        chart-data="dataTrt" chart-labels="labelTrt" chart-options="optionsTrt" chart-colors="colors">
+                </canvas>
+            </div>
+            <div class="col-xs-12">
+                <div class="col-xs-4" ng-repeat="tweet in arr_trt track by $index">
+                    <h4 align="center">Numero #{{$index + 1}}</h4>
+                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                </div>
+            </div>
+        </div>
+        <h3 align="center" ng-if="emptytweetretweets">No existen datos todavía</h3>
+
+        <!--Tweets/likes per month stat-->
+        <h2 align="center">Top Tweets con mas likes en el mes</h2>
+        <div ng-if="!emptytweetlikesmonth" class="col-xs-12">
+            <div class="col-xs-12">
+                <canvas id="tweetlikesmonth" class="chart chart-pie"
+                        chart-data="dataTlm" chart-labels="labelTlm" chart-options="optionsTlm" chart-colors="colors">
+                </canvas>
+            </div>
+            <div class="col-xs-12">
+                <div class="col-xs-4" ng-repeat="tweet in arr_tlm track by $index">
+                    <h4 align="center">Numero #{{$index + 1}}</h4>
+                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                </div>
+            </div>
+        </div>
+        <h3 align="center" ng-if="emptytweetlikesmonth">No existen datos todavía</h3>
+
+        <!--Tweets/likes per day stat-->
+        <h2 align="center">Top Tweets con mas likes en el dia</h2>
+        <div ng-if="!emptytweetlikesday" class="col-xs-12">
+            <div class="col-xs-12">
+                <canvas id="tweetlikesday" class="chart chart-bar"
+                        chart-data="dataTld" chart-labels="labelTld" chart-options="optionsTld" chart-colors="colors">
+                </canvas>
+            </div>
+            <div class="col-xs-12">
+                <div class="col-xs-4" ng-repeat="tweet in arr_tld track by $index">
+                    <h4 align="center">Numero #{{$index + 1}}</h4>
+                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                </div>
+            </div>
+        </div>
+        <h3 align="center" ng-if="emptytweetlikesday">No existen datos todavía</h3>
+
+        <!--Tweets/retweets per month stat-->
+        <h2 align="center">Top Tweets con mas retweets en el mes</h2>
+        <div ng-if="!emptytweetretweetsmonth" class="col-xs-12">
+            <div class="col-xs-12">
+                <canvas id="tweetretweetsmonth" class="chart chart-pie"
+                        chart-data="dataTrtm" chart-labels="labelTrtm" chart-options="optionsTrtm"
+                        chart-colors="colors">
+                </canvas>
+            </div>
+            <div class="col-xs-12">
+                <div class="col-xs-4" ng-repeat="tweet in arr_trtm track by $index">
+                    <h4 align="center">Numero #{{$index + 1}}</h4>
+                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                </div>
+            </div>
+        </div>
+        <h3 align="center" ng-if="emptytweetretweetsmonth">No existen datos todavía</h3>
+
+        <!--Tweets/retweets per day stat-->
+        <h2 align="center">Top Tweets con mas retweets en el dia</h2>
+        <div ng-if="!emptytweetretweetsday" class="col-xs-12">
+            <div class="col-xs-12">
+                <canvas id="tweetretweetsday" class="chart chart-bar"
+                        chart-data="dataTrtd" chart-labels="labelTrtd" chart-options="optionsTrtd"
+                        chart-colors="colors">
+                </canvas>
+            </div>
+            <div class="col-xs-12">
+                <div class="col-xs-4" ng-repeat="tweet in arr_trtd track by $index">
+                    <h4 align="center">Numero #{{$index + 1}}</h4>
+                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                </div>
+            </div>
+        </div>
+        <h3 align="center" ng-if="emptytweetretweetsday">No existen datos todavía</h3>
+
+        <!--Tweets per day stat-->
+        <h2 align="center">Numero de tweets por dia</h2>
+        <canvas ng-if="!emptytweetsday" id="tweetsday" class="chart chart-line"
+                chart-data="dataTd" chart-labels="labelTd" chart-options="optionsTd" chart-colors="colors">
+        </canvas>
+        <h3 align="center" ng-if="emptytweetsday">No existen datos todavía</h3>
+
+        <!--Top accounts stat-->
+        <h2 align="center">Top Cuentas con mas seguidores</h2>
+        <div class="col-xs-12">
+            <div ng-if="!emptyaccFollowers" class="col-xs-6">
+                <canvas id="accFollowers" class="chart chart-doughnut"
+                        chart-data="dataAc" chart-labels="labelAc" chart-options="optionsAc" chart-colors="colors"
+                        chart-click="onClickAc">
+                </canvas>
+            </div>
+            <div class="col-xs-6">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="text-center">Información de la cuenta con id: {{acc_id}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="text-center">
+                            <pre>{{info_acc}}</pre>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <h3 align="center" ng-if="emptyaccFollowers">No existen datos todavía</h3>
+
+        <!--Top Hashtags stat-->
+        <h2 align="center">Top Hashtags más seguidos</h2>
+        <canvas ng-if="!emptyHashtags" id="hashtags" class="chart chart-horizontal-bar"
+                chart-data="dataHashtags" chart-labels="labelHashtags" chart-options="optionsHashtags"
+                chart-colors="colors">
+        </canvas>
+        <h3 align="center" ng-if="emptyHashtags">No existen datos todavía</h3>
+
+        <!--Top Users stat-->
+        <h2 align="center">Top Usuarios más seguidos</h2>
+        <canvas ng-if="!emptyFollowed" id="followed" class="chart chart-horizontal-bar"
+                chart-data="dataFollowed" chart-labels="labelFollowed" chart-options="optionsFollowed"
+                chart-colors="colors">
+        </canvas>
+        <h3 align="center" ng-if="emptyFollowed">No existen datos todavía</h3>
+    </div>
+</div>
+</div>
