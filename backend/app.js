@@ -17,6 +17,8 @@ var userStats = require('./user-stats.js');
 var tweets = require('./tweets.js');
 var verifyCaptcha = require('./verify-captcha.js');
 
+var xmlValidator = require('./xml-validator.js');
+
 // scheduler every minute (second=5)
 var tweetScheduling = schedule.scheduleJob('5 * * * * *', function(){
   scheduler.tweetSchedulerUpdate();
@@ -1071,6 +1073,9 @@ var appRouter = function(app) {
      *         description: The twitter account description and the tokens used to access Twitter
      *         schema:
      *           $ref: "#/definitions/Twitter-accounts"
+     *     consumes:
+     *       - application/json
+     *       - application/xml
      *     produces:
      *       - text/html
      *       - application/json
@@ -1090,18 +1095,9 @@ var appRouter = function(app) {
      */
     app.post("/twitter-accounts", function(request, response) {
         
-        if(!request.body.description || !request.body.information){
-            return response.status(400).send("Parameters error!");
-        }
-        
         console.log("APP-POST-ACCOUNT");
         
-        var newAccount = {
-                "description": request.body.description,
-                "information": request.body.information
-        };
-        
-        twitterAccounts.postAccount(request.headers.token, newAccount, function (err, data){
+        var callBackFunc = function (err, data){
             if(!err){
                 console.log("APP-POST-ACCOUNT: OK");
                 
@@ -1134,7 +1130,48 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        });
+        };
+        
+        var newAccount;
+        const DTD = "twitteraccount";
+        
+        if(request.headers['content-type'] === 'application/xml'){
+            
+            xmlValidator.validate(DTD, request.rawBody, function(success){
+                
+                if(success){
+                    
+                    // no need to verify params because DTD
+                    
+                    newAccount = {
+                            "description": request.body.twitteraccount.description,
+                            "information": {
+                                "consumerKey": request.body.twitteraccount.information.consumerkey,
+                                "consumerSecret": request.body.twitteraccount.information.consumersecret,
+                                "accessToken": request.body.twitteraccount.information.accesstoken,
+                                "accessTokenSecret": request.body.twitteraccount.information.accesstokensecret
+                            }
+                    };
+                    
+                    twitterAccounts.postAccount(request.headers.token, newAccount, callBackFunc);
+                    
+                } else {
+                    return response.status(400).send("XML not valid. Check DTD at http://<server>:8888/XML/" + DTD + ".dtd");
+                }
+            });
+        } else {
+            
+            if(!request.body.description || !request.body.information){
+                return response.status(400).send("Parameters error!");
+            }
+            
+            newAccount = {
+                    "description": request.body.description,
+                    "information": request.body.information
+            };
+            
+            twitterAccounts.postAccount(request.headers.token, newAccount, callBackFunc);
+        }
     });
     
     //borra una cuenta

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- Twitter account data -->
+<twitteraccount>
+    
+    <!-- Twitter account description -->
+    <description></description>
+    
+    <!-- Twitter account authentication data -->
+    <information>
+        <consumerKey></consumerKey>
+        <consumerSecret></consumerSecret>
+        <accessToken></accessToken>
+        <accessTokenSecret></accessTokenSecret>
+    </information>
+    
+</twitteraccount>

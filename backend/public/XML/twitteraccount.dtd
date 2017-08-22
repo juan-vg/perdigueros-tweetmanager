@@ -1,0 +1,10 @@
+twitteraccount
+[
+<!ELEMENT twitteraccount (description,information)>
+    <!ELEMENT description (#PCDATA)>
+    <!ELEMENT information (consumerKey,consumerSecret,accessToken,accessTokenSecret)>
+        <!ELEMENT consumerKey (#PCDATA)>
+        <!ELEMENT consumerSecret (#PCDATA)>
+        <!ELEMENT accessToken (#PCDATA)>
+        <!ELEMENT accessTokenSecret (#PCDATA)>
+]
