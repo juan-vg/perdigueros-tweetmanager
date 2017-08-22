@@ -7,10 +7,13 @@ var accVerificator = require("./account-verifications.js");
 var dbVerificator = require("./db-verifications.js");
 var mongoose = require("mongoose");
 var objectID = require('mongodb').ObjectID;
+var HashMap = require('hashmap');
 
-const wss = new WebSocketServer.Server({ port: 8889 }, function(err){
+const SERVER_PORT = 8889;
+
+const wss = new WebSocketServer.Server({ port: SERVER_PORT }, function(err){
     if(!err){
-        console.log("Servidor escuchando peticiones en el puerto 8889");
+        console.log("Backend RT server listening on port %s...", SERVER_PORT);
     }
 });
 
@@ -18,15 +21,14 @@ const wss = new WebSocketServer.Server({ port: 8889 }, function(err){
 mongoose.connect('mongodb://localhost:27017/ptm');
 
 // global vars
-var clients=[];
-var numClients = 0;
+var clients = new HashMap();
 
 
-function streamFunc(index, callback){
+function streamFunc(client, callback){
     
     var error, tweet;
     
-    var twitterAccountId = clients[index].twitterAccountId;
+    var twitterAccountId = client.twitterAccountId;
     
     twiAccModel.find({"_id": new objectID(twitterAccountId)}, function(err, dbData){
         if(!err){
@@ -41,7 +43,7 @@ function streamFunc(index, callback){
             
             var Twitter = new TwitterPackage(secret);
             
-            if(clients[index].streamFunc == "hashtags"){
+            if(client.streamFunc == "hashtags"){
                 
                 hashtagsModel.find({"twitterAccountId":twitterAccountId}, function(err, dbData){
                     if(!err){
@@ -67,23 +69,21 @@ function streamFunc(index, callback){
                             Twitter.stream('statuses/filter', {track: query}, function(stream) {
                             
                                 // save stream handler
-                                if(!clients[index].stream){
-                                    clients[index].stream = stream;
+                                if(!client.stream){
+                                    client.stream = stream;
+                                    clients.set(client.ws, client);
                                 }
 
                                 stream.on('data', function(event) {
                                     tweet = {
-                                        created_at: event.created_at,
-                                        full_name: event.user.name,
-                                        name: event.user.screen_name,
-                                        text: event.text
+                                        id_str: event.id_str
                                     };
                                     error = false;
                                     callback(error, tweet);
                                 });
 
                                 stream.on('error', function(error) {
-                                    console.log("TWITTER ERROR : " + error);
+                                    console.log(">> [RT]: TWITTER ERROR : " + error);
                                     
                                     tweet = "TWITTER ERROR";
                                     error = true;
@@ -93,14 +93,14 @@ function streamFunc(index, callback){
                             });
                             
                         } else {
-                            console.log("EMPTY HASHTAG LIST");
+                            console.log(">> [RT]: EMPTY HASHTAG LIST");
                             tweet = "EMPTY LIST ERROR";
                             error = true;
                             callback(error, tweet);
                         }
                         
                     } else {
-                        console.log("H DB ERROR");
+                        console.log(">> [RT]: Hashtags DB ERROR");
                         tweet = "DB ERROR";
                         error = true;
                         callback(error, tweet);
@@ -117,6 +117,9 @@ function streamFunc(index, callback){
                         // generate followed users list
                         for(var i=0; i<dbData.length; i++){
                             var userId = dbData[i].userId;
+                            userId = userId.replace("@","");
+                            userId = userId.replace("%40","");
+                            
                             list.push(userId);
                         }
                         
@@ -127,23 +130,21 @@ function streamFunc(index, callback){
                             Twitter.stream('statuses/filter', {follow: query}, function(stream) {
                             
                                 // save stream handler
-                                if(!clients[index].stream){
-                                    clients[index].stream = stream;
+                                if(!client.stream){
+                                    client.stream = stream;
+                                    clients.set(client.ws, client);
                                 }
 
                                 stream.on('data', function(event) {
                                     tweet = {
-                                        created_at: event.created_at,
-                                        full_name: event.user.name,
-                                        name: event.user.screen_name,
-                                        text: event.text
+                                        id_str: event.id_str
                                     };
                                     error = false;
                                     callback(error, tweet);
                                 });
 
                                 stream.on('error', function(error) {
-                                    console.log("TWITTER ERROR " + error);
+                                    console.log(">> [RT]: TWITTER ERROR " + error);
                                     
                                     tweet = "TWITTER ERROR";
                                     error = true;
@@ -153,7 +154,7 @@ function streamFunc(index, callback){
                             });
                             
                         } else {
-                            console.log("EMPTY FOLLOWED LIST");
+                            console.log(">> [RT]: EMPTY FOLLOWED LIST");
                             
                             tweet = "EMPTY LIST ERROR";
                             error = true;
@@ -161,7 +162,7 @@ function streamFunc(index, callback){
                         }
                         
                     } else {
-                        console.log("FU DB ERROR");
+                        console.log(">> [RT]: FollowedUsers DB ERROR");
                         
                         tweet = "DB ERROR";
                         error = true;
@@ -171,7 +172,7 @@ function streamFunc(index, callback){
             }
             
         } else {
-            console.log("TA DB ERROR");
+            console.log(">> [RT]: TwitterAccounts DB ERROR");
             
             tweet = "DB ERROR";
             error = true;
@@ -199,7 +200,13 @@ wss.on('connection', function connection(ws, req) {
     // get twitter account id from url path
     var regexp = /\/twitter-accounts\/(.*)\/tweets\/.*/g;
     var match = regexp.exec(url);
-    twitterAccountId = match[1];
+    if(match && match[1]){
+        twitterAccountId = match[1];
+    } else {
+        twitterAccountId = null;
+    }
+    
+    console.log(">> [RT]: NEW CONNECTION (TwAcc: " + twitterAccountId + ", Func: " + strFunc + ")");
     
     // save client
     var c = {
@@ -209,29 +216,37 @@ wss.on('connection', function connection(ws, req) {
         'twitterAccountId': twitterAccountId, 
         'validated': false
     };
-    clients.push(c);
-    var numClient = numClients++;
+    clients.set(ws, c);
+    
+    var util = require('util');
+    
+    //console.log("SET: " + JSON.stringify(util.inspect(ws)));
+    //console.log("------------------------------------");
     
     // define onMessage
     ws.on('message', function incoming(message) {
         
-        // search client
-        for(var i=0; i<clients.length; i++){
-            if(ws === clients[i].ws){
-                index = i;
-            }
-        }
+        var client = clients.get(ws);
         
         // if exists & not validated yet
-        if(index >= 0 && !clients[index].validated){
+        if(client && !client.validated){
             
-            var twitterAccountId = clients[index].twitterAccountId;
+            var twitterAccountId = client.twitterAccountId;
             
             // if it is a validation message
             if(message.search("token:") === 0 && message.length > 6){
                 
                 var token = message.substr(6);
-                console.log("validating token " + token);
+                
+                var censoredToken;
+        
+                if(token && token.length > 10){
+                    censoredToken = "**********" + token.substr(10);
+                } else {
+                    censoredToken = token;
+                }
+                
+                console.log(">> [RT]: validating token " + censoredToken);
                 
                 // Check if ID is valid
                 dbVerificator.verifyDbId(twitterAccountId, function(success){
@@ -245,29 +260,47 @@ wss.on('connection', function connection(ws, req) {
                         // validate token
                         accVerificator.verifyUser(accountID, function(success, data){
                             if(success){
-                                console.log("VALIDATION OK");
+                                console.log(">> [RT]: VALIDATION OK");
                                 
-                                clients[index].validated = true;
+                                client.validated = true;
+                                clients.set(client.ws, client);
                                 
-                                streamFunc(index, function(err, tweet){
+                                streamFunc(client, function(err, tweet){
                                         
                                     if(!err){
-                                        ws.send(JSON.stringify(tweet));
+                                        ws.send(JSON.stringify(tweet), function ack(error) {
+                                            if(error){
+                                                console.log(">> [RT]: ERROR: Closed socket");
+                                                ws.close();
+                                            }
+                                        });
                                     } else {
-                                        ws.send(tweet);
+                                        ws.send(tweet, function ack(error) {
+                                            if(error){
+                                                console.log(">> [RT]: ERROR: Closed socket");
+                                            }
+                                        });
                                         ws.close();
                                     }
                                 });
                                 
                             } else {
-                                console.log("VALIDATION ERROR");
-                                ws.send("VALIDATION-ERROR: " + data);
+                                console.log(">> [RT]: VALIDATION ERROR");
+                                ws.send("VALIDATION-ERROR: " + data, function ack(error) {
+                                    if(error){
+                                        console.log(">> [RT]: ERROR: Closed socket");
+                                    }
+                                });
                                 ws.close();
                             }
                         });
                     } else {
-                        console.log("ID NOT VALID");
-                        ws.send("TWITTER ID NOT VALID");
+                        console.log(">> [RT]: TWITTER ID NOT VALID");
+                        ws.send("TWITTER ID NOT VALID", function ack(error) {
+                            if(error){
+                                console.log(">> [RT]: ERROR: Closed socket");
+                            }
+                        });
                         ws.close();
                     }
                 });
@@ -283,22 +316,31 @@ wss.on('connection', function connection(ws, req) {
     // define onClose
     ws.on('close', function incoming(message) {
         
-        var index=-1;
-        
-        // search client
-        for(var i=0; i<clients.length; i++){
-            if(ws === clients[i].ws){
-                index = i;
-            }
-        }
+        var client = clients.get(ws);
         
         // if exists -> close stream & delete
-        if(index >= 0){
-            if(clients[index].stream){
-                clients[index].stream.destroy();
+        if(client){
+            if(client.stream){
+                client.stream.destroy();
             }
-            clients.splice(index, 1);
-            numClients--;
+            console.log(">> [RT]: CLOSED CONNECTION (TwAcc: " + client.twitterAccountId + ", Func: " + client.streamFunc + ")");
+            clients.remove(client.ws);
+        }
+    });
+    
+    // define onError
+    ws.on('error', function incoming(message) {
+        
+        var client = clients.get(ws);
+        
+        // if exists -> close stream & delete
+        if(client){
+            if(client.stream){
+                client.stream.destroy();
+            }
+            console.log(">> [RT]: ONERROR: CLOSED CONNECTION (TwAcc: " + client.twitterAccountId + ", Func: " + client.streamFunc + ")");
+            clients.remove(client.ws);
+            ws.close();
         }
     });
 });

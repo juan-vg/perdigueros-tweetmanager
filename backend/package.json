@@ -1,22 +1,27 @@
 {
-  "name": "tweetmanager-backend",
+  "name": "ptm-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Perdigueros Tweet Manager (Backend Project)",
+  "repository": "https://github.com/juan-vg/perdigueros-tweetmanager",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "prestart": "npm install",
+    "start": "parallelshell 'node --harmony_tailcalls server.js' 'node tweet-rt.js'"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.17.1",
+    "cors": "^2.8.4",
     "express": "^4.15.2",
     "formidable": "^1.1.1",
+    "hashmap": "^2.1.0",
     "mongodb": "^2.2.25",
-    "mongoose": "^4.9.5",
+    "mongoose": "4.10.8",
     "node-schedule": "^1.2.1",
     "nodemailer": "^4.0.1",
+    "parallelshell": "^3.0.1",
     "request": "^2.81.0",
     "swagger-jsdoc": "^1.9.2",
     "twitter": "^1.7.0",

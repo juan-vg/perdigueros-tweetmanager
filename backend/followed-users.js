@@ -27,7 +27,7 @@ exports.getAll = function(accountID, callback){
 
                             //Retrieve data
                             if(dbData.length > 0){
-                                console.log("FOLLOWED-USERS-GET-ALL: Obtained User:", dbData);
+                                console.log("FOLLOWED-USERS-GET-ALL: Obtained Users");
                                 data = dbData;
                             } else {
 
@@ -82,7 +82,7 @@ exports.get = function (accountID, user, callback){
 
                             // Retrieve data
                             if(dbData.length > 0){
-                                console.log("FOLLOWED-USERS-GET-ID: ", dbData);
+                                console.log("FOLLOWED-USERS-GET-ID: Obtained user");
 
                                 error = false;
                                 data = dbData;
@@ -133,6 +133,10 @@ exports.post = function (accountID, user, callback){
             accVerificator.verifyUser(accountID, function(success, result){
 
                 if(success){
+                    
+                    // remove '#' char
+                    user = user.replace("@","");
+                    user = user.replace("%40","");
 
                     // Check if the specified user already exists
                     follUsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'user': user}, function(err,dbData){
@@ -158,7 +162,7 @@ exports.post = function (accountID, user, callback){
                                 var Twitter = new TwitterPackage(secret);
                                 
                                 // get twitter user id
-                                Twitter.get('users/lookup', {screen_name: user.replace("@","")}, function(err, body){
+                                Twitter.get('users/lookup', {screen_name: user}, function(err, body){
                                     if(!err){
                                         
                                         // Everything ok
@@ -184,6 +188,8 @@ exports.post = function (accountID, user, callback){
                                             callback(error, data);
                                         });
                                     } else {
+                                        console.log("FOLLOWED-USERS-POST-ID: Twitter error: " + JSON.stringify(err));
+                                        
                                         error = true;
                                         data = "TWITTER ERROR";
                                         callback(error, data);

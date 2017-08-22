@@ -13,6 +13,7 @@ var uploadImages = require('./upload-images.js');
 var formidable = require('formidable');
 var login = require('./login.js');
 var adminStats = require('./admin-stats.js');
+var userStats = require('./user-stats.js');
 var tweets = require('./tweets.js');
 var verifyCaptcha = require('./verify-captcha.js');
 
@@ -25,6 +26,17 @@ var tweetScheduling = schedule.scheduleJob('5 * * * * *', function(){
 var dailyCleaningScheduling = schedule.scheduleJob('0 0 0 * * *', function(){
   scheduler.twitterAccountsCleaningUpdate();
   scheduler.userAccountsCleaningUpdate();
+});
+
+
+// scheduler every 15 minutes
+var twitterLoaderScheduling = schedule.scheduleJob('0 0,15,30,45 * * * *', function(){
+  scheduler.twitterLoader();
+});
+
+// scheduler every 15 minutes (5 minutes offset)
+var twitterTrackerScheduling = schedule.scheduleJob('0 5,20,35,50 * * * *', function(){
+  scheduler.twitterTracker();
 });
 
 var appRouter = function(app) {
@@ -190,6 +202,50 @@ var appRouter = function(app) {
      *         type: string
      *         description: "The google captcha response"
      * 
+     *   UserStats:
+     *     type: "object"
+     *     properties:
+     *       "tweetLikes":
+     *         type: array
+     *         description: Top 10 tweets having more likes
+     *         example: [{tweet: "tweet1", count: 1245}, {tweet: "tweet2", count: 469}, ...]
+     *       "tweetRetweets":
+     *         type: array
+     *         description: Top 10 tweets having more retweets
+     *         example: [{tweet: "tweet1", count: 1356}, {tweet: "tweet2", count: 765}, ...]
+     *       "tweetLikesPerMonth":
+     *         type: array
+     *         description: Top 10 tweets having more likes in the current month
+     *         example: [{tweet: "tweet1", count: 596}, {tweet: "tweet2", count: 214}, ...]
+     *       "tweetRetweetsPerMonth":
+     *         type: array
+     *         description: Top 10 tweets having more retweets in the current month
+     *         example: [{tweet: "tweet1", count: 443}, {tweet: "tweet2", count: 381}, ...]
+     *       "tweetLikesPerDay":
+     *         type: array
+     *         description: Top 10 tweets having more likes in the current day
+     *         example: [{tweet: "tweet1", count: 235}, {tweet: "tweet2", count: 124}, ...]
+     *       "tweetRetweetsPerDay":
+     *         type: array
+     *         description: Top 10 tweets having more retweets in the current day
+     *         example: [{tweet: "tweet1", count: 179}, {tweet: "tweet2", count: 145}, ...]
+     *       "tweetsPerDay":
+     *         type: array
+     *         description: Numer of tweets per day in the current month (from the first day)
+     *         example: [{day: 1, count: 3}, {day: 2, count: 31}, {day: 11, count: 23}, {day: 12, count: 35}, {day: 17, count: 97}, {day: 26, count: 0}, {day: 28, count: 2}, ...]
+     *       "accFollowers":
+     *         type: array
+     *         description: Top 10 twitter accounts having more followers
+     *         example: [{accId: "ptmTwitterAccountID-1", count: 3780}, {accId: "ptmTwitterAccountID-2", count: 2811}, ...]
+     *       "hashtags":
+     *         type: array
+     *         description: Top 10 hashtags most used in the PTM app
+     *         example: [{hashtag: "hashtag1", count: 102}, {hashtag: "hashtag2", count: 84}, ...]
+     *       "followed":
+     *         type: array
+     *         description: Top 10 followed-users most used in the PTM app
+     *         example: [{followed: "twitterUserScreenName-1", count: 67}, {followed: "twitterUserScreenName-2", count: 46}, ...]
+     * 
      */
 
 
@@ -226,7 +282,9 @@ var appRouter = function(app) {
      */
     app.post("/login/signup", function(request, response) {
         
-        if(!request.body.name || !request.body.surname || !request.body.email || !request.body['g-recaptcha-response']){
+        var emailValidator = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+        
+        if(!request.body.name || !request.body.surname || !request.body.email || !request.body['g-recaptcha-response'] || !emailValidator.test(request.body.email)){
             return response.status(400).send("Parameters error!");
         }
         
@@ -1028,7 +1086,7 @@ var appRouter = function(app) {
      *       500:
      *         description: Error inserting the twitter account into the database
      *       503:
-     *         description: Twitter service unavailable OR Wrong twitter-autentication data
+     *         description: Twitter service (error OR unavailable) OR Wrong twitter-autentication data
      */
     app.post("/twitter-accounts", function(request, response) {
         
@@ -1066,7 +1124,7 @@ var appRouter = function(app) {
                     console.log("APP-POST-ACCOUNT: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable OR Wrong twitter-autentication data");
+                    response.write("Twitter service (error OR unavailable) OR Wrong twitter-autentication data");
                     
                 } else {
                     console.log("APP-POST-ACCOUNT: Already exists");
@@ -1152,7 +1210,7 @@ var appRouter = function(app) {
     // reactiva una cuenta
     /**
      * @swagger
-     * /twitter-accounts/{id}:
+     * /twitter-accounts/{id}/activated:
      *   put:
      *     tags:
      *       - Twitter Accounts
@@ -1258,7 +1316,7 @@ var appRouter = function(app) {
      *       404:
      *         description: Unable to find the requested twitter account {id}
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.post("/twitter-accounts/:id/tweets/publish", function(request, response) {
         
@@ -1304,7 +1362,7 @@ var appRouter = function(app) {
                     console.log("APP-POST-TWEET-PUBLISH: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-POST-TWEET-PUBLISH: DB ERROR!!!");
@@ -1352,7 +1410,7 @@ var appRouter = function(app) {
      *       500:
      *         description: Error saving scheduled tweet
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.post("/twitter-accounts/:id/tweets/schedule", function(request, response) {
         
@@ -1402,7 +1460,7 @@ var appRouter = function(app) {
                     console.log("APP-POST-TWEET-SCHEDULE: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-POST-TWEET-SCHEDULE: DB ERROR!!!");
@@ -1446,7 +1504,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/user-timeline", function(request, response) {
         
@@ -1485,7 +1543,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-USER-TIMELINE: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-USER-TIMELINE: DB ERROR!!!");
@@ -1529,7 +1587,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/home-timeline", function(request, response) {
         
@@ -1568,7 +1626,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-HOME-TIMELINE: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-HOME-TIMELINE: DB ERROR!!!");
@@ -1612,7 +1670,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/scheduled", function(request, response) {
         
@@ -1651,7 +1709,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-SCHEDULED: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-SCHEDULED: DB ERROR!!!");
@@ -1695,7 +1753,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/mentions", function(request, response) {
         
@@ -1734,7 +1792,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-MENTIONS: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
@@ -1778,7 +1836,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/retweeted", function(request, response) {
         
@@ -1817,7 +1875,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-RETWEETED: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
@@ -1861,7 +1919,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.get("/twitter-accounts/:id/tweets/favorited", function(request, response) {
         
@@ -1900,7 +1958,7 @@ var appRouter = function(app) {
                     console.log("APP-GET-TWEET-FAVORITED: Twitter error");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-GET-TWEET-MENTIONS: DB ERROR!!!");
@@ -1953,7 +2011,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-ALL-HASHTAGS: Retrieving all hashtags for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.getAll(accountID,  function (err, data){
             
@@ -2032,7 +2090,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-GET-HASHTAGS: Retrieving a hashtag for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-HASHTAGS: Retrieving a hashtag for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.get(accountID, request.params.hashtag, function (err, data){
             
@@ -2123,7 +2181,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.post(accountID, request.body.hashtag, function (err, data){
             
@@ -2213,7 +2271,7 @@ var appRouter = function(app) {
             'twitterAccountId': request.params.id
         };
         
-        console.log("APP-DELETE-HASHTAG: Deleting hashtag " + request.params.hashtag + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-DELETE-HASHTAG: Deleting hashtag " + request.params.hashtag + " for twitterAccountId: " + accountID.twitterAccountId);
         
         hashtags.delete(accountID, request.params.hashtag, function (err, data){
             
@@ -2290,7 +2348,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-ALL-FOLLOWED-USERS: Retrieving all followed users for twitterAccountId: " + accountID.twitterAccountId);
 
         followedUsers.getAll(accountID,  function (err, data){
 
@@ -2358,7 +2416,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-GET-FOLLOWED-USERS: Retrieving a followed user for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-GET-FOLLOWED-USERS: Retrieving a followed user for twitterAccountId: " + accountID.twitterAccountId);
         
         followedUsers.get(accountID, request.params.user, function (err, data){
             
@@ -2429,7 +2487,7 @@ var appRouter = function(app) {
      *       500:
      *         description: DB error
      *       503:
-     *         description: Twitter service unavailable
+     *         description: Twitter service error OR unavailable
      */
     app.post("/twitter-accounts/:id/followed-users", function(request, response) {
         
@@ -2442,7 +2500,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for twitterAccountId: " + accountID.twitterAccountId);
             
         followedUsers.post(accountID, request.body.newuser, function (err, data){
             
@@ -2466,10 +2524,10 @@ var appRouter = function(app) {
                     response.write("Followed user already exists for the provided twitter account");    
                     
                 } else if (data == "TWITTER ERROR") {
-                    console.log("APP-POST-ACCOUNT: Twitter service unavailable");
+                    console.log("APP-POST-FOLLOWED-USERS: Twitter service error OR unavailable");
                     
                     response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service unavailable");
+                    response.write("Twitter service error OR unavailable");
                     
                 } else {
                     console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
@@ -2521,7 +2579,7 @@ var appRouter = function(app) {
                 'twitterAccountId': request.params.id
             };
             
-        console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user + " for (token: " + accountID.token + ", twitterAccountId: " + accountID.twitterAccountId + ")");
+        console.log("APP-DELETE-FOLLOWED-USERS: Deleting user " + request.params.user + " for twitterAccountId: " + accountID.twitterAccountId);
 
         followedUsers.delete(accountID, request.params.user, function (err, data){
 
@@ -2859,29 +2917,15 @@ var appRouter = function(app) {
         
     });
     
-    //STATS
-    app.get("/stats/hashtags", function(request, response) {
-
-
-    });
-    
-    app.get("/stats/followed-users", function(request, response) {
-
-
-    });
-    
-    app.get("/stats/users", function(request, response) {
-
-
-    });
+    //STATS  
     
      /**
      * @swagger
-     * /stats/app:
+     * /stats/users:
      *   get:
      *     tags:
      *       - Statistics 
-     *     description: Get application statistics (ADMIN)
+     *     description: Get user statistics (ADMIN)
      *     parameters:
      *       - name: token
      *         in: header
@@ -2892,7 +2936,49 @@ var appRouter = function(app) {
      *       - text/html
      *     responses:
      *       200:
-     *         description: Statistics of last accesses, registries and downs
+     *         description: App and twitter usage statistics
+     *         schema:
+     *           $ref: '#/definitions/UserStats'
+     *       403:
+     *         description: Forbidden
+     */ 
+    app.get("/stats/users", function(request, response) {
+        console.log("APP-GET-USER-STATS: Request stats.");
+        
+        userStats.get(request.headers.token, function(err, res){
+            if(!err){
+                console.log("APP-GET-USER-STATS: OK ");
+                
+                response.writeHead(200, {"Content-Type": "application/json"});
+                response.write(JSON.stringify(res));
+            } else {
+                console.log("APP-GET-USER-STATS: Forbidden!!!");
+                
+                response.writeHead(403, {"Content-Type": "text/html"});
+                response.write("Forbidden");
+            }
+            response.end();
+        });
+    });
+    
+     /**
+     * @swagger
+     * /stats/app:
+     *   get:
+     *     tags:
+     *       - Statistics 
+     *     description: Get application statistics (ADMIN ONLY)
+     *     parameters:
+     *       - name: token
+     *         in: header
+     *         required: true
+     *         description: The user token
+     *     produces:
+     *       - application/json
+     *       - text/html
+     *     responses:
+     *       200:
+     *         description: App usage statistics (last accesses, registries, downs, ...)
      *       403:
      *         description: Forbidden
      */
@@ -2932,6 +3018,7 @@ var appRouter = function(app) {
      *         description: The short URL-ID
      *         type: string
      *     produces:
+     *       - application/json
      *       - text/html
      *     responses:
      *       307:
@@ -2945,8 +3032,9 @@ var appRouter = function(app) {
             function (err, url){
                 if(!err){
                     console.log("APP-GET-URLS-ID: Requested URL is: " + url);
-                    response.writeHead(307, {"Content-Type": "text/html", Location: url});
-                    response.write("Redirecting to " + url);
+                    response.writeHead(307, {"Content-Type": "application/json", Location: url});
+                    var resp = {url: url}
+                    response.write(JSON.stringify(resp));
                 } else {
                     console.log("APP-GET-URLS-ID: Requested URL-ID not found!!!");
                     response.writeHead(404, {"Content-Type": "text/html"});
@@ -2975,6 +3063,7 @@ var appRouter = function(app) {
      *           $ref: "#/definitions/Urls"
      *     produces:
      *       - application/json
+     *       - text/html
      *     responses:
      *       201:
      *         description: The short URL was created successfully
@@ -2994,8 +3083,9 @@ var appRouter = function(app) {
             function (err, urlId){
                 if(!err){
                     console.log("APP-POST-URLS: Short URL saved!");
-                    response.writeHead(201, {"Content-Type": "text/html"});
-                    response.write("Short URL saved! (ID="+urlId+")");
+                    response.writeHead(201, {"Content-Type": "application/json"});
+                    var resp = {id: urlId}
+                    response.write(JSON.stringify(resp));
                 } else {
                     console.log("APP-POST-URLS: DB ERROR!!!");
                     response.writeHead(500, {"Content-Type": "text/html"});
@@ -3018,7 +3108,7 @@ var appRouter = function(app) {
      *       - name: id
      *         in: path
      *         required: true
-     *         description: The image name
+     *         description: The image hash
      *         type: string
      *     produces:
      *       - image/png
@@ -3072,8 +3162,11 @@ var appRouter = function(app) {
      *         required: true
      *         description: The image file
      *         type: file
+     *     consumes:
+     *       - multipart/form-data
      *     produces:
      *       - text/html
+     *       - application/json
      *     responses:
      *       201:
      *         description: Image saved on the server
@@ -3090,8 +3183,11 @@ var appRouter = function(app) {
                   if(!err){
                       console.log("APP-POST-IMAGE: Image saved.");
 
-                      response.writeHead(201, {"Content-Type": "text/html"});
-                      response.write("Image saved (" + res + ").");
+                      response.writeHead(201, {"Content-Type": "application/json"});
+                      var result = {
+                          id: res
+                      }
+                      response.write(JSON.stringify(result));
 
                   } else {
                       console.log("APP-POST-IMAGE: Error while saving the image.");
@@ -3126,7 +3222,7 @@ var appRouter = function(app) {
      *       400:
      *         description: Params error
      *       503:
-     *         description: Captcha service unavailable
+     *         description: Captcha service error OR unavailable
      */
     app.post("/verify-captcha", function(request, response){
         
@@ -3147,10 +3243,10 @@ var appRouter = function(app) {
                 } else {
                     
                     if(data == "CAPTCHA ERROR"){
-                        console.log("APP-VERIFY-CAPTCHA: Captcha service unavailable");
+                        console.log("APP-VERIFY-CAPTCHA: Captcha service error OR unavailable");
                         
                         response.writeHead(503, {"Content-Type": "text/html"});
-                        response.write("Captcha service unavailable");
+                        response.write("Captcha service error OR unavailable");
                         
                     } else {
                         console.log("APP-VERIFY-CAPTCHA: " + data);

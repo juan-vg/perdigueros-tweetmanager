@@ -14,14 +14,20 @@ function verifyUser(accountID, callback){
     
     var success, reason;
     
-    verifyAdmin(accountID, function(success){
+    var censoredToken;
         
-        var censoredToken = "**********" + accountID.token.substr(10);
-        console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + censoredToken);
+    if(accountID.token){
+        censoredToken = "**********" + accountID.token.substr(10);
+    } else {
+        censoredToken = accountID.token;
+    }
+    console.log("ACC-VERIFS-VERIFY-USER: Verifying token: " + censoredToken);
+        
+    
+    verifyAdmin(accountID, function(success){
         
         // Admin permission bypass
         if(success){
-            console.log("ACC-VERIFS-VERIFY-USER: ADMIN DETECTED. WHATEVER YOU WANT WILL BE GRANTED MY LORD. COME IN");
             reason = "ADMIN";
             callback(success, reason);
         } else {
@@ -59,6 +65,10 @@ function verifyAdmin(accountID, callback){
             
         if(!err){
             success = data.admin;
+            
+            if(success){
+                console.log("ACC-VERIFS-VERIFY-ADMIN: ADMIN DETECTED. WHATEVER YOU WANT WILL BE GRANTED MY LORD. COME IN");
+            }
         } else {
             success = false;
         }
@@ -198,39 +208,48 @@ function checkTokenForUserAccount(accountID, callback){
 // Retrieves the user data associated to the supplied token
 function getUser(token, callback){
     
-    // updates token expiration date (async)
-    tokenExpire.update(token);
-    
-    
     var error, data;
     
-    // get valid-user data from token
-    usersModel.find({"token" : token, "validated": true, "activated": true, "firstLogin": false }, {"password":0},
-        function(err, dbData) {
-            if(!err && dbData.length > 0){
-                
-                tokenExpire.verifyToken(token, function(err, data){
-                    if(!err){
-                        error = false;
-                        data = dbData[0];
-                    } else {
-                        error = true;
-                        data = "TOKEN EXPIRED";
-                    }
+    
+    if(token){
+        
+        // updates token expiration date (async)
+        tokenExpire.update(token);
+        
+        // get valid-user data from token
+        usersModel.find({"token" : token, "validated": true, "activated": true, "firstLogin": false }, {"password":0},
+            function(err, dbData) {
+                if(!err && dbData.length > 0){
+                    
+                    tokenExpire.verifyToken(token, function(err, data){
+                        if(!err){
+                            error = false;
+                            data = dbData[0];
+                        } else {
+                            error = true;
+                            data = "TOKEN EXPIRED";
+                        }
+                        callback(error, data);
+                    });
+                    
+                } else if(!err){
+                    error = true;
+                    data = "NOT FOUND";
                     callback(error, data);
-                });
+                } else {
+                    error = true;
+                    data = "DB ERROR";
+                    callback(error, data);
+                }
                 
-            } else if(!err){
-                error = true;
-                data = "NOT FOUND";
-                callback(error, data);
-            } else {
-                error = true;
-                data = "DB ERROR";
-                callback(error, data);
             }
-            
-        }
-    );
+        );
+        
+    } else {
+		// undefined token
+        error = true;
+        data = "NOT FOUND";
+        callback(error, data);
+    }
 }
 module.exports.getUser = getUser;

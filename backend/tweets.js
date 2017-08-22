@@ -49,7 +49,7 @@ exports.publish = function (accountID, text, ip, callback){
                                         var tweetData = {
                                             date: new Date(),
                                             country: country,
-                                            accountId: data._id
+                                            userId: data._id
                                         };
                                         adminStats.saveTweet(tweetData);
                                     }
@@ -59,7 +59,7 @@ exports.publish = function (accountID, text, ip, callback){
                             error = false;
                             data = null;
                         } else {
-                            console.log("TWEETS-PUBLISH: Twitter error");
+                            console.log("TWEETS-PUBLISH: Twitter error: " + JSON.stringify(err));
                             
                             error = true;
                             data = "TWITTER ERROR";
@@ -143,12 +143,12 @@ exports.schedule = function (accountID, tweetData, ip, callback){
                                 
                                 accVerificator.getUser(accountID.token, function(err, data){
                                     if(!err){
-                                        var tweetData = {
+                                        var tweetStatsData = {
                                             date: tweetData.date,
                                             country: country,
                                             userId: data._id
                                         };
-                                        adminStats.saveTweet(tweetData);
+                                        adminStats.saveTweet(tweetStatsData);
                                     }
                                 });
                             });
@@ -235,7 +235,7 @@ exports.userTimeline = function (accountID, callback){
                             }
                             
                         } else {
-                            console.log("TWEETS-USER-TIMELINE: Twitter error");
+                            console.log("TWEETS-USER-TIMELINE: Twitter error: " + JSON.stringify(err));
                             
                             error = true;
                             data = "TWITTER ERROR";
@@ -315,7 +315,7 @@ exports.homeTimeline = function (accountID, callback){
                             }
                             
                         } else {
-                            console.log("TWEETS-HOME-TIMELINE: Twitter error");
+                            console.log("TWEETS-HOME-TIMELINE: Twitter error: " + JSON.stringify(err));
                             
                             error = true;
                             data = "TWITTER ERROR";
@@ -461,7 +461,7 @@ exports.mentions = function (accountID, callback){
                             }
                             
                         } else {
-                            console.log("TWEETS-MENTIONS: Twitter error");
+                            console.log("TWEETS-MENTIONS: Twitter error: " + JSON.stringify(err));
                             
                             error = true;
                             data = "TWITTER ERROR";
@@ -543,7 +543,7 @@ exports.retweeted = function (accountID, callback){
                             }
                             
                         } else {
-                            console.log("TWEETS-RETWEETED: Twitter error");
+                            console.log("TWEETS-RETWEETED: Twitter error: " + JSON.stringify(err));
                             
                             error = true;
                             data = "TWITTER ERROR";
@@ -610,7 +610,7 @@ exports.favorited = function (accountID, callback){
                     };
                     var Twitter = new TwitterPackage(secret);
                     
-                    Twitter.get('statuses/retweets_of_me', function(err, body){
+                    Twitter.get('favorites/list', function(err, body){
                         
                         if(!err){
                             error = false;
@@ -626,7 +626,7 @@ exports.favorited = function (accountID, callback){
                             }
                             
                         } else {
-                            console.log("TWEETS-FAVORITED: Twitter error");
+                            console.log("TWEETS-FAVORITED: Twitter error: " + JSON.stringify(err));
                             
                             error = true;
                             data = "TWITTER ERROR";

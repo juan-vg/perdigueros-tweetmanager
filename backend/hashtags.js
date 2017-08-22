@@ -154,6 +154,10 @@ exports.post = function (accountID, hashtag, callback){
                 
                 if(success){
                     
+                    // remove '#' char
+                    hashtag = hashtag.replace("#","");
+                    hashtag = hashtag.replace("%23","");
+                    
                     // check if the specified hashtag already exists
                     hashtagsModel.find({'twitterAccountId' : accountID.twitterAccountId, 'hashtag': hashtag},
                         
