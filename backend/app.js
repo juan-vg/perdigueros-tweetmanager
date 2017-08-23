@@ -1143,7 +1143,12 @@ var appRouter = function(app) {
                 
                 if(success){
                     
-                    // no need to verify params because DTD
+                    if(!request.body.twitteraccount.description || !request.body.twitteraccount.information
+                        || !request.body.twitteraccount.information.consumerkey || !request.body.twitteraccount.information.consumersecret
+                        || !request.body.twitteraccount.information.accesstoken || !request.body.twitteraccount.information.accesstokensecret){
+                            
+                        return response.status(400).send("Parameters error!");
+                    }
                     
                     newAccount = {
                             "description": request.body.twitteraccount.description,
@@ -1163,7 +1168,10 @@ var appRouter = function(app) {
             });
         } else {
             
-            if(!request.body.description || !request.body.information){
+            if(!request.body.description || !request.body.information
+                || !request.body.information.consumerKey || !request.body.information.consumerSecret
+                || !request.body.information.accessToken || !request.body.information.accessTokenSecret){
+                    
                 return response.status(400).send("Parameters error!");
             }
             
@@ -1421,7 +1429,9 @@ var appRouter = function(app) {
                 
                 if(success){
                     
-                    // no need to verify params because DTD
+                    if(!request.body.tweet.text){
+                        return response.status(400).send("Parameters error!");
+                    }
 
                     text = request.body.tweet.text;
                     
@@ -1547,7 +1557,11 @@ var appRouter = function(app) {
                 
                 if(success){
                     
-                    // no need to verify params because DTD
+                    if(!request.body.tweet.text || !request.body.tweet.date
+                        || "Invalid Date" === new Date(request.body.tweet.date).toString()){
+                            
+                        return response.status(400).send("Parameters error!");
+                    }
 
                     var tweetData = {
                         text: request.body.tweet.text,
@@ -1562,7 +1576,8 @@ var appRouter = function(app) {
             });
         } else {
             
-            if(!request.body.text || !request.body.date){
+            if(!request.body.text || !request.body.date
+                || "Invalid Date" === new Date(request.body.date).toString()){
                 return response.status(400).send("Parameters error!");
             }
             
@@ -2332,7 +2347,9 @@ var appRouter = function(app) {
                 
                 if(success){
                     
-                    // no need to verify params because DTD
+                    if(!request.body.hashtag.text){
+                        return response.status(400).send("Parameters error!");
+                    }
                     
                     hashtags.post(accountID, request.body.hashtag.text, callBackFunc);
                     
@@ -2668,7 +2685,9 @@ var appRouter = function(app) {
                 
                 if(success){
                     
-                    // no need to verify params because DTD
+                    if(!request.body.followed.newuser){
+                        return response.status(400).send("Parameters error!");
+                    }
                     
                     followedUsers.post(accountID, request.body.followed.newuser, callBackFunc);
                     
