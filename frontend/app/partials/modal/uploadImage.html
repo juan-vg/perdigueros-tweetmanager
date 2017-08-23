@@ -1,0 +1,31 @@
+<div class="modal-header">
+    <h3 class="modal-title">Subir imagenes</h3>
+</div>
+<div class="modal-body">
+    <form ng-submit="uploadFile()">
+        <label>Adjuntar imagen:</label>
+        <input type="file" name="file" uploader-model="file" />
+        <br>
+        <button class="btn btn-primary" type="submit">Subir foto</button>
+    </form>
+    <hr>
+    <!-- Result of upload-->
+    <tr>
+        <td >
+            <div class="row">
+                <div class="col-xs-10">
+                    <pre id="foo">{{imageUrlResponse}}</pre>
+                </div>
+                <div clas="col-xs-2">
+                    <button class="btn" ngclipboard data-clipboard-target="#foo">
+                        <i class="fa fa-clipboard fa-lg center-block" aria-hidden="true" title="Copiar al portapapeles"></i>
+                    </button>
+                </div>
+            </div>
+        </td>
+    </tr>
+
+</div>
+<div class="modal-footer">
+    <button ng-click="close()" class="btn btn-primary pull-left"> Cerrar</button>
+</div>

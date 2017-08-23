@@ -7,7 +7,8 @@ var app = angular.module('app');
 /**
  *  Controller for handle account table information.
  */
-app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService, $location) {
+app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService) {
+
     var accountCtrl = this;
     accountCtrl.active = false;
     $rootScope.activeAccount = accountCtrl.active;
@@ -26,13 +27,13 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
     };
     $http(req).then(function (response) {
         accountCtrl.accountList = response.data;
+        if(accountCtrl.accountList.length!=0){
+            accountCtrl.selectAccount(response.data[0]);
+        }
     })
         .catch(function (response) {
             if (response.status == 403) {
-                if (!localStorage.getItem('token')) {
                     localStorage.clear();
-                }
-                AlertService.alert('Error', 'El usuario no tiene permiso para listar cuentas de Twitter.', 'Cerrar');
             }
             else if (response.status == 500) {
                 AlertService.alert('Error', 'Error obteniendo las cuentas de Twitter de la base de datos.', 'Cerrar');

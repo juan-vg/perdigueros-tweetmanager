@@ -68,16 +68,20 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
             templateUrl: 'partials/login/forgot.html',
             controller: 'forgotPasswdCtrl'
         })
-        .when('/stadistics',{
-            templateUrl: 'partials/stadistics/stats.html',
-            controller:'stadisticsController'
+        .when('/statistics',{
+            templateUrl: 'partials/statistics/stats.html',
+            controller:'statisticsController'
         })
 
         .when('/dashboard/profile',{
             templateUrl : 'partials/dashboard/profile.html',
             controller: 'profileCtrl'
         })
-        .otherwise({redirectTo:'/'});
+        .when('/404',{
+            templateUrl : 'partials/404.html',
+            controller : '404Ctrl'
+        })
+        .otherwise({redirectTo:'/404'});
   
     /* */
     ;
