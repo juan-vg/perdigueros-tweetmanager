@@ -15,8 +15,10 @@
     "body-parser": "^1.17.1",
     "cors": "^2.8.4",
     "express": "^4.15.2",
+    "express-xml-bodyparser": "^0.3.0",
     "formidable": "^1.1.1",
     "hashmap": "^2.1.0",
+    "libxmljs": "^0.18.7",
     "mongodb": "^2.2.25",
     "mongoose": "4.10.8",
     "node-schedule": "^1.2.1",
@@ -25,6 +27,7 @@
     "request": "^2.81.0",
     "swagger-jsdoc": "^1.9.2",
     "twitter": "^1.7.0",
+    "w3c-validate": "0.0.2",
     "ws": "^3.0.0"
   }
 }

@@ -1,0 +1,5 @@
+hashtag
+[
+<!ELEMENT hashtag (text)>
+    <!ELEMENT text (#PCDATA)>
+]
