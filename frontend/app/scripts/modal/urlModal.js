@@ -4,7 +4,7 @@
 
 var app = angular.module('app');
 
-app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$http,$locale,$route) {
+app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$http,$locale) {
 
     $scope.postUrl = function () {
         var req = {

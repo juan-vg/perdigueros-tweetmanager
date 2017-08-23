@@ -149,7 +149,7 @@
                             <uib-tab ng-click="tweetCtrl.isUserSelected()"  heading="Seguimiento en tiempo real">
                                 <hr>
                                 <uib-tabset type="pills" class="center-pills">
-                                    <uib-tab ng-click="tweetCtrl.getSeguimiento()" heading="Gestionar seguimiento">
+                                    <uib-tab elem-ready="tweetCtrl.getSeguimiento()" heading="Gestionar seguimiento">
                                         <hr>
                                         <div >
                                             <table class="table table-bordered">
@@ -207,7 +207,7 @@
                                     <uib-tab ng-click="tweetCtrl.webSocketHashtags()" heading="Seguir Hashtags">
                                         <hr>
                                         <h1 class="text-center">Hashtags</h1>
-                                        <div ng-repeat="tweet in tweetCtrl.hashtagTweet">
+                                        <div ng-repeat="tweet in tweetCtrl.hashtagTweet track by tweet.id_str">
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
                                         </div>
@@ -215,7 +215,7 @@
                                     <uib-tab ng-click="tweetCtrl.webSocketFollowedUsers()" heading="Tweets de usuarios seguidos">
                                         <hr>
                                         <h1 class="text-center">Tweets de usuarios seguidos</h1>
-                                        <div ng-repeat="tweet in tweetCtrl.followedUserTweet">
+                                        <div ng-repeat="tweet in tweetCtrl.followedUserTweet track by tweet.id_str">
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
                                         </div>

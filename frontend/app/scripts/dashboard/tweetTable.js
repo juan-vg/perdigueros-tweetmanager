@@ -4,47 +4,13 @@ var app = angular.module('app');
 /**
  * Controller for tweet table information
  */
-app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal, $websocket,$route) {
+app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal, $websocket) {
     var tweetCtrl = this;
-
-    if (localStorage.getItem('selectedAccount')) {
-
-        var req = {
-            method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
-            + localStorage.getItem('selectedAccount') + '/hashtags',
-            headers: {
-                'Content-Type': 'application/json',
-                'token': localStorage.getItem('token')
-            }
-        }
-        
-        $http(req).then(function (response) {
-            tweetCtrl.allHashtags = response.data;
-        })
-            .catch(function (response) {
-                if (response.status == 400) {
-                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
-                }
-            });
-        var req = {
-            method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
-            + localStorage.getItem('selectedAccount') + '/followed-users',
-            headers: {
-                'Content-Type': 'application/json',
-                'token': localStorage.getItem('token')
-            }
-        }
-        $http(req).then(function (response) {
-            tweetCtrl.allFollowedUsers = response.data;
-        })
-            .catch(function (response) {
-
-            });
-
-
-
+    /*
+    *  Load home timeline at init of controller
+    * */
+    $rootScope.$watch("activeAccount",function(){
+        if($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
                 url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
@@ -58,50 +24,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 tweetCtrl.homeTimeLineTweetsList = response.data;
             });
 
+            tweetCtrl.getSeguimiento();
 
-        /**
-         * GET HASHTAGS
-         * @type {{method: string, url: string, headers: {Content-Type: string, token}}}
-         */
-        var req = {
-            method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
-            + localStorage.getItem('selectedAccount') + '/hashtags',
-            headers: {
-                'Content-Type': 'application/json',
-                'token': localStorage.getItem('token')
-            }
         }
-        $http(req).then(function (response) {
-            tweetCtrl.allHashtags = response.data;
-        })
-            .catch(function (response) {
-                if (response.status == 400) {
-                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
-                }
-            });
-        /**
-         * GET HASHTAGS
-         * @type {{method: string, url: string, headers: {Content-Type: string, token}}}
-         */
-        var req = {
-            method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
-            + localStorage.getItem('selectedAccount') + '/followed-users',
-            headers: {
-                'Content-Type': 'application/json',
-                'token': localStorage.getItem('token')
-            }
-        }
-        $http(req).then(function (response) {
-            tweetCtrl.allFollowedUsers = response.data;
-        })
-            .catch(function (response) {
-                if (response.status == 400) {
-                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
-                }
-            });
-    }
+    });
     /**
      * GET HOME TIMELINE
      */
