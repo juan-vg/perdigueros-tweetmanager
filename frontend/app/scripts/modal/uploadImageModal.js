@@ -1,7 +1,11 @@
 var app = angular.module('app');
 
-app.controller('uploadImageCtrl', ['$scope', 'upload', function ($scope, upload,$uibModalInstance)
+app.controller('uploadImageCtrl', ['$scope', 'upload','$uibModalInstance', function ($scope, upload,$uibModalInstance)
 {
+    $scope.close = function(){
+        $uibModalInstance.close();
+    }
+
 	$scope.uploadFile = function()
 	{
 		var file = $scope.file;
@@ -12,9 +16,6 @@ app.controller('uploadImageCtrl', ['$scope', 'upload', function ($scope, upload,
 		})
 	}
 
-	$scope.close = function(){
-    	$uibModalInstance.close();
-	}
 }]);
 
 app.directive('uploaderModel', ["$parse", function ($parse) {
@@ -30,7 +31,7 @@ app.directive('uploaderModel', ["$parse", function ($parse) {
 	};
 }]);
 
-app.service('upload', ["$http", "$q", function ($http, $q) 
+app.service('upload', ["$http", "$q", function ($http, $q)
 {
 	this.uploadFile = function(file, name)
 	{
@@ -52,5 +53,5 @@ app.service('upload', ["$http", "$q", function ($http, $q)
 			deferred.reject(msg);
 		})
 		return deferred.promise;
-	}	
+	}
 }]);
