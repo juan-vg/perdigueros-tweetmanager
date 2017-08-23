@@ -930,8 +930,10 @@ var appRouter = function(app) {
         login.reactivateAccount(accountID, callbackFunc);
     });
     
+    
+    // TWITTER ACCOUNTS
 
-    //todas las cuentas
+    // retrieve all the Twitter accounts
     /**
      * @swagger
      * /twitter-accounts:
@@ -983,7 +985,7 @@ var appRouter = function(app) {
         );
     });
 
-    //obtiene una cuenta
+    // retrieves a Twitter account
     /**
      * @swagger
      * /twitter-accounts/{id}:
@@ -1054,14 +1056,14 @@ var appRouter = function(app) {
         );
     });
     
-    //crea una cuenta
+    // creates a Twitter account
     /**
      * @swagger
      * /twitter-accounts:
      *   post:
      *     tags:
      *       - Twitter Accounts
-     *     description: Create a new twitter account
+     *     description: Create a new twitter account (XML INPUT SUPPORTED)
      *     parameters:
      *       - name: token
      *         in: header
@@ -1174,7 +1176,7 @@ var appRouter = function(app) {
         }
     });
     
-    //borra una cuenta
+    // deletes a Twitter account
     /**
      * @swagger
      * /twitter-accounts/{id}:
@@ -1244,7 +1246,7 @@ var appRouter = function(app) {
         );
     });
     
-    // reactiva una cuenta
+    // reactivates a deleted Twitter account
     /**
      * @swagger
      * /twitter-accounts/{id}/activated:
@@ -1317,14 +1319,14 @@ var appRouter = function(app) {
     
     // TWEETS
     
-    //publicar tweet
+    // tweet publish
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/publish:
      *   post:
      *     tags:
      *       - Tweets
-     *     description: Publish a new tweet (ADMIN)
+     *     description: Publish a new tweet (ADMIN)  (XML INPUT SUPPORTED)
      *     parameters:
      *       - name: token
      *         in: header
@@ -1340,6 +1342,9 @@ var appRouter = function(app) {
      *         description: The tweet text
      *         schema:
      *           $ref: "#/definitions/Tweet"
+     *     consumes:
+     *       - application/json
+     *       - application/xml
      *     produces:
      *       - text/html
      *       - application/json
@@ -1357,21 +1362,7 @@ var appRouter = function(app) {
      */
     app.post("/twitter-accounts/:id/tweets/publish", function(request, response) {
         
-        if(!request.body.text){
-            return response.status(400).send("Parameters error!");
-        }
-        
-        var accountID = {
-            'token': request.headers.token,
-            'twitterAccountId': request.params.id
-        };
-        
-        console.log("APP-POST-TWEET-PUBLISH: Publishing tweet for account: " + accountID.twitterAccountId);
-        
-        var text = request.body.text;
-        var ip = request.connection.remoteAddress;
-        
-        tweets.publish(accountID, text, ip, function (err, data){
+        var callBackFunc = function (err, data){
             
             if(!err){
                 console.log("APP-POST-TWEET-PUBLISH: OK");
@@ -1408,17 +1399,61 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        });
+        };
+        
+        
+        var text;
+        var ip = request.connection.remoteAddress;
+        
+        var accountID = {
+            'token': request.headers.token,
+            'twitterAccountId': request.params.id
+        };
+        
+        console.log("APP-POST-TWEET-PUBLISH: Publishing tweet for account: " + accountID.twitterAccountId);
+        
+        
+        const DTD = "tweetpublish";
+        
+        if(request.headers['content-type'] === 'application/xml'){
+            
+            xmlValidator.validate(DTD, request.rawBody, function(success){
+                
+                if(success){
+                    
+                    // no need to verify params because DTD
+
+                    text = request.body.tweet.text;
+                    
+                    tweets.publish(accountID, text, ip, callBackFunc);
+                    
+                } else {
+                    return response.status(400).send("XML not valid. Check DTD at http://<server>:8888/XML/" + DTD + ".dtd");
+                }
+            });
+        } else {
+            
+            if(!request.body.text){
+                return response.status(400).send("Parameters error!");
+            }
+            
+            text = request.body.text;
+            
+            tweets.publish(accountID, text, ip, callBackFunc);
+        }
+        
+        
+        
     });
     
-    //programar tweet
+    // tweet schedule
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/schedule:
      *   post:
      *     tags:
      *       - Tweets
-     *     description: Create a new scheduled tweet (ADMIN)
+     *     description: Create a new scheduled tweet (ADMIN) (XML INPUT SUPPORTED)
      *     parameters:
      *       - name: token
      *         in: header
@@ -1434,6 +1469,9 @@ var appRouter = function(app) {
      *         description: The tweet text and the publish date
      *         schema:
      *           $ref: "#/definitions/ScheduledTweet"
+     *     consumes:
+     *       - application/json
+     *       - application/xml
      *     produces:
      *       - text/html
      *       - application/json
@@ -1451,25 +1489,7 @@ var appRouter = function(app) {
      */
     app.post("/twitter-accounts/:id/tweets/schedule", function(request, response) {
         
-        if(!request.body.text || !request.body.date){
-            return response.status(400).send("Parameters error!");
-        }
-        
-        var accountID = {
-            'token': request.headers.token,
-            'twitterAccountId': request.params.id
-        };
-        
-        var tweetData = {
-            text: request.body.text,
-            date: new Date(request.body.date)
-        };
-        
-        var ip = request.connection.remoteAddress;
-        
-        console.log("APP-POST-TWEET-PUBLISH: Scheduling tweet for account: " + accountID.twitterAccountId);
-        
-        tweets.schedule(accountID, tweetData, ip, function (err, data){
+        var callBackFunc = function (err, data){
             
             if(!err){
                 console.log("APP-POST-TWEET-SCHEDULE: OK");
@@ -1506,10 +1526,56 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        });
+        };
+        
+        
+        var ip = request.connection.remoteAddress;
+        
+        var accountID = {
+            'token': request.headers.token,
+            'twitterAccountId': request.params.id
+        };
+        
+        console.log("APP-POST-TWEET-PUBLISH: Scheduling tweet for account: " + accountID.twitterAccountId);
+        
+        
+        const DTD = "tweetschedule";
+        
+        if(request.headers['content-type'] === 'application/xml'){
+            
+            xmlValidator.validate(DTD, request.rawBody, function(success){
+                
+                if(success){
+                    
+                    // no need to verify params because DTD
+
+                    var tweetData = {
+                        text: request.body.tweet.text,
+                        date: new Date(request.body.tweet.date)
+                    };
+                    
+                    tweets.schedule(accountID, tweetData, ip, callBackFunc);
+                    
+                } else {
+                    return response.status(400).send("XML not valid. Check DTD at http://<server>:8888/XML/" + DTD + ".dtd");
+                }
+            });
+        } else {
+            
+            if(!request.body.text || !request.body.date){
+                return response.status(400).send("Parameters error!");
+            }
+            
+            var tweetData = {
+                text: request.body.text,
+                date: new Date(request.body.date)
+            };
+            
+            tweets.schedule(accountID, tweetData, ip, callBackFunc);
+        }
     });
     
-    //tweeter user timeline
+    // Twitter user timeline
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/user-timeline:
@@ -1592,7 +1658,7 @@ var appRouter = function(app) {
         });
     });
     
-    //tweeter home timeline
+    // Twitter home timeline
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/home-timeline:
@@ -1675,7 +1741,7 @@ var appRouter = function(app) {
         });
     });
     
-    //scheduled tweets
+    // retrieves scheduled tweets
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/scheduled:
@@ -1758,7 +1824,7 @@ var appRouter = function(app) {
         });
     });
     
-    //mentions
+    // retrieves the Twitter account mentions
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/mentions:
@@ -1841,7 +1907,7 @@ var appRouter = function(app) {
         });
     });
     
-    //tweets retuiteados
+    // retrieves the Twitter account, retweeted tweets
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/retweeted:
@@ -1924,7 +1990,7 @@ var appRouter = function(app) {
         });
     });
     
-    //tweets marcados favoritos
+    // retrieves the Twitter account, favorited tweets
     /**
      * @swagger
      * /twitter-accounts/{id}/tweets/favorited:
@@ -2174,7 +2240,7 @@ var appRouter = function(app) {
      *   post:
      *     tags:
      *       - Hashtags
-     *     description: Creates a new hashtag for the provided twitter-account's {id} (ADMIN)
+     *     description: Creates a new hashtag for the provided twitter-account's {id} (ADMIN) (XML INPUT SUPPORTED)
      *     parameters:
      *       - name: token
      *         in: header
@@ -2190,6 +2256,9 @@ var appRouter = function(app) {
      *         description: The hashtag string to create
      *         schema:
      *           $ref: "#/definitions/Hashtags"
+     *     consumes:
+     *       - application/json
+     *       - application/xml
      *     produces:
      *       - application/json
      *       - text/html
@@ -2208,19 +2277,8 @@ var appRouter = function(app) {
      *         description: DB error
      */
     app.post("/twitter-accounts/:id/hashtags", function(request, response) {
-        
-        if(!request.body.hashtag){
-            return response.status(400).send("Parameters error!");
-        }
-        
-        var accountID = {
-            'token': request.headers.token,
-            'twitterAccountId': request.params.id
-        };
-        
-        console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for twitterAccountId: " + accountID.twitterAccountId);
-        
-        hashtags.post(accountID, request.body.hashtag, function (err, data){
+
+        var callBackFunc = function (err, data){
             
             if(!err){
                 console.log("APP-POST-HASHTAG: OK");
@@ -2256,14 +2314,40 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        });
-    });
-    
-    app.put("/twitter-accounts/:id/hashtags/:hashtag", function(request, response) {
-        // Not implemented yet. Waiting for more data
-        console.log("APP-PUT-HASHTAG: Called!");
-        response.writeHead(501, {"Content-Type": "text/html"});
-        response.write("Not implemented yet");
+        };
+        
+        var accountID = {
+            'token': request.headers.token,
+            'twitterAccountId': request.params.id
+        };
+        
+        console.log("APP-POST-HASHTAG: Creating hashtag " + request.body.hashtag + " for twitterAccountId: " + accountID.twitterAccountId);
+        
+        
+        const DTD = "hashtag";
+        
+        if(request.headers['content-type'] === 'application/xml'){
+            
+            xmlValidator.validate(DTD, request.rawBody, function(success){
+                
+                if(success){
+                    
+                    // no need to verify params because DTD
+                    
+                    hashtags.post(accountID, request.body.hashtag.text, callBackFunc);
+                    
+                } else {
+                    return response.status(400).send("XML not valid. Check DTD at http://<server>:8888/XML/" + DTD + ".dtd");
+                }
+            });
+        } else {
+            
+            if(!request.body.hashtag){
+                return response.status(400).send("Parameters error!");
+            }
+            
+            hashtags.post(accountID, request.body.hashtag, callBackFunc);
+        }
     });
     
     /**
@@ -2349,7 +2433,7 @@ var appRouter = function(app) {
         });
     });
     
-    //USUARIOS FOLLOWED
+    // FOLLOWED USERS
     
     /**
      * @swagger
@@ -2493,7 +2577,7 @@ var appRouter = function(app) {
      *   post:
      *     tags:
      *       - Followed
-     *     description: Creates a new followed user for the provided twitter-account's {id} (ADMIN)
+     *     description: Creates a new followed user for the provided twitter-account's {id} (ADMIN) (XML INPUT SUPPORTED)
      *     parameters:
      *       - name: token
      *         in: header
@@ -2509,6 +2593,9 @@ var appRouter = function(app) {
      *         description: The user to be followed
      *         schema:
      *           $ref: "#/definitions/Followed-users"
+     *     consumes:
+     *       - application/json
+     *       - application/xml
      *     produces:
      *       - application/json
      *       - text/html
@@ -2528,18 +2615,7 @@ var appRouter = function(app) {
      */
     app.post("/twitter-accounts/:id/followed-users", function(request, response) {
         
-        if(!request.body.newuser){
-            return response.status(400).send("Parameters error!");
-        }
-        
-        var accountID = {
-                'token': request.headers.token,
-                'twitterAccountId': request.params.id
-            };
-            
-        console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for twitterAccountId: " + accountID.twitterAccountId);
-            
-        followedUsers.post(accountID, request.body.newuser, function (err, data){
+        var callBackFunc = function (err, data){
             
             if(!err){
                 console.log("APP-POST-FOLLOWED-USERS: OK");
@@ -2574,7 +2650,40 @@ var appRouter = function(app) {
                 }
             }
             response.end();
-        });
+        };
+        
+        var accountID = {
+                'token': request.headers.token,
+                'twitterAccountId': request.params.id
+            };
+            
+        console.log("APP-POST-FOLLOWED-USERS: Creating user " + request.body.newuser + " for twitterAccountId: " + accountID.twitterAccountId);
+        
+        
+        const DTD = "followeduser";
+        
+        if(request.headers['content-type'] === 'application/xml'){
+            
+            xmlValidator.validate(DTD, request.rawBody, function(success){
+                
+                if(success){
+                    
+                    // no need to verify params because DTD
+                    
+                    followedUsers.post(accountID, request.body.followed.newuser, callBackFunc);
+                    
+                } else {
+                    return response.status(400).send("XML not valid. Check DTD at http://<server>:8888/XML/" + DTD + ".dtd");
+                }
+            });
+        } else {
+            
+            if(!request.body.newuser){
+                return response.status(400).send("Parameters error!");
+            }
+            
+            followedUsers.post(accountID, request.body.newuser, callBackFunc);
+        }
     });
     
      /**
@@ -2650,7 +2759,8 @@ var appRouter = function(app) {
         });
     });
     
-    //ADMIN
+    
+    // APP USERS
     
     /**
      * @swagger
@@ -2808,7 +2918,7 @@ var appRouter = function(app) {
      *       - text/html
      *     responses:
      *       200:
-     *         description: The user info
+     *         description: OK
      *       400:
      *         description: The provided {id} is not valid OR Params error
      *       401:
@@ -2843,7 +2953,6 @@ var appRouter = function(app) {
             if(!err){
                 console.log("APP-PUT-USER: OK");
                 response.writeHead(200, {"Content-Type": "application/json"});
-                //response.write(JSON.stringify(data));
                 
             } else {
                 if (data == "ID NOT VALID"){
@@ -2954,6 +3063,7 @@ var appRouter = function(app) {
         
     });
     
+    
     //STATS  
     
      /**
@@ -3040,7 +3150,9 @@ var appRouter = function(app) {
         });
     });
     
-    //ACORTAR URL
+    
+    // URL SHORTENER
+    
     /**
      * @swagger
      * /urls/{id}:
@@ -3133,7 +3245,9 @@ var appRouter = function(app) {
         );
     });
     
-    //IMAGENES
+    
+     // IMAGE UPLOAD
+    
      /**
      * @swagger
      * /images/{id}:
@@ -3236,6 +3350,9 @@ var appRouter = function(app) {
               });
             });
     });
+    
+    
+    // CAPTCHA
     
     /**
      * @swagger

@@ -1,0 +1,5 @@
+tweet
+[
+<!ELEMENT tweet (text)>
+    <!ELEMENT text (#PCDATA)>
+]

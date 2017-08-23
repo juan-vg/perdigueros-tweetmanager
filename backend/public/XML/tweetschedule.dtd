@@ -1,0 +1,6 @@
+tweet
+[
+<!ELEMENT tweet (text,date)>
+    <!ELEMENT text (#PCDATA)>
+    <!ELEMENT date (#PCDATA)>
+]
