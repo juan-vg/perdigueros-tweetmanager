@@ -4,53 +4,30 @@ var app = angular.module('app');
 /**
  * Controller for tweet table information
  */
-app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal, $websocket,$route) {
+app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal, $websocket) {
     var tweetCtrl = this;
+    /*
+    *  Load home timeline at init of controller
+    * */
+    $rootScope.$watch("activeAccount",function(){
+        if($rootScope.activeAccount) {
+            var req = {
+                method: 'GET',
+                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                + localStorage.getItem('selectedAccount') + '/tweets/home-timeline',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'token': localStorage.getItem('token')
+                }
+            }
+            $http(req).then(function (response) {
+                tweetCtrl.homeTimeLineTweetsList = response.data;
+            });
 
-    if (localStorage.getItem('selectedAccount')) {
-        /**
-         * GET HASHTAGS
-         * @type {{method: string, url: string, headers: {Content-Type: string, token}}}
-         */
-        var req = {
-            method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
-            + localStorage.getItem('selectedAccount') + '/hashtags',
-            headers: {
-                'Content-Type': 'application/json',
-                'token': localStorage.getItem('token')
-            }
+            tweetCtrl.getSeguimiento();
+
         }
-        $http(req).then(function (response) {
-            tweetCtrl.allHashtags = response.data;
-        })
-            .catch(function (response) {
-                if (response.status == 400) {
-                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
-                }
-            });
-        /**
-         * GET HASHTAGS
-         * @type {{method: string, url: string, headers: {Content-Type: string, token}}}
-         */
-        var req = {
-            method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
-            + localStorage.getItem('selectedAccount') + '/followed-users',
-            headers: {
-                'Content-Type': 'application/json',
-                'token': localStorage.getItem('token')
-            }
-        }
-        $http(req).then(function (response) {
-            tweetCtrl.allFollowedUsers = response.data;
-        })
-            .catch(function (response) {
-                if (response.status == 400) {
-                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
-                }
-            });
-    }
+    });
     /**
      * GET HOME TIMELINE
      */
@@ -374,6 +351,16 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         });
     }
     /**
+     * Show upload image modal
+     */
+
+    tweetCtrl.uploadImageModal = function () {
+        var modalInstance = $uibModal.open({
+            templateUrl : 'partials/modal/uploadImage.html',
+            controller : 'uploadImageCtrl'
+        });
+    }
+    /**
      * Function that get all hashtags added by twitter account
      */
     tweetCtrl.getAllHashtags = function () {
@@ -462,7 +449,11 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             tweetCtrl.getAllHashtags();
         })
             .catch(function (response) {
-
+                if(response.status==403){
+                    localStorage.clear();
+                    AlertService.alert('Error','No tienes permiso para realizar esta acción','Cerrar');
+                    $location.url('/');
+                }
             });
 
     }
@@ -496,6 +487,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             });
     }
 
+    tweetCtrl.getSeguimiento= function (){
+        tweetCtrl.getAllHashtags();
+        tweetCtrl.getAllFollowed();
+    }
 
     /**
      * GETS ALL FOLLOWED USERS
