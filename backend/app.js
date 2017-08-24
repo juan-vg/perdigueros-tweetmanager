@@ -1558,7 +1558,8 @@ var appRouter = function(app) {
                 if(success){
                     
                     if(!request.body.tweet.text || !request.body.tweet.date
-                        || "Invalid Date" === new Date(request.body.tweet.date).toString()){
+                        || "Invalid Date" === new Date(request.body.tweet.date).toString() // invalid date
+                        || new Date() > new Date(request.body.tweet.date)){                // past date
                             
                         return response.status(400).send("Parameters error!");
                     }
@@ -1577,7 +1578,9 @@ var appRouter = function(app) {
         } else {
             
             if(!request.body.text || !request.body.date
-                || "Invalid Date" === new Date(request.body.date).toString()){
+                || "Invalid Date" === new Date(request.body.date).toString() // invalid date
+                || new Date() > new Date(request.body.date)){                // past date
+                    
                 return response.status(400).send("Parameters error!");
             }
             
