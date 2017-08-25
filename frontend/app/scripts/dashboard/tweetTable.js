@@ -445,14 +445,14 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         })
             .catch(function (response) {
                 if(response.status==403){
-                    AlertService.alert('Error','No tienes permiso para realizar esta acción. Cuenta no existente o desactivada','Cerrar');
+                    AlertService.alert('Error','El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.','Cerrar');
                     $location.url('/dashboard');
                 }
                 else if(response.status==400){
                     AlertService.alert('Error','El campo está vacío o ha habido un problema con la información introducida.','Cerrar');
                 }
                 else if(response.status==404){
-                    AlertService.alert('Error','La cuenta no existe o está desactivada','Cerrar');
+                    AlertService.alert('Error','Cuenta no existente o desactivada','Cerrar');
                 }
                 else if(response.status==409){
                     AlertService.alert('Error','El hashtag a seguir ya existe en la lista de hashtags seguidos.','Cerrar');
@@ -535,14 +535,14 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         })
             .catch(function (response) {
                 if(response.status==403){
-                    AlertService.alert('Error','La cuenta no existe o está desactivada','Cerrar');
+                    AlertService.alert('Error','El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.','Cerrar');
                     $location.url('/dashboard');
                 }
                 else if(response.status==400){
                     AlertService.alert('Error','El campo está vacío o ha habido un problema con la información introducida.','Cerrar');
                 }
                 else if(response.status==404){
-                    AlertService.alert('Error','La cuenta no existe o está desactivada','Cerrar');
+                    AlertService.alert('Error','Cuenta no existente o desactivada','Cerrar');
                 }
                 else if(response.status==409){
                     AlertService.alert('Error','El usuario a seguir ya existe en la lista de usuarios seguidos.','Cerrar');
