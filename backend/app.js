@@ -1429,7 +1429,7 @@ var appRouter = function(app) {
                 
                 if(success){
                     
-                    if(!request.body.tweet.text){
+                    if(!request.body.tweet.text || request.body.tweet.text.length > 140){ // Twitter char limit
                         return response.status(400).send("Parameters error!");
                     }
 
@@ -1443,7 +1443,7 @@ var appRouter = function(app) {
             });
         } else {
             
-            if(!request.body.text){
+            if(!request.body.text || request.body.text.length > 140){ // Twitter char limit
                 return response.status(400).send("Parameters error!");
             }
             
@@ -1557,7 +1557,7 @@ var appRouter = function(app) {
                 
                 if(success){
                     
-                    if(!request.body.tweet.text || !request.body.tweet.date
+                    if(!request.body.tweet.text || !request.body.tweet.date || request.body.tweet.text.length > 140 // Twitter char limit
                         || "Invalid Date" === new Date(request.body.tweet.date).toString() // invalid date
                         || new Date() > new Date(request.body.tweet.date)){                // past date
                             
@@ -1577,7 +1577,7 @@ var appRouter = function(app) {
             });
         } else {
             
-            if(!request.body.text || !request.body.date
+            if(!request.body.text || !request.body.date || request.body.text.length > 140 // Twitter char limit
                 || "Invalid Date" === new Date(request.body.date).toString() // invalid date
                 || new Date() > new Date(request.body.date)){                // past date
                     
