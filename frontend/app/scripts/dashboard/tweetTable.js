@@ -445,7 +445,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         })
             .catch(function (response) {
                 if(response.status==403){
-                    AlertService.alert('Error','No tienes permiso para realizar esta acción.Cuenta no existente o desactivada','Cerrar');
+                    AlertService.alert('Error','No tienes permiso para realizar esta acción. Cuenta no existente o desactivada','Cerrar');
                     $location.url('/dashboard');
                 }
                 else if(response.status==400){
