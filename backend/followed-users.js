@@ -44,10 +44,24 @@ exports.getAll = function(accountID, callback){
                         callback(error, data);
                     });
                 } else {
-                    console.log("FOLLOWED-USERS-GET-ALL: Forbidden.");
+                    
+                    if(reason == "ACCOUNT NOT FOUND"){
+                        console.log("FOLLOWED-USERS-GET-ALL: Twitter account NOT FOUND");
 
-                    error = true;
-                    data = "FORBIDDEN";
+                        error = true;
+                        data = "ACCOUNT NOT FOUND";
+                    } else if(reason == "DB ERROR") {
+                        console.log("FOLLOWED-USERS-GET-ALL: DB ERROR!!!" );
+
+                        error = true;
+                        data = "DB ERROR";
+                    } else {
+                        console.log("FOLLOWED-USERS-GET-ALL: User does not own that account");
+
+                        error = true;
+                        data = "FORBIDDEN" ;
+                    }
+                    
                     callback(error, data);
                 }
             });
@@ -102,10 +116,24 @@ exports.get = function (accountID, user, callback){
                     }
                     );
                 } else {
-                    console.log("FOLLOWED-USERS-GET-ID: Forbidden.");
+                    
+                    if(reason == "ACCOUNT NOT FOUND"){
+                        console.log("FOLLOWED-USERS-GET-ID: Twitter account NOT FOUND");
 
-                    error = true;
-                    data = "FORBIDDEN";  
+                        error = true;
+                        data = "ACCOUNT NOT FOUND";
+                    } else if(reason == "DB ERROR") {
+                        console.log("FOLLOWED-USERS-GET-ID: DB ERROR!!!" );
+
+                        error = true;
+                        data = "DB ERROR";
+                    } else {
+                        console.log("FOLLOWED-USERS-GET-ID: User does not own that account");
+
+                        error = true;
+                        data = "FORBIDDEN" ;
+                    }
+                    
                     callback(error, data);
                 }
             }); 
@@ -204,11 +232,25 @@ exports.post = function (accountID, user, callback){
                             callback(error, data);
                         }
                     });
-                } else {
-                    console.log("FOLLOWED-USERS-POST-ID: Forbidden.");
+                } else {                    
+                    
+                    if(reason == "ACCOUNT NOT FOUND"){
+                        console.log("FOLLOWED-USERS-POST-ID: Twitter account NOT FOUND");
 
-                    error = true;
-                    data = "FORBIDDEN";
+                        error = true;
+                        data = "ACCOUNT NOT FOUND";
+                    } else if(reason == "DB ERROR") {
+                        console.log("FOLLOWED-USERS-POST-ID: DB ERROR!!!" );
+
+                        error = true;
+                        data = "DB ERROR";
+                    } else {
+                        console.log("FOLLOWED-USERS-POST-ID: User does not own that account");
+
+                        error = true;
+                        data = "FORBIDDEN" ;
+                    }
+                    
                     callback(error, data);
                 }
             }); 
@@ -273,10 +315,24 @@ exports.delete = function (accountID, user, callback){
                         }
                     });
                 } else {
-                    console.log("FOLLOWED-USERS-DELETE-ID: Forbidden.");
                     
-                    error = true;
-                    data = "FORBIDDEN";
+                    if(reason == "ACCOUNT NOT FOUND"){
+                        console.log("FOLLOWED-USERS-DELETE-ID: Twitter account NOT FOUND");
+
+                        error = true;
+                        data = "ACCOUNT NOT FOUND";
+                    } else if(reason == "DB ERROR") {
+                        console.log("FOLLOWED-USERS-DELETE-ID: DB ERROR!!!" );
+
+                        error = true;
+                        data = "DB ERROR";
+                    } else {
+                        console.log("FOLLOWED-USERS-DELETE-ID: User does not own that account");
+
+                        error = true;
+                        data = "FORBIDDEN" ;
+                    }
+                    
                     callback(error, data);
                 }
             });   

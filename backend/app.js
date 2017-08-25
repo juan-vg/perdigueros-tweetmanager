@@ -2479,6 +2479,8 @@ var appRouter = function(app) {
      *         description: The followed users list
      *       403:
      *         description: Given token does not have permission to the provided twitter-account's {id}
+     *       404:
+     *         description: Unable to find the requested twitter account {id}
      *       500:
      *         description: DB error
      */
@@ -2500,15 +2502,25 @@ var appRouter = function(app) {
                 response.write(JSON.stringify(data));
 
             } else {
-                if(data == "FORBIDDEN"){
+                
+                if (data == "ID NOT VALID"){
+                    console.log("APP-GET-ALL-FOLLOWED-USERS: Bad request. ID not valid");
+                    
+                    response.writeHead(400, {"Content-Type": "text/html"});
+                    response.write("Bad request. Twitter account ID not valid");
+                    
+                } else if(data == "FORBIDDEN"){
                     console.log("APP-GET-ALL-FOLLOWED-USERS: Forbidden!!!");
-
                     response.writeHead(403, {"Content-Type": "text/html"});
                     response.write("Forbidden");
-
+                    
+                } else if(data == "ACCOUNT NOT FOUND"){
+                    console.log("APP-GET-ALL-FOLLOWED-USERS: Twitter account NOT found!!!");
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Twitter account NOT found");
+                    
                 } else {
                     console.log("APP-GET-ALL-FOLLOWED-USERS: DB ERROR!!!");
-
                     response.writeHead(500, {"Content-Type": "text/html"});
                     response.write("Sorry, DB Error!");
                 }
@@ -2546,7 +2558,7 @@ var appRouter = function(app) {
      *       403:
      *         description: Given token does not own the provided twitter-account's {id}
      *       404:
-     *         description: Not found {user}
+     *         description: Not found {id} OR {user}
      *       500:
      *         description: DB error
      */
@@ -2568,21 +2580,30 @@ var appRouter = function(app) {
                 response.write(JSON.stringify(data));
                 
             } else {
-                if(data == "FORBIDDEN"){
-                    console.log("APP-GET-FOLLOWED-USERS: Forbidden!!!");
+                
+                if (data == "ID NOT VALID"){
+                    console.log("APP-GET-FOLLOWED-USERS: Bad request. ID not valid");
                     
+                    response.writeHead(400, {"Content-Type": "text/html"});
+                    response.write("Bad request. Twitter account ID not valid");
+                    
+                } else if(data == "FORBIDDEN"){
+                    console.log("APP-GET-FOLLOWED-USERS: Forbidden!!!");
                     response.writeHead(403, {"Content-Type": "text/html"});
                     response.write("Forbidden");
                     
-                } else if(data == "NOT FOUND"){
-                    console.log("APP-GET-FOLLOWED-USERS: Not found!!!");
-                    
+                } else if(data == "ACCOUNT NOT FOUND"){
+                    console.log("APP-GET-FOLLOWED-USERS: Twitter account NOT found!!!");
                     response.writeHead(404, {"Content-Type": "text/html"});
-                    response.write("Not Found");  
-                    
+                    response.write("Twitter account NOT Found");
+                                    
+                } else if(data == "NOT FOUND"){
+                    console.log("APP-GET-FOLLOWED-USERS: Followed user NOT found!!!");
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Hashtag NOT Found");
+                                    
                 } else {
                     console.log("APP-GET-FOLLOWED-USERS: DB ERROR!!!");
-                    
                     response.writeHead(500, {"Content-Type": "text/html"});
                     response.write("Sorry, DB Error!");
                 }
@@ -2626,6 +2647,8 @@ var appRouter = function(app) {
      *         description: Params error
      *       403:
      *         description: Given token does not own the provided twitter-account's {id}
+     *       404:
+     *         description: Unable to find the requested twitter account {id}
      *       409:
      *         description: Conflict. The {user} already exists for the provided twitter-account's {id}
      *       500:
@@ -2644,27 +2667,30 @@ var appRouter = function(app) {
                 response.write("Created");
                 
             } else {
-                if(data == "FORBIDDEN"){
-                    console.log("APP-POST-FOLLOWED-USERS: Forbidden!!!");
+                
+                if (data == "ID NOT VALID"){
+                    console.log("APP-POST-FOLLOWED-USERS: Bad request. ID not valid");
                     
+                    response.writeHead(400, {"Content-Type": "text/html"});
+                    response.write("Bad request. Twitter account ID not valid");
+                    
+                } else if(data == "FORBIDDEN"){
+                    console.log("APP-POST-FOLLOWED-USERS: Forbidden!!!");
                     response.writeHead(403, {"Content-Type": "text/html"});
                     response.write("Forbidden");
                     
                 } else if(data == "ALREADY EXISTS"){
                     console.log("APP-POST-FOLLOWED-USERS: Conflict. Already exists!!!");
-                    
                     response.writeHead(409, {"Content-Type": "text/html"});
-                    response.write("Followed user already exists for the provided twitter account");    
-                    
-                } else if (data == "TWITTER ERROR") {
-                    console.log("APP-POST-FOLLOWED-USERS: Twitter service error OR unavailable");
-                    
-                    response.writeHead(503, {"Content-Type": "text/html"});
-                    response.write("Twitter service error OR unavailable");
-                    
+                    response.write("Followed user already exists for the provided twitter account");
+                                    
+                } else if(data == "ACCOUNT NOT FOUND"){
+                    console.log("APP-POST-FOLLOWED-USERS: Twitter account NOT found!!!");
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Twitter account NOT Found");
+                                    
                 } else {
                     console.log("APP-POST-FOLLOWED-USERS: DB ERROR!!!");
-                    
                     response.writeHead(500, {"Content-Type": "text/html"});
                     response.write("Sorry, DB Error!");
                 }
@@ -2736,6 +2762,8 @@ var appRouter = function(app) {
      *         description: Followed user deleted
      *       403:
      *         description: Given token does not own the provided twitter-account's {id}
+     *       404:
+     *         description: Not found {id} OR {user}
      *       409:
      *         description: Conflict. The {user} does not exist for the provided twitter-account's {id}
      *       500:
@@ -2758,21 +2786,30 @@ var appRouter = function(app) {
                 response.write("Deleted");
 
             } else {
-                if(data == "FORBIDDEN"){
+                
+                if (data == "ID NOT VALID"){
+                    console.log("APP-DELETE-FOLLOWED-USERS: Bad request. ID not valid");
+                    
+                    response.writeHead(400, {"Content-Type": "text/html"});
+                    response.write("Bad request. Twitter account ID not valid");
+                    
+                } else if(data == "FORBIDDEN"){
                     console.log("APP-DELETE-FOLLOWED-USERS: Forbidden!!!");
-
                     response.writeHead(403, {"Content-Type": "text/html"});
                     response.write("Forbidden");
-
+                    
                 } else if(data == "NOT EXIST"){
-                    console.log("APP-DELETE-FOLLOWED-USERS: Conflict. Does not exist!!!");
-
-                    response.writeHead(409, {"Content-Type": "text/html"});
-                    response.write("Followed user does not exist for the provided twitter account"); 
-
+                    console.log("APP-DELETE-FOLLOWED-USERS: Followed user NOT found!!!");
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Followed user NOT found");
+                                
+                } else if(data == "ACCOUNT NOT FOUND"){
+                    console.log("APP-DELETE-FOLLOWED-USERS: Twitter account NOT found!!!");
+                    response.writeHead(404, {"Content-Type": "text/html"});
+                    response.write("Twitter account NOT Found");
+                                    
                 } else {
                     console.log("APP-DELETE-FOLLOWED-USERS: DB ERROR!!!");
-
                     response.writeHead(500, {"Content-Type": "text/html"});
                     response.write("Sorry, DB Error!");
                 }
