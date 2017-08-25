@@ -26,7 +26,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 .catch(function(response){
                     if(response.status==404){
                         tweetCtrl.homeTimeLineTweetsList = null;
-                        AlertService.alert('Error','Cuenta no existente o desactivada','Cerrar');
+                        AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
                     }
                 });
 
@@ -54,10 +54,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 .catch(function (response) {
                     if(response.status==404){
                         tweetCtrl.homeTimeLineTweetsList = null;
-                        AlertService.alert('Error','Cuenta no existente o desactivada','Cerrar');
+                        AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
                     }
                     else if(response.status==503){
-                        AlertService.alert('Error','Error con servicio interno de Twitter, espere unos segundos para reintentar la operación','Cerrar');
+                        AlertService.alert('Error','Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación','Cerrar');
                     }
                 });
         }
@@ -84,19 +84,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 tweetCtrl.myTweets = response.data;
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
+                    AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
                 }
                 else if (response.status == 403) {
                     AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
                 }
                 else if (response.status == 404) {
-                    AlertService.alert('Error', 'Cuenta no existente o desactivada.', 'Cerrar');
+                    AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
                 }
                 else if (response.status == 500) {
                     AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
                 }
                 else if (response.status == 503) {
-                    AlertService.alert('Error', 'Servicio externo de Twitter no disponible.', 'Cerrar');
+                    AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
                 }
             });
         }
@@ -125,19 +125,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 tweetCtrl.scheduledTweets = response.data;
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
+                    AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
                 }
                 else if (response.status == 403) {
                     AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
                 }
                 else if (response.status == 404) {
-                    AlertService.alert('Error', 'Cuenta no existente o desactivada.', 'Cerrar');
+                    AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
                 }
                 else if (response.status == 500) {
                     AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
                 }
                 else if (response.status == 503) {
-                    AlertService.alert('Error', 'Servicio externo de Twitter no disponible.', 'Cerrar');
+                    AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
                 }
             });
         }
@@ -170,16 +170,16 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id provisto no es válido o el tweet es demasiado largo para ser publicado. Revíselo antes ', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros. Es posible que el tweet sea demasiado largo para ser publicado, o no reúna los requisitos de Twitter. Revíselo antes.', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'Cuenta no existente o desactivada.', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Servicio externo de Twitter no disponible.', 'Cerrar');
+                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
                     }
                 });
         }
@@ -210,7 +210,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 AlertService.alert('Enhorabuena', 'El tweet se ha programado correctamente.', 'Cerrar');
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
+                    AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros. Es posible que el tweet sea demasiado largo para ser publicado, o no reúna los requisitos de Twitter. Revíselo antes.', 'Cerrar');
                 }
                 else if (response.status == 403) {
                     AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
@@ -219,10 +219,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                     AlertService.alert('Error', 'Error guardando tweet programado en la base de datos.', 'Cerrar');
                 }
                 else if (response.status == 503) {
-                    AlertService.alert('Error', 'Servicio externo de Twitter no disponible.', 'Cerrar');
+                    AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
                 }
                 else if(response.status == 404){
-                    AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada','Cerrar');
+                    AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
                 }
             });
         }
@@ -251,19 +251,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'Cuenta no existente o desactivada', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
                     }
                     else if (response.status == 500) {
                         AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Servicio externo de Twitter no disponible.', 'Cerrar');
+                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
                     }
                 });
         }
@@ -293,19 +293,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'Cuenta no existente o desactivada', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
                     }
                     else if (response.status == 500) {
                         AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Servicio externo de Twitter no disponible.', 'Cerrar');
+                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
                     }
                 });
             ;
@@ -336,19 +336,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'El id provisto no es válido o hay un error en los parametros. ', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
                     }
                     else if (response.status == 403) {
                         AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'Cuenta no existente o desactivada', 'Cerrar');
+                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
                     }
                     else if (response.status == 500) {
                         AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Servicio externo de Twitter no disponible.', 'Cerrar');
+                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
                     }
                 });
             ;
@@ -397,6 +397,8 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             .catch(function (response) {
                 if (response.status == 400) {
                     AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
+                } else {
+                    AlertService.alert('Error', 'No se ha podido obtener la lista de hashtags.', 'Cerrar');
                 }
             });
     }
@@ -452,7 +454,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                     AlertService.alert('Error','El campo está vacío o ha habido un problema con la información introducida.','Cerrar');
                 }
                 else if(response.status==404){
-                    AlertService.alert('Error','Cuenta no existente o desactivada','Cerrar');
+                    AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
                 }
                 else if(response.status==409){
                     AlertService.alert('Error','El hashtag a seguir ya existe en la lista de hashtags seguidos.','Cerrar');
@@ -480,7 +482,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             tweetCtrl.getAllHashtags();
         })
             .catch(function (response) {
-
+                AlertService.alert('Error', 'No se ha podido eliminar el hashtag.', 'Cerrar');
             });
     }
 
@@ -506,7 +508,11 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             tweetCtrl.allFollowedUsers = response.data;
         })
             .catch(function (response) {
-
+                if (response.status == 400) {
+                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
+                } else {
+                    AlertService.alert('Error', 'No se ha podido obtener la lista de usuarios a seguir.', 'Cerrar');
+                }
             });
 
 
@@ -542,7 +548,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                     AlertService.alert('Error','El campo está vacío o ha habido un problema con la información introducida.','Cerrar');
                 }
                 else if(response.status==404){
-                    AlertService.alert('Error','Cuenta no existente o desactivada','Cerrar');
+                    AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
                 }
                 else if(response.status==409){
                     AlertService.alert('Error','El usuario a seguir ya existe en la lista de usuarios seguidos.','Cerrar');
@@ -571,7 +577,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             tweetCtrl.getAllFollowed();
         })
             .catch(function (response) {
-
+                AlertService.alert('Error', 'No se ha podido eliminar el usuario a seguir.', 'Cerrar');
             });
 
     }
@@ -645,7 +651,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                     AlertService.alert('Atencion','No hay usuarios a seguir en esta cuenta','Cerrar');
                 }
                 else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                    AlertService.alert('Atencion','La cuenta no existe o está desactivada','Cerrar');
+                    AlertService.alert('Atencion','La cuenta no existe o está desactivada.','Cerrar');
                 }
                 var res;
                 try {
@@ -678,7 +684,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         $http(req).then(function (response) {
         }).catch(function (response) {
             if(response.status==404){
-                AlertService.alert('Error', 'Cuenta no existente o desactivada.', 'Cerrar');
+                AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
             }
         });
     }
