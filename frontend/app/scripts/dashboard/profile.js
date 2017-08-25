@@ -7,7 +7,8 @@ var app = angular.module('app');
  *
  */
 
-app.controller("profileCtrl", function ($http, $scope, AlertService, $location) {
+app.controller("profileCtrl", function ($http, $scope, AlertService, $location,$rootScope) {
+    $rootScope.currentUser = localStorage.getItem('currentUserName');
     var req = {
         method: 'GET',
         url: 'http://zaratech-ptm.ddns.net:8888/users/'
@@ -19,7 +20,14 @@ app.controller("profileCtrl", function ($http, $scope, AlertService, $location) 
     }
     $http(req).then(function (response) {
         $scope.myInfo = response.data;
-    });
+    })
+        .catch(function (response) {
+            if(response.status==400){
+                localStorage.clear();
+                AlertService.alert('Error','No tienes permiso para acceder a esta zona.','Cerrar');
+                $location.url('/');
+            }
+        });
 
     /**
      * CHANGES THE CURRENT USER PASSWORD

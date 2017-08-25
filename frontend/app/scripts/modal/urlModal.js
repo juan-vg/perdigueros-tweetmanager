@@ -4,7 +4,7 @@
 
 var app = angular.module('app');
 
-app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$http,$locale,$route) {
+app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$http,$locale) {
 
     $scope.postUrl = function () {
         var req = {
@@ -18,7 +18,7 @@ app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$h
             }
         };
         $http(req).then(function (response) {
-            $scope.urlResponse = "http://zaratech-ptm.ddns:8888/urls/" + response.data.id;
+            $scope.urlResponse = "http://zaratech-ptm.ddns.net:8888/urls/" + response.data.id;
             console.log(response);
         }).catch(function (response) {
             if (response.status == 400) {

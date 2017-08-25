@@ -160,7 +160,7 @@ exports.socialSignin = function(accountData, callback){
             // save last access for statistics
             adminStats.saveLastAccess(new Date());
             
-            userAccModel.find({"email": resData.profile.email}, function(err, dbData){
+            userAccModel.find({"email": resData.profile.email, "activated": true}, function(err, dbData){
                 
                 // generate token
                 var token = crypto.randomBytes(25).toString('hex');

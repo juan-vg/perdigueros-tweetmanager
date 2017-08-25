@@ -5,6 +5,7 @@ var bodyParser = require("body-parser");
 var swaggerJSDoc = require('swagger-jsdoc');
 var mongoose = require("mongoose");
 var cors = require('cors');
+var xmlparser = require('express-xml-bodyparser');
 var router = express.Router();
 var app = express();
 
@@ -43,7 +44,12 @@ var swaggerSpec = swaggerJSDoc(options);
 // enables JSON support & URL encoded values
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ "extended": true }));
+
+// enables cross origins header
 app.use(cors());
+
+// enables XML support
+app.use(xmlparser({explicitArray: false}));
 
 // avoid displaying sensitive data to end users because body parser syntax errors
 app.use(function (error, req, res, next) {

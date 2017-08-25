@@ -2,8 +2,8 @@ var app = angular.module('app');
 
 var api = "http://zaratech-ptm.ddns.net:8888";
 // Stadistics Data Binding
-app.controller('stadisticsController', function($http,$scope) {
-
+app.controller('statisticsController', function($rootScope,$http,$scope,$location,AlertService) {
+    $rootScope.currentUser = localStorage.getItem('currentUserName');
     var req = {
         method: 'GET',
         url: api + '/stats/users',
@@ -391,5 +391,12 @@ app.controller('stadisticsController', function($http,$scope) {
 			console.log("Error getting stats");
 			var error_msg = "Error " + error.status + ": " + error.data;
 			alert(error_msg);
-		});
+		})
+    .catch(function(response){
+        if(response.status==403){
+            localStorage.clear();
+            AlertService.alert('Error','No tienes permiso para acceder a esta zona.','Cerrar');
+            $location.url('/');
+        }
+    });
 });

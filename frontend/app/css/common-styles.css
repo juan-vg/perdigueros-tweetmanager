@@ -128,9 +128,6 @@ body {
     font-size: 0.9em;
 }
 
-.fa {
-    color: #337ab7;
-}
 
 #userIcon {
     color: white;
@@ -171,4 +168,11 @@ body {
 }
 #statsPanel {
     margin-top: 10em;
+}
+
+.blueIcon{
+    color: #337ab7;
+}
+#userIcon{
+    color:white;
 }

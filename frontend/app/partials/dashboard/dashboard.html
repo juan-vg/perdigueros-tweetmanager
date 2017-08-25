@@ -10,7 +10,7 @@
                     Cuentas
                     <div class="pull-right modal-demo">
                         <button ng-click="accountCtrl.showModal()" class="icon-button"><i
-                                class="fa fa-plus-circle fa-lg" aria-hidden="true"></i></button>
+                                class="fa fa-plus-circle fa-lg blueIcon" aria-hidden="true"></i></button>
                     </div>
                 </div>
 
@@ -58,7 +58,8 @@
                                     <div>
                                         <button ng-click="accountCtrl.reactivate(account)"
                                                 class="icon-button center-block"><i id="reactivateIcon"
-                                                href="" class="fa fa-lg fa-history" aria-hidden="true"></i></button>
+                                                                                    href="" class="fa fa-lg fa-history"
+                                                                                    aria-hidden="true"></i></button>
                                     </div>
                                 </td>
                             </tr>
@@ -116,10 +117,10 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>{{tweet.text}}</td>
-                                                <td>{{tweet.publishDate | date:"dd/MM/yyyy 'a las' h:mma"}}</td>
-                                            </tr>
+                                        <tr>
+                                            <td>{{tweet.text}}</td>
+                                            <td>{{tweet.publishDate | date:"dd/MM/yyyy 'a las' h:mma"}}</td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -146,13 +147,14 @@
                                 </div>
                             </uib-tab>
 
-                            <uib-tab ng-click="tweetCtrl.isUserSelected()" heading="Seguimiento en tiempo real">
+                            <uib-tab ng-click="tweetCtrl.isUserSelected()"  heading="Seguimiento en tiempo real">
                                 <hr>
                                 <uib-tabset type="pills" class="center-pills">
-                                    <uib-tab ng-click="tweetCtrl.isUserSelected()" heading="Gestionar seguimiento">
+                                    <uib-tab elem-ready="tweetCtrl.getSeguimiento()" heading="Gestionar seguimiento">
                                         <hr>
-                                        <div >
+                                        <div>
                                             <table class="table table-bordered">
+
                                                 <thead>
                                                 <tr>
                                                     <th class="text-center">Hashtags</th>
@@ -162,20 +164,47 @@
                                                 <tbody ng-repeat="i in tweetCtrl.allHashtags">
                                                 <tr>
                                                     <td class="text-center">#{{i.hashtag}}</td>
-                                                    <td><button class="btn btn-danger center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
+                                                    <td>
+                                                        <button class="btn btn-primary center-block"
+                                                                ng-init="toggle[$index] = false"
+                                                                ng-click="toggle[$index] = !toggle[$index]"><i
+                                                                class="fa fa-trash text-center" aria-hidden="true"></i>
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                                 <tr ng-if="toggle[$index]">
-                                                    <td colspan="4"><h5 align="center">¿Estas seguro que deseas eliminarla?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="tweetCtrl.deleteHashtag(i)">Si</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
+                                                    <td colspan="4"><h5 align="center">¿Estas seguro que deseas
+                                                        eliminarla?</h5>
+                                                        <div class="text-center">
+                                                            <div class="btn-group">
+                                                                <button class="btn btn-danger"
+                                                                        ng-click="tweetCtrl.deleteHashtag(i)">Si
+                                                                </button>
+                                                                <button class="btn btn-info center-block"
+                                                                        ng-click="toggle[$index] = false">No
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
-                                            <form ng-submit="tweetCtrl.postHashtag()">
-                                                <div class="pull-right">
-                                                    <input type="text" placeholder="Introduce un hashtag" ng-model="tweetCtrl.hashtag">
-                                                    <hr>
-                                                    <button class=" btn btn-success pull-right " type="submit">Añadir</button>
+                                        </div>
+                                        <div>
+                                            <form class="form-inline pull-right" ng-submit="tweetCtrl.postHashtag()">
+                                                <div class="form-group">
+                                                    <label>Hashtag a seguir:</label>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <input class="form-control" type="text"
+                                                           ng-model="tweetCtrl.hashtag">
                                                 </div>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <button class=" btn btn-success pull-right" type="submit">Añadir
+                                                </button>
                                             </form>
+
+                                            <br><br><br><br><br>
+                                            <hr>
 
                                             <table class="table table-bordered">
                                                 <thead>
@@ -187,43 +216,62 @@
                                                 <tbody ng-repeat="i in tweetCtrl.allFollowedUsers">
                                                 <tr>
                                                     <td class="text-center">{{i.user}}</td>
-                                                    <td><button class="btn btn-danger center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
+                                                    <td>
+                                                        <button class="btn btn-primary center-block"
+                                                                ng-init="toggle[$index] = false"
+                                                                ng-click="toggle[$index] = !toggle[$index]"><i
+                                                                class="fa fa-trash text-center" aria-hidden="true"></i>
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                                 <tr ng-if="toggle[$index]">
-                                                    <td colspan="4"><h5 align="center">¿Estas seguro que deseas eliminarlo?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="tweetCtrl.deleteFollowed(i)">Si</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
+                                                    <td colspan="4"><h5 align="center">¿Estas seguro que deseas
+                                                        eliminarlo?</h5>
+                                                        <div class="text-center">
+                                                            <div class="btn-group">
+                                                                <button class="btn btn-danger"
+                                                                        ng-click="tweetCtrl.deleteFollowed(i)">Si
+                                                                </button>
+                                                                <button class="btn btn-info center-block"
+                                                                        ng-click="toggle[$index] = false">No
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 </tbody>
                                             </table>
 
-                                            <form ng-submit="tweetCtrl.postFollowed()">
-                                                <div class="pull-right">
-                                                <input type="text" placeholder="Usuario a seguir" ng-model="tweetCtrl.followedUser">
-                                                <hr>
-                                                <button class="btn btn-success pull-right">Añadir</button>
+                                            <form class="form-inline pull-right" ng-submit="tweetCtrl.postFollowed()">
+                                                <div class="form-group">
+                                                    <label for="followedUser">Usuario a seguir:</label>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <input id="followedUser" type="text" class="form-control"
+                                                           ng-model="tweetCtrl.followedUser">
                                                 </div>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                                <button type="submit" class="btn btn-success pull-right">Añadir</button>
                                             </form>
                                         </div>
                                     </uib-tab>
                                     <uib-tab ng-click="tweetCtrl.webSocketHashtags()" heading="Seguir Hashtags">
                                         <hr>
                                         <h1 class="text-center">Hashtags</h1>
-                                        <div ng-repeat="tweet in tweetCtrl.hashtagTweet">
+                                        <div ng-repeat="tweet in tweetCtrl.hashtagTweet track by tweet.id_str">
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
                                         </div>
                                     </uib-tab>
-                                    <uib-tab ng-click="tweetCtrl.webSocketFollowedUsers()" heading="Tweets de usuarios seguidos">
+                                    <uib-tab ng-click="tweetCtrl.webSocketFollowedUsers()"
+                                             heading="Tweets de usuarios seguidos">
                                         <hr>
                                         <h1 class="text-center">Tweets de usuarios seguidos</h1>
-                                        <div ng-repeat="tweet in tweetCtrl.followedUserTweet">
+                                        <div ng-repeat="tweet in tweetCtrl.followedUserTweet track by tweet.id_str">
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
                                         </div>
                                     </uib-tab>
                                 </uib-tabset>
-                                <hr>
-
-
                             </uib-tab>
                         </uib-tabset>
 
@@ -245,14 +293,24 @@
                             <textarea class="form-control embed-responsive" row="5" ng-maxlength="140"
                                       ng-model="tweetCtrl.tweet"></textarea>
                             <br>
-                            <button type="submit" class="btn btn-default">Publicar tweet  <i class="fa fa-plus-circle fa-lg"></i>
+                            <button type="submit" class="btn btn-default">Publicar tweet <i
+                                    class="fa fa-plus-circle fa-lg blueIcon"></i>
                             </button>
+
                         </form>
+
                         <hr>
-                        <!--URL SHORTENER -->
+                        <h1>Funciones avanzadas</h1>
+                        <hr>
+                        <!--URL SHORTENER && UPLOAD IMAGES -->
                         <div>
-                            <button ng-click="tweetCtrl.showUrlModal()" class="btn btn-default">
-                                Acortar URL&nbsp;<i class="fa fa-cut fa-lg"></i>
+                            <button id="shortButton" ng-click="tweetCtrl.showUrlModal()"
+                                    class="btn btn-default colorButton pull-left">
+                                Acortar URL&nbsp;<i class="fa fa-cut fa-lg blueIcon"></i>
+                            </button>
+                            <button id="uploadButton" ng-click="tweetCtrl.uploadImageModal()"
+                                    class="btn btn-default colorButton pull-right">
+                                Subir imagen&nbsp;<i class="fa fa-upload fa-lg blueIcon"></i>
                             </button>
                         </div>
                     </uib-tab-body>
@@ -262,7 +320,7 @@
                 <!-- Other tools tab -->
                 <uib-tab index="2">
                     <uib-tab-heading>
-                        <i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Más herramientas
+                        <i class="fa fa-cogs " aria-hidden="true"></i>&nbsp;Más herramientas
                     </uib-tab-heading>
                     <uib-tab-body>
                         <hr>
@@ -274,19 +332,30 @@
                                       ng-model="tweetCtrl.sTweet"></textarea>
                             <hr>
                             <label>Selecciona fecha y hora:</label>
-                            <adm-dtp ng-model='tweetCtrl.sDate' options='{gregorianStartDay: 1}'></adm-dtp>
+                            <adm-dtp ng-model='tweetCtrl.sDate' options='{autoClose:true, calType: "gregorian",
+                            default:"today",gregorianStartDay: 1,    gregorianDic: {
+        title: "Grégorien",
+                            monthsNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto",
+                            "Septiembre", "Octubre", "Noviembre", "Diciembre"], daysNames: ["D", "L", "M", "X", "J", "V", "S"],
+                            todayBtn: "Mes actual"
+                            }}'></adm-dtp>
                             <br>
-                            <button type="submit" class="btn btn-default">Publicar tweet <i class="fa fa-plus-circle fa-lg"></i>
+                            <button type="submit" class="btn btn-default">Publicar tweet <i
+                                    class="fa fa-plus-circle fa-lg blueIcon"></i>
                             </button>
                         </form>
 
                         <hr>
-                        <!--URL SHORTENER -->
-
-                        <!--URL SHORTENER -->
+                        <h1>Funciones avanzadas</h1>
+                        <hr>
+                        <!--URL SHORTENER && UPLOAD IMAGES -->
                         <div>
-                            <button ng-click="tweetCtrl.showUrlModal()" class="btn btn-default">
-                                Acortar URL&nbsp;<i class="fa fa-cut fa-lg"></i>
+                            <button ng-click="tweetCtrl.showUrlModal()" class="btn btn-default colorButton pull-left">
+                                Acortar URL&nbsp;<i class="fa fa-cut fa-lg blueIcon"></i>
+                            </button>
+                            <button ng-click="tweetCtrl.uploadImageModal()"
+                                    class="btn btn-default colorButton pull-right">
+                                Subir imagen&nbsp;<i class="fa fa-upload fa-lg blueIcon"></i>
                             </button>
                         </div>
 

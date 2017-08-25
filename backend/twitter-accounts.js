@@ -320,7 +320,8 @@ exports.reactivateAccount = function(userToken, idAccount, callback){
             
             var accountID = {
                 'token': userToken,
-                'twitterAccountId': idAccount
+                'twitterAccountId': idAccount,
+                'reactivate': true
             };
             
             // Check if the account belongs to the user

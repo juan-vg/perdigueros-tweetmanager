@@ -107,37 +107,40 @@ function checkTokenForTwitterAccount(accountID, callback){
     getUserEmail(accountID.token, function(err, data){
             
         if(!err){
+            
+            var query = {"_id" : new objectID(accountID.twitterAccountId)};
+            
+            if(!accountID.reactivate){
+                query.activated = true;
+            }
 
-            twiAccModel.find({"_id" : new objectID(accountID.twitterAccountId)},
+            twiAccModel.find(query, function(err, dbData){
                 
-                function(err, dbData){
+                if(!err && dbData.length > 0){
                     
-                    if(!err && dbData.length > 0){
-                        
-                        // check if the email matchs the twitterAccountId
-                        if(data == dbData[0].email){
-                            console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " owns TwitterAccount: " + accountID.twitterAccountId);
-                            success = true;
-                            reason = dbData[0].information;
-                        } else {
-                            console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
-                            success = false;
-                            reason = "FORBIDDEN";
-                        }
- 
-                    } else if(!err){
-                        console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: TwitterAccount: " + accountID.twitterAccountId + " NOT found!");
-                        success = false;
-                        reason = "ACCOUNT NOT FOUND";
+                    // check if the email matchs the twitterAccountId
+                    if(data == dbData[0].email){
+                        console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " owns TwitterAccount: " + accountID.twitterAccountId);
+                        success = true;
+                        reason = dbData[0].information;
                     } else {
-                        console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: DB ERROR!!!");
+                        console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: email: " + data + " does NOT owns TwitterAccount: " + accountID.twitterAccountId);
                         success = false;
-                        reason = "DB ERROR";
+                        reason = "FORBIDDEN";
                     }
-                    
-                    callback(success, reason);
+
+                } else if(!err){
+                    console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: TwitterAccount: " + accountID.twitterAccountId + " NOT found!");
+                    success = false;
+                    reason = "ACCOUNT NOT FOUND";
+                } else {
+                    console.log("ACC-VERIFS-CHK-TKN-4-TW-ACC: DB ERROR!!!");
+                    success = false;
+                    reason = "DB ERROR";
                 }
-            );
+                
+                callback(success, reason);
+            });
             
         } else {
             
