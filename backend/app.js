@@ -30,6 +30,11 @@ var dailyCleaningScheduling = schedule.scheduleJob('0 0 0 * * *', function(){
   scheduler.userAccountsCleaningUpdate();
 });
 
+// scheduler every day (at 01:00:00 h)
+var dailyCleaningSchedulingAt1 = schedule.scheduleJob('0 0 1 * * *', function(){
+  scheduler.twitterStatsCleaning();
+});
+
 
 // scheduler every 15 minutes
 var twitterLoaderScheduling = schedule.scheduleJob('0 0,15,30,45 * * * *', function(){
