@@ -282,7 +282,7 @@ app.controller('dashboardCtrl', function ($rootScope, $location, $scope, $http, 
     $http(req).then(function (response) {
         var name = response.data[0].email.substring(0, response.data[0].email.lastIndexOf("@"));
         $rootScope.currentUser = name;
-        console.log(response);
+        localStorage.setItem('currentUserName',name);
         $rootScope.currentUserId = "";
     })
     //error

@@ -2,8 +2,8 @@ var app = angular.module('app');
 
 var api = "http://zaratech-ptm.ddns.net:8888";
 // Stadistics Data Binding
-app.controller('statisticsController', function($http,$scope,$location,AlertService) {
-
+app.controller('statisticsController', function($rootScope,$http,$scope,$location,AlertService) {
+    $rootScope.currentUser = localStorage.getItem('currentUserName');
     var req = {
         method: 'GET',
         url: api + '/stats/users',
