@@ -7,7 +7,8 @@ var app = angular.module('app');
  *
  */
 
-app.controller("profileCtrl", function ($http, $scope, AlertService, $location) {
+app.controller("profileCtrl", function ($http, $scope, AlertService, $location,$rootScope) {
+    $rootScope.currentUser = localStorage.getItem('currentUserName');
     var req = {
         method: 'GET',
         url: 'http://zaratech-ptm.ddns.net:8888/users/'

@@ -130,6 +130,7 @@ app_admin.controller('AccountController', function($scope,$http) {
 				var error_msg = "Error " + error.status + ": " + error.data;
 				alert(error_msg);
 			}
+			// Get Followed Users from the account
 			$http.get(api+'/twitter-accounts/'+account._id+'/followed-users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackFollowed, errorCallbackFollowed);
 			function successCallbackFollowed(twitter_accounts){
 				var index = -1;
