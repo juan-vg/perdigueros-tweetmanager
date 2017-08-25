@@ -169,6 +169,8 @@ function userAccountsCleaning(callback){
 
 exports.twitterStatsCleaning = function(){
     
+    console.log("TWITER-STATS-CLEANER: Start AT: " + new Date());
+    
     twStatsModel.distinct("tweetIdStr", function(err, dbData){
         if(!err){
             
