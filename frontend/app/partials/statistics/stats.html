@@ -1,8 +1,10 @@
 <!-- Stadistics-->
 <div class="container">
     <div id="statsPanel" class="row">
+        <hr>
         <h1 class="text-center">Estadísticas</h1>
         <hr>
+        <a class="pull-right" href="/"><h3>Volver a pagina principal</h3></a>
         <!--List of stats-->
 		
 		<!--Tweets/likes stat-->
@@ -17,10 +19,11 @@
                 <div class="col-xs-12">
                     <div class="col-xs-4" ng-repeat="tweet in arr_tl track by $index">
                         <h4 align="center">Numero #{{$index + 1}}</h4>
-                        <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                        <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
+						{{tweet.id_str}}
+						
                     </div>
-                </div>
-
+                </div>			
             </div>
             <h3 align="center" ng-if="emptytweetlikes">No existen datos todavía</h3>
         </div>
@@ -38,7 +41,7 @@
             <div class="col-xs-12">
                 <div class="col-xs-4" ng-repeat="tweet in arr_trt track by $index">
                     <h4 align="center">Numero #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -49,7 +52,7 @@
 		<hr><br>
         <h2 align="center">Top Tweets con mas likes en el mes</h2>
         <div ng-if="!emptytweetlikesmonth" class="col-xs-12">
-            <div class="col-xs-12">
+            <div class="col-xs-6 col-xs-offset-3 text-center" style="width:50%; height:50%"> 
                 <canvas id="tweetlikesmonth" class="chart chart-pie"
                         chart-data="dataTlm" chart-labels="labelTlm" chart-options="optionsTlm" chart-colors="colors">
                 </canvas>
@@ -57,7 +60,7 @@
             <div class="col-xs-12">
                 <div class="col-xs-4" ng-repeat="tweet in arr_tlm track by $index">
                     <h4 align="center">Numero #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -76,7 +79,7 @@
             <div class="col-xs-12">
                 <div class="col-xs-4" ng-repeat="tweet in arr_tld track by $index">
                     <h4 align="center">Numero #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -87,7 +90,7 @@
 		<hr><br>
         <h2 align="center">Top Tweets con mas retweets en el mes</h2>
         <div ng-if="!emptytweetretweetsmonth" class="col-xs-12">
-            <div class="col-xs-12">
+            <div class="col-xs-6 col-xs-offset-3 text-center" style="width:50%; height:50%">
                 <canvas id="tweetretweetsmonth" class="chart chart-pie"
                         chart-data="dataTrtm" chart-labels="labelTrtm" chart-options="optionsTrtm"
                         chart-colors="colors">
@@ -96,7 +99,7 @@
             <div class="col-xs-12">
                 <div class="col-xs-4" ng-repeat="tweet in arr_trtm track by $index">
                     <h4 align="center">Numero #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -116,7 +119,7 @@
             <div class="col-xs-12">
                 <div class="col-xs-4" ng-repeat="tweet in arr_trtd track by $index">
                     <h4 align="center">Numero #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
                 </div>
             </div>
         </div>

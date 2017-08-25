@@ -31,11 +31,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 			$scope.error = error_msg;
 			$scope.pwdError = true;
 		}
-				
-			
 	};
-	
-    
 });
 
 // List of Users Data
@@ -176,7 +172,7 @@ app_admin.controller('AccountController', function($scope,$http) {
 	}
 });
 
-// Stadistics Data
+// Statistics Data
 
 // Support Functions for parsing dates
 app_admin.factory('DateService', function() {
@@ -210,7 +206,7 @@ app_admin.factory('DateService', function() {
 })
 // User Iputs and Outputs from the Application Data
 app_admin.controller('UserDoorController', function($scope,$http,DateService) {
-    // Get data Stadistics from the server
+    // Get data Statistics from the server
     $http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
     function successCallbackStats(stats){
         var registrationData= stats.data.ups;	// Registration Data
@@ -218,7 +214,7 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
         var label=[];
         var data=[];
         var date_now=new Date();
-        // Fill last twelve dates with Downs and Registration Stadistics
+        // Fill last twelve dates with Downs and Registration Statistics
         var lastTwelve = DateService.getArrayLastTwelve(date_now);
         for( var key in registrationData) {
             var year = key;
@@ -284,14 +280,14 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
 
 // User Last Connection Time Data
 app_admin.controller('AccessDataController', function($scope,$http,DateService) {
-    // Get last connection data stadistics from the server
+    // Get last connection data statistics from the server
     $http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
     function successCallbackStats(stats){
         var accessData= stats.data.lastAccess;
         var label=[];
         var data=[];
         var date_now=new Date();
-        // // Fill last twelve dates with Access Stadistics
+        // // Fill last twelve dates with Access Statistics
         var lastTwelve = DateService.getArrayLastTwelve(date_now);
         for( var key in accessData) {
             var year = key;
@@ -333,8 +329,8 @@ app_admin.controller('AccessDataController', function($scope,$http,DateService) 
     }
 });
 
-// Stadistics Data Binding
-app_admin.controller('StadisticsController', function($scope,$http,DateService) {
+// Statistics Data Binding
+app_admin.controller('StatisticsController', function($scope,$http,DateService) {
     $http.get(api+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
 
     function successCallbackStats(stats){
@@ -403,6 +399,7 @@ app_admin.controller('StadisticsController', function($scope,$http,DateService) 
     $scope.onClick = function (points, evt) {
         $http.get(api+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
         function successCallbackInfo(info){
+			console.log(points[0]);
             $scope.user_id=points[0]._view.label;
             $scope.info="Email: " + info.data[0].email + "\n" +
                 "Nombre: " + info.data[0].name + "\n" +
