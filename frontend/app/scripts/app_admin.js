@@ -45,7 +45,7 @@ app_admin.config(function ($routeProvider, $locationProvider) {
         //route for activity stats admin
         .when('/admin-activity-panel',{
             templateUrl : 'partials/admin/admin-activity-panel.html',
-            controller: 'StadisticsController'
+            controller: 'StatisticsController'
         })
 
     /* */
