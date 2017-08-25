@@ -1,0 +1,42 @@
+<!-- Stadistics-->
+        <div class="container">
+            <div class="row">
+                <div>
+			         <ul class="nav nav-pills">
+  				          <li><a href="/admin-door-panel">Altas y Bajas</a></li>
+  				          <li><a href="/admin-last-panel">Entradas</a></li>
+  				          <li  class="active"><a href="/admin-activity-panel">Actividad</a></li>
+			         </ul>
+                </div>
+                <div class="col-xs-12" ng-app="StatisticsData" ng-controller="StadisticsController">
+                    <h2 align="center">Tweets por zona</h2>
+                    <div id="map" style="height: 400px;"></div>
+					<hr><br>
+                    <h2 align="center">Tweets por dia</h2>
+                    <canvas id="tweetsday" class="chart chart-bar"
+                        chart-data="data" chart-labels="labels" chart-options="options" chart-colors="colors">
+                    </canvas>
+					<hr><br>
+                    <h2 align="center">Top Usuarios con mas tweets</h2>
+					<div class="col-md-6 col-xs-12">
+						<canvas id="tweetsuser" class="chart chart-pie"
+                        chart-data="data2" chart-labels="labels2" chart-options="options2" chart-click="onClick">
+						</canvas>
+					</div>
+					<div class="col-md-6 col-xs-12">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th class="text-center">Información del usuario con id: {{user_id}}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+								<td class="text-center"><pre>{{info}}</pre></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+                </div>
+            </div>
+        </div>
