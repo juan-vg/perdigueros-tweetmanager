@@ -176,13 +176,13 @@ exports.twitterStatsCleaning = function(){
             
             for(var i=0; i<dbData.length; i++){
                 
-                request("https://twitter.com/statuses/" + dbData[i].tweetIdStr, function(err,response,body) {
+                request("https://twitter.com/statuses/" + dbData[i], function(err,response,body) {
                     
                     if(!err){
                         
                         // if the tweet is no longer available -> remove from stats
                         if(response.request.href === "https://twitter.com/"){
-                            twStatsModel.remove({tweetIdStr: this.tweetIdStr}, function(err, dbData2){});
+                            twStatsModel.remove({tweetIdStr: this}, function(err, dbData2){});
                         }
                     }
                     
