@@ -3,8 +3,8 @@ var schedTweetsModel = require("./models/scheduled-tweets");
 var twiAccModel = require("./models/twitter-accounts");
 var userAccModel = require("./models/user-accounts");
 var twStatsModel = require("./models/twitter-stats");
-
 var twitterWorker = require("./twitter-worker.js");
+var request = require('request');
 
 var objectID = require('mongodb').ObjectID;
  
