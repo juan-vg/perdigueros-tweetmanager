@@ -19,11 +19,9 @@
                     </canvas>
                 </div>
                 <div class="col-xs-12">
-                    <div class="col-xs-4" ng-repeat="tweet in arr_tl track by $index">
+                    <div class="col-xs-6" ng-repeat="tweet in arr_tl track by $index">
                         <h4 align="center">Numero #{{$index + 1}}</h4>
                         <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
-						{{tweet.id_str}}
-						
                     </div>
                 </div>			
             </div>
