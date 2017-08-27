@@ -4,7 +4,6 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 	$http.get('config.json').
 	then(function onSuccess(response) {
 		localStorage.setItem('api', response.data.api);
-		console.log(localStorage.getItem('api'));
 	}).
 	catch(function onError(response) {
 		console.log("Error obteniendo API");
