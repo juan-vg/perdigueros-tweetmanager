@@ -12,7 +12,13 @@ var app = angular.module('app');
 app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
     function ($location, $http, $auth, AlertService) {
         var vm = this;
-
+		$http.get('config.json').
+		then(function onSuccess(response) {
+			localStorage.setItem('api', response.data.api);
+		}).
+		catch(function onError(response) {
+			console.log("Error obteniendo API");
+		});
         // Local Login function
         this.login = function () {
             // Uses the $auth login function for login process
