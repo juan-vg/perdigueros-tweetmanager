@@ -15,6 +15,9 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
 		$http.get('config.json').
 		then(function onSuccess(response) {
 			localStorage.setItem('api', response.data.api);
+			localStorage.setItem('port', response.data.apiPort);
+			localStorage.setItem('rtport', response.data.rtPort);
+			apiPort
 		}).
 		catch(function onError(response) {
 			console.log("Error obteniendo API");

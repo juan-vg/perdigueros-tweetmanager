@@ -4,6 +4,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 	$http.get('config.json').
 	then(function onSuccess(response) {
 		localStorage.setItem('api', response.data.api);
+		localStorage.setItem('port', response.data.apiPort);
 	}).
 	catch(function onError(response) {
 		console.log("Error obteniendo API");
@@ -25,7 +26,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 			'g-recaptcha-response': vcRecaptchaService.getResponse($scope.recaptchaId),
 			'loginType' : 'local'
 		};
-		$http.post(localStorage.getItem('api')+'/login/signin',data).then(successCallback, errorCallback);
+		$http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/signin',data).then(successCallback, errorCallback);
 		function successCallback(response){
 			localStorage.setItem('token_admin', response.data.token);
 			$location.path('/admin-main-panel');
@@ -40,7 +41,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 
 // List of Users Data
 app_admin.controller('UserController', function($scope,$http,$location,$window) {
-	$http.get(localStorage.getItem('api')+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+	$http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 	function successCallback(response){
 		//Get response data
 		var users=response.data;
@@ -75,7 +76,7 @@ app_admin.controller('UserController', function($scope,$http,$location,$window) 
 		
 		// RemoveUser from the list
 		$scope.removeUser =function(user) {
-			$http.delete(localStorage.getItem('api')+'/users/'+user._id,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+			$http.delete(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/users/'+user._id,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 			function successCallback(response){
 				var index = -1;		
 				var usersArr = eval( $scope.users );
@@ -104,7 +105,7 @@ app_admin.controller('UserController', function($scope,$http,$location,$window) 
 // Accounts and Hastags Data Binding
 app_admin.controller('AccountController', function($scope,$http) {
 	// Get accounts data 
-	$http.get(localStorage.getItem('api')+'/twitter-accounts',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+	$http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 	//Data Get Successfull
 	function successCallback(response){
 		$scope.accounts = response.data;
@@ -114,7 +115,7 @@ app_admin.controller('AccountController', function($scope,$http) {
 			$scope.account_select=account.name;
 			$scope.account_description=account.description;
 			// Get Hashtag Data from the account
-			$http.get(localStorage.getItem('api')+'/twitter-accounts/'+account._id+'/hashtags',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackHastags, errorCallbackHastags);
+			$http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'+account._id+'/hashtags',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackHastags, errorCallbackHastags);
 			function successCallbackHastags(hashtags){
 				var index = -1;
 				var comArr = eval( hashtags.data );
@@ -131,7 +132,7 @@ app_admin.controller('AccountController', function($scope,$http) {
 				alert(error_msg);
 			}
 			// Get Followed Users from the account
-			$http.get(localStorage.getItem('api')+'/twitter-accounts/'+account._id+'/followed-users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackFollowed, errorCallbackFollowed);
+			$http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'+account._id+'/followed-users',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackFollowed, errorCallbackFollowed);
 			function successCallbackFollowed(twitter_accounts){
 				var index = -1;
 				var comArr = eval( twitter_accounts.data );
@@ -143,14 +144,14 @@ app_admin.controller('AccountController', function($scope,$http) {
 				$scope.followed_select=result;
 			}
 			function errorCallbackFollowed(error){
-				console.log("Error getting users followed");
+				console.log("Error getting followed users");
 				var error_msg = "Error " + error.status + ": " + error.data;
 				alert(error_msg);
 			}
 		};
 		// RemoveAccount from the list
 		$scope.removeAccount =function(account) {
-			$http.delete(localStorage.getItem('api')+'/twitter-accounts/'+account._id,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
+			$http.delete(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'+account._id,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 			function successCallback(response){
 				var index = -1;		
 				var accArr = eval( $scope.accounts );
@@ -211,7 +212,7 @@ app_admin.factory('DateService', function() {
 // User Iputs and Outputs from the Application Data
 app_admin.controller('UserDoorController', function($scope,$http,DateService) {
     // Get data Statistics from the server
-    $http.get(localStorage.getItem('api')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
+    $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
     function successCallbackStats(stats){
         var registrationData= stats.data.ups;	// Registration Data
         var downsData= stats.data.downs;					// Downs Data
@@ -285,7 +286,7 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
 // User Last Connection Time Data
 app_admin.controller('AccessDataController', function($scope,$http,DateService) {
     // Get last connection data statistics from the server
-    $http.get(localStorage.getItem('api')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
+    $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
     function successCallbackStats(stats){
         var accessData= stats.data.lastAccess;
         var label=[];
@@ -335,7 +336,7 @@ app_admin.controller('AccessDataController', function($scope,$http,DateService) 
 
 // Statistics Data Binding
 app_admin.controller('StatisticsController', function($scope,$http,DateService) {
-    $http.get(localStorage.getItem('api')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
+    $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
 
     function successCallbackStats(stats){
         // Map Information Bind
@@ -401,7 +402,7 @@ app_admin.controller('StatisticsController', function($scope,$http,DateService) 
         alert("Error Obteniendo datos de las estadisticas");
     }
     $scope.onClick = function (points, evt) {
-        $http.get(localStorage.getItem('api')+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
+        $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
         function successCallbackInfo(info){
 			console.log(points[0]);
             $scope.user_id=points[0]._view.label;
