@@ -25,6 +25,7 @@ $ npm install -g bower
 Only execute `npm start` because we have configured npm for install the bower and npm dependencies.
 This command runs the application in 8000 port too.
 
+There is a file [/app/config.json] to configure the route API and ports of the application.
 
 
 ## Contact
