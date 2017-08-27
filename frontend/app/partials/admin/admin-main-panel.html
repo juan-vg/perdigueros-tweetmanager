@@ -7,10 +7,10 @@
 			<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th class="text-center">Usuario</th>
-						<th class="text-center">Ultima Entrada</th>
-						<th class="text-center">Fecha de Registro</th>
-                        <th class="text-center col-md-1">¿Eliminar?</th>
+						<th class="text-center">User</th>
+						<th class="text-center">Last Input</th>
+						<th class="text-center">Register Date</th>
+                        <th class="text-center col-md-1">Delete?</th>
 					</tr>
 				</thead>
 				<tbody ng-repeat="i in users">
@@ -21,7 +21,7 @@
                         <td><button class="icon-button center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
 					</tr>
 					<tr ng-if="toggle[$index]">
-						<td colspan="4"><h5 align="center">¿Estas seguro que deseas eliminarlo?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="removeUser(i)">Si</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
+						<td colspan="4"><h5 align="center">Are you sure you want to delete?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="removeUser(i)">Yes</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
 					</tr>
 				</tbody>
 			</table>
