@@ -6,6 +6,7 @@ var TwitterPackage = require('twitter');
 var objectID = require('mongodb').ObjectID;
 const BigInteger = require('./utilities/biginteger').BigInteger;
 var HashMap = require('hashmap');
+var request = require('request');
 
 // global vars & consts
 
@@ -317,68 +318,60 @@ function saveStats(dbData, favorites, retweets){
     // for each tweet
     favorites.forEach(function(favs, id_str){
         
-        
-        var retws = retweets.get(id_str);
-        
-        // get last (total) values
-        twStatsModel.aggregate([
-            {$match: {userId: dbData.userId, tweetIdStr: id_str}}, 
-            {$group:{'_id': '', countfavs: {$sum: '$favorites'}, countretws: {$sum: '$retweets'}}}], 
+        // check if tweet is public and exists (ng-tweet compatible)
+        request("https://twitter.com/statuses/" + id_str, function(err,response,body) {
             
-            function(err, dbData2){
+            if(!err){
                 
-                if(!err){
+                // only save stats if the tweet is public and exists (ng-tweet compatible)
+                if(response.request.href !== "https://twitter.com/"){
                     
-                    // if there is previous data
-                    if(dbData2.length > 0){
-                        
-                        // get diff
-                        favs = favs - dbData2[0].countfavs;
-                        retws = retws - dbData2[0].countretws;
-                        
-                        // if there are differences between previous data and current data 
-                        if(favs != 0 || retws != 0){
-                            
-                            // insert
-                            var db = new twStatsModel();
-                            db.userId = dbData.userId;
-                            db.tweetIdStr = id_str;
-                            db.favorites = favs;
-                            db.retweets = retws;
-                            db.date = new Date();
-                            
-                            db.save(function(err, dbData2){
-                                if(err){
-                                    console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-save-1)");
-                                }
-                            });
-                        }
-
-                    } else {
-                        
-                        // if there is data
-                        if(favs != 0 || retws != 0){
-                            
-                            // insert
-                            var db = new twStatsModel();
-                            db.userId = dbData.userId;
-                            db.tweetIdStr = id_str;
-                            db.favorites = favs;
-                            db.retweets = retws;
-                            db.date = new Date();
-                            
-                            db.save(function(err, dbData2){
-                                if(err){
-                                    console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-save-2)");
-                                }
-                            });
-                        }
-                    }
+                    var retws = retweets.get(id_str);
                     
-                } else {
-                    console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-aggregate)");
+                    // get last (total) values
+                    twStatsModel.aggregate([
+                        {$match: {userId: dbData.userId, tweetIdStr: id_str}}, 
+                        {$group:{'_id': '', countfavs: {$sum: '$favorites'}, countretws: {$sum: '$retweets'}}}], 
+                        
+                        function(err, dbData2){
+                            
+                            if(!err){
+                                
+                                // if there is previous data
+                                if(dbData2.length > 0){
+                                    
+                                    // get diff
+                                    favs = favs - dbData2[0].countfavs;
+                                    retws = retws - dbData2[0].countretws;
+                                }
+                                
+                                // if there is data
+                                if(favs != 0 || retws != 0){
+                                    
+                                    // insert
+                                    var db = new twStatsModel();
+                                    db.userId = dbData.userId;
+                                    db.tweetIdStr = id_str;
+                                    db.favorites = favs;
+                                    db.retweets = retws;
+                                    db.date = new Date();
+                                    
+                                    db.save(function(err, dbData2){
+                                        if(err){
+                                            console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-save)");
+                                        }
+                                    });
+                                }
+                                
+                            } else {
+                                console.log("TWITTER-WORKER-SAVE-STATS: DB ERROR (twStats-aggregate)");
+                            }
+                        }
+                    );
                 }
+            } else {
+                console.log("TWITTER-WORKER-SAVE-STATS: REQ ERROR");
             }
-        );
+        });
     });
 }

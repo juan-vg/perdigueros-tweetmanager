@@ -2,8 +2,9 @@ var TwitterPackage = require('twitter');
 var schedTweetsModel = require("./models/scheduled-tweets");
 var twiAccModel = require("./models/twitter-accounts");
 var userAccModel = require("./models/user-accounts");
-
+var twStatsModel = require("./models/twitter-stats");
 var twitterWorker = require("./twitter-worker.js");
+var request = require('request');
 
 var objectID = require('mongodb').ObjectID;
  
@@ -164,6 +165,31 @@ function userAccountsCleaning(callback){
             callback(error, data);
         }
     );
+}
+
+exports.twitterStatsCleaning = function(){
+    
+    console.log("TWITER-STATS-CLEANER: Start AT: " + new Date());
+    
+    twStatsModel.distinct("tweetIdStr", function(err, dbData){
+        if(!err){
+            
+            for(var i=0; i<dbData.length; i++){
+                
+                request("https://twitter.com/statuses/" + dbData[i], function(err,response,body) {
+                    
+                    if(!err){
+                        
+                        // if the tweet is no longer available -> remove from stats
+                        if(response.request.href === "https://twitter.com/"){
+                            twStatsModel.remove({tweetIdStr: this}, function(err, dbData2){});
+                        }
+                    }
+                    
+                }.bind(dbData[i]));
+            }
+        }
+    });
 }
 
 exports.twitterLoader = function(){
