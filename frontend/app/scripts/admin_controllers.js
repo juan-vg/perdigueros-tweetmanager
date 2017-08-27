@@ -7,7 +7,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 		localStorage.setItem('port', response.data.apiPort);
 	}).
 	catch(function onError(response) {
-		console.log("Error obteniendo API");
+		console.log("Error getting API");
 	});
     $scope.pwdError =false;
     var vm = this;
@@ -53,7 +53,7 @@ app_admin.controller('UserController', function($scope,$http,$location,$window) 
 					"_id": usersArr[i]._id,
 					"email": usersArr[i].email,
 					"registrationDate" : formatDate(new Date(usersArr[i].registrationDate)),
-					"last" : "No ha accedido todavía"
+					"last" : "User doesnt enter yet"
 				};
 				data.push(user);
 			}
@@ -185,10 +185,10 @@ app_admin.factory('DateService', function() {
         // Return String Name month corresponding to a number
         getMonthName: function(date) {
             var monthNames = [
-                "Enero", "Febrero", "Marzo",
-                "Abril", "Mayo", "Junio", "Julio",
-                "Agosto", "Septiembre", "Octubre",
-                "Noviembre", "Diciembre"
+                "January", "February", "March",
+                "April", "May", "June", "July",
+                "August", "September", "October",
+                "November", "December"
             ];
             return monthNames[date];
         },
@@ -265,7 +265,7 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
         }
         $scope.labels = label;
         $scope.data = [data1,data2];
-        $scope.series = ['Altas', 'Bajas'];
+        $scope.series = ['Ups', 'Downs'];
         $scope.options = {
             scales: {
                 yAxes: [{
@@ -278,7 +278,7 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
     }
     function errorCallbackStats(error){
         console.log("Error getting stats");
-        alert("Error Obteniendo datos de las estadisticas");
+        alert("Error getting statistics data");
     }
 });
 
@@ -330,7 +330,7 @@ app_admin.controller('AccessDataController', function($scope,$http,DateService) 
     }
     function errorCallbackStats(error){
         console.log("Error getting stats");
-        alert("Error Obteniendo datos de las estadisticas");
+        alert("Error getting statistics data");
     }
 });
 
@@ -399,7 +399,7 @@ app_admin.controller('StatisticsController', function($scope,$http,DateService) 
     }
     function errorCallbackStats(error){
         console.log("Error getting stats");
-        alert("Error Obteniendo datos de las estadisticas");
+        alert("Error getting statistics data");
     }
     $scope.onClick = function (points, evt) {
         $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
@@ -407,13 +407,13 @@ app_admin.controller('StatisticsController', function($scope,$http,DateService) 
 			console.log(points[0]);
             $scope.user_id=points[0]._view.label;
             $scope.info="Email: " + info.data[0].email + "\n" +
-                "Nombre: " + info.data[0].name + "\n" +
-                "Apellido: "+ info.data[0].surname + "\n" +
-                "Registro: "+ formatDate(new Date(info.data[0].registrationDate)) + "\n" +
-                "Ultima Conexión: " + formatDate(new Date(info.data[0].lastAccess)) + "\n";
+                "Name: " + info.data[0].name + "\n" +
+                "Surname: "+ info.data[0].surname + "\n" +
+                "Register: "+ formatDate(new Date(info.data[0].registrationDate)) + "\n" +
+                "Last connection: " + formatDate(new Date(info.data[0].lastAccess)) + "\n";
         }
         function errorCallbackInfo(error){
-            $scope.info="Error obteniendo datos";
+            $scope.info="Error getting data";
             console.log("Error getting info user");
         }
     };
@@ -449,10 +449,10 @@ function formatDate(date) {
     }
     else  {
         var monthNames = [
-            "Enero", "Febrero", "Marzo",
-            "Abril", "Mayo", "Junio", "Julio",
-            "Agosto", "Septiembre", "Octubre",
-            "Noviembre", "Diciembre"
+                "January", "February", "March",
+                "April", "May", "June", "July",
+                "August", "September", "October",
+                "November", "December"
         ];
         var day = date.getDate();
         var monthIndex = date.getMonth();
