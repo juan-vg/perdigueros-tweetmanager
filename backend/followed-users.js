@@ -14,7 +14,7 @@ exports.getAll = function(accountID, callback){
         if(success){
 
             // Check if user owns that account
-            accVerificator.verifyUser(accountID, function(success){
+            accVerificator.verifyUser(accountID, function(success, reason){
 
                 if(success){
 
@@ -85,7 +85,7 @@ exports.get = function (accountID, user, callback){
         if(success){ 
             
             // Check if user owns that account
-            accVerificator.verifyUser(accountID, function(success){
+            accVerificator.verifyUser(accountID, function(success, reason){
 
                 if(success){
 
@@ -234,12 +234,12 @@ exports.post = function (accountID, user, callback){
                     });
                 } else {                    
                     
-                    if(reason == "ACCOUNT NOT FOUND"){
+                    if(result == "ACCOUNT NOT FOUND"){
                         console.log("FOLLOWED-USERS-POST-ID: Twitter account NOT FOUND");
 
                         error = true;
                         data = "ACCOUNT NOT FOUND";
-                    } else if(reason == "DB ERROR") {
+                    } else if(result == "DB ERROR") {
                         console.log("FOLLOWED-USERS-POST-ID: DB ERROR!!!" );
 
                         error = true;
@@ -274,7 +274,7 @@ exports.delete = function (accountID, user, callback){
         if(success){ 
 
             // Check if user owns that account
-            accVerificator.verifyUser(accountID, function(success){
+            accVerificator.verifyUser(accountID, function(success, reason){
 
                 if(success){
 
