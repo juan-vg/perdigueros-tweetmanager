@@ -15,7 +15,7 @@
 				</thead>
 				<tbody ng-repeat="i in accounts">
 					<tr>
-						<td class="text-center">{{i.name}}</td>
+						<td class="text-center">@{{i.name}}</td>
 						<td class="text-center">{{i.email}}</td>
 						<td class="text-center"><button type="button" ng-click="showInfo(i)" class="btn btn-info">Information</button>
 						<td><button class="icon-button center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
@@ -30,9 +30,9 @@
         	<table class="table table-bordered">
 				<thead>
 					<tr>
-						<th class="text-center">Followed Users of {{account_select}}</th>
-						<th class="text-center">Hashtags of {{account_select}}</th>
-						<th class="text-center">Description of {{account_select}}</th>
+						<th class="text-center">Followed Users of @{{account_select}}</th>
+						<th class="text-center">Hashtags of @{{account_select}}</th>
+						<th class="text-center">Description of @{{account_select}}</th>
 					</tr>
 						
 				</thead>
