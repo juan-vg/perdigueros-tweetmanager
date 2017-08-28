@@ -1,0 +1,12 @@
+/*
+ * Row with equal height columns
+ * --------------------------------------------------
+ */
+.aligned-row {
+    display: flex;
+    flex-flow: row wrap;
+
+    &::before {
+        display: block;
+    }
+}
