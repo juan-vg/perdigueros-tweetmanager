@@ -1,10 +1,12 @@
 <!-- Stadistics-->
 <div class="container">
     <div id="statsPanel" class="row">
-        <hr>
+        
+		<a class="pull-right" href="/"><h3>Volver a pagina principal</h3></a>
+		<br><hr>
         <h1 class="text-center">Estadísticas</h1>
         <hr>
-        <a class="pull-right" href="/"><h3>Volver a pagina principal</h3></a>
+        
         <!--List of stats-->
 		
 		<!--Tweets/likes stat-->
@@ -17,11 +19,9 @@
                     </canvas>
                 </div>
                 <div class="col-xs-12">
-                    <div class="col-xs-4" ng-repeat="tweet in arr_tl track by $index">
+                    <div class="col-xs-6" ng-repeat="tweet in arr_tl track by $index">
                         <h4 align="center">Numero #{{$index + 1}}</h4>
                         <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden'}"></twitter-widget>
-						{{tweet.id_str}}
-						
                     </div>
                 </div>			
             </div>
@@ -184,6 +184,8 @@
         </canvas>
         <h3 align="center" ng-if="emptyFollowed">No existen datos todavía</h3>
 		</div>
+		<hr><br>
+		<a class="pull-right" href="/"><h3>Volver a pagina principal</h3></a>
     </div>
 </div>
 </div>
