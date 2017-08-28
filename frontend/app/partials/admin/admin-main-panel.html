@@ -21,7 +21,7 @@
                         <td><button class="icon-button center-block"  ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]"><i class="fa fa-trash text-center" aria-hidden="true"></i></button></td>
 					</tr>
 					<tr ng-if="toggle[$index]">
-						<td colspan="4"><h5 align="center">Are you sure you want to delete?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="removeUser(i)">Yes</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
+						<td colspan="4"><h5 align="center">Are you sure you want to delete it?</h5><div class="text-center"><div class="btn-group"><button class="btn btn-danger"  ng-click="removeUser(i)">Yes</button><button class="btn btn-info center-block" ng-click="toggle[$index] = false">No</button></div></div></td>
 					</tr>
 				</tbody>
 			</table>
