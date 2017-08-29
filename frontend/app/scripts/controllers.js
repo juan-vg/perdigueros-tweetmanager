@@ -229,7 +229,7 @@ app.controller('firstLoginCtrl', ['$scope', '$http', '$location','AlertService',
         $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/firstlogin', data
         ).then(function (response) {
                 $location.url('/');
-                AlertService.alert('Congratulations','Password be changed successfully','Close');
+                AlertService.alert('Congratulations','Password has been changed successfully','Close');
             },
             //status code errors
             function (response) {
