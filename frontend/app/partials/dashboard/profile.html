@@ -1,9 +1,10 @@
+
 <div class="container bootstrap snippet " id="profile-panel">
     <div class="panel-body inf-content">
         <div class="row">
             <div class="col-md-4">
                 <img alt="" style="width:600px;" title="" class="img-circle img-thumbnail isTooltip"
-                     src="https://bootdey.com/img/Content/user-453533-fdadfd.png" data-original-title="Usuario">
+                     src="https://bootdey.com/img/Content/user-453533-fdadfd.png" data-original-title="User">
                 <ul title="Ratings" class="list-inline ratings text-center">
                     <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
                     <li><a href="#"><span class="glyphicon glyphicon-star"></span></a></li>
@@ -17,11 +18,11 @@
                     <tbody>
 
                     <tr>
-                        <strong><h4> Mi perfil </h4></strong>
+                        <strong><h4> My profile </h4></strong>
                         <td>
                             <strong>
                                 <span class="glyphicon glyphicon-user  text-primary"></span>
-                                Nombre
+                                Name
                             </strong>
                         </td>
                         <td class="text-primary">
@@ -32,7 +33,7 @@
                         <td>
                             <strong>
                                 <span class="glyphicon glyphicon-cloud text-primary"></span>
-                                Apellido
+                                Surname
                             </strong>
                         </td>
                         <td class="text-primary">
@@ -55,33 +56,33 @@
                         <td>
                             <strong>
                                 <span class="glyphicon glyphicon-calendar text-primary"></span>
-                                Creado en
+                                Created on
                             </strong>
                         </td>
                         <td class="text-primary">
-                            {{myInfo[0].registrationDate | date:"dd/MM/yyyy 'a las' h:mma" }}
+                            {{myInfo[0].registrationDate | date:"dd/MM/yyyy 'at' h:mma" }}
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <strong>
                                 <span class="glyphicon glyphicon-calendar text-primary"></span>
-                                Ultimo acceso
+                                Last access
                             </strong>
                             <br><br>
                             <hr>
                         </td>
                         <td class="text-primary">
-                            {{myInfo[0].lastAccess | date:"dd/MM/yyyy 'a las' h:mma"}}
+                            {{myInfo[0].lastAccess | date:"dd/MM/yyyy 'at' h:mma"}}
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <form role="form" ng-submit="changePassword()">
-                                <strong><h4> Cambia tu contraseña </h4></strong>
+                                <strong><h4>Change your password</h4></strong>
                                 <strong>
                                     <span class="glyphicon glyphicon-lock text-primary"></span>
-                                    Contraseña actual:
+                                    Current password:
                                 </strong>
                                 <div class="input-group">
                                     <input type="text" ng-model="oldPasswd">
@@ -90,19 +91,19 @@
                                 <br>
                                 <strong>
                                     <span class="glyphicon glyphicon-lock text-primary"></span>
-                                    Nueva contraseña:
+                                    New password:
                                 </strong>
                                 <div class="input-group">
                                     <input type="text" ng-model="newPasswd">
                                 </div>
                                 <br>
-                                <button type="submit" class="btn btn-primary">Cambiar contraseña</button>
+                                <button type="submit" class="btn btn-primary">Change password</button>
                             </form>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <button ng-click="showDeleteModal()" class="btn btn-danger">Borrar cuenta</button>
+                            <button ng-click="showDeleteModal()" class="btn btn-danger">Remove account</button>
                         </td>
                     </tr>
                     </tbody>
@@ -110,5 +111,5 @@
             </div>
         </div>
     </div>
-    <a class="pull-right" href="/"><h3>Volver a pagina principal</h3></a>
+    <a class="pull-right" href="/"><h3>Return to home</h3></a>
 </div>
