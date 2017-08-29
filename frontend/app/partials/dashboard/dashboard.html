@@ -91,21 +91,21 @@
                         <uib-tabset type="pills" class="center-pills">
                             <uib-tab heading="Home tweets" ng-click="tweetCtrl.getHomeTimeline()">
                                 <hr>
-                                <div class="container" ng-repeat="tweet in tweetCtrl.homeTimeLineTweetsList">
+                                <div class="container" ng-repeat="tweet in tweetCtrl.homeTimeLineTweetsList track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
                             </uib-tab>
                             <uib-tab heading="My tweets" ng-click="tweetCtrl.getMyTweets()">
                                 <hr>
-                                <div class="container" ng-repeat="tweet in tweetCtrl.myTweets">
+                                <div class="container" ng-repeat="tweet in tweetCtrl.myTweets track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
                             </uib-tab>
                             <uib-tab heading="Scheduled tweets" ng-click="tweetCtrl.getScheduledTweets()">
                                 <hr>
-                                <div ng-repeat="tweet in tweetCtrl.scheduledTweets">
+                                <div ng-repeat="tweet in tweetCtrl.scheduledTweets track by tweet.id_str">
                                     <hr>
                                     <h3>Tweets awaiting publication</h3>
                                     <table class="table table-bordered table-responsive">
@@ -126,21 +126,21 @@
                             </uib-tab>
                             <uib-tab heading="Mentions" ng-click="tweetCtrl.getMentions()">
                                 <hr>
-                                <div class="container" ng-repeat="tweet in tweetCtrl.mentions">
+                                <div class="container" ng-repeat="tweet in tweetCtrl.mentions track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
                             </uib-tab>
                             <uib-tab heading="I have been retwitted" ng-click="tweetCtrl.getRetweets()">
                                 <hr>
-                                <div class="container" ng-repeat="tweet in tweetCtrl.retweets">
+                                <div class="container" ng-repeat="tweet in tweetCtrl.retweets track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
                             </uib-tab>
                             <uib-tab heading="My favorites" ng-click="tweetCtrl.getFavorites()">
                                 <hr>
-                                <div class="container" ng-repeat="tweet in tweetCtrl.favorites">
+                                <div class="container" ng-repeat="tweet in tweetCtrl.favorites track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
@@ -160,7 +160,7 @@
                                                     <th class="text-center col-md-1">Delete?</th>
                                                 </tr>
                                                 </thead>
-                                                <tbody ng-repeat="i in tweetCtrl.allHashtags">
+                                                <tbody ng-repeat="i in tweetCtrl.allHashtags ">
                                                 <tr>
                                                     <td class="text-center">#{{i.hashtag}}</td>
                                                     <td>
