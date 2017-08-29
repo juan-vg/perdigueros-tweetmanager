@@ -148,7 +148,7 @@ app_admin.controller('AccountController', function($scope,$http) {
 				var error_msg = "Error " + error.status + ": " + error.data;
 				alert(error_msg);
 			}
-		};
+			
 		// RemoveAccount from the list
 		$scope.removeAccount =function(account) {
 			$http.delete(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'+account._id,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
@@ -169,7 +169,7 @@ app_admin.controller('AccountController', function($scope,$http) {
 				alert(error_msg);
 			}
 		};
-	}
+	}}
 	function errorCallback(error){
 		console.log("Error getting user accounts");
 		var error_msg = "Error " + error.status + ": " + error.data;

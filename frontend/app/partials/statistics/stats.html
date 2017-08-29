@@ -9,17 +9,17 @@
 		
 		<!--Tweets/likes stat-->
         <div class="col-xs-12">
-            <h2 align="center">Top Tweets with more likes</h2>
+            <h2 align="center">Top Tweets that have more likes</h2>
             <div ng-if="!emptytweetlikes" class="col-xs-12">
                 <div class="col-xs-12">
                     <canvas id="tweetlikes" class="chart chart-bar"
                             chart-data="dataTl" chart-labels="labelTl" chart-options="optionsTl" chart-colors="colors">
                     </canvas>
                 </div>
-                <div class="col-xs-12">
-                    <div class="col-xs-4" ng-repeat="tweet in arr_tl track by $index">
+                <div class="col-xs-12 aligned-row"">
+                    <div class="col-xs-6" ng-repeat="tweet in arr_tl track by $index">
                         <h4 align="center">Number #{{$index + 1}}</h4>
-                        <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                        <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                     </div>
                 </div>
 
@@ -29,7 +29,7 @@
         <!--Tweets/retweets stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Tweets with more retweets</h2>
+        <h2 align="center">Top Tweets that have more retweets</h2>
 
         <div ng-if="!emptytweetretweets" class="col-xs-12">
             <div class="col-xs-12">
@@ -37,10 +37,10 @@
                         chart-data="dataTrt" chart-labels="labelTrt" chart-options="optionsTrt" chart-colors="colors">
                 </canvas>
             </div>
-            <div class="col-xs-12">
-                <div class="col-xs-4" ng-repeat="tweet in arr_trt track by $index">
+            <div class="col-xs-12 aligned-row"">
+                <div class="col-xs-6" ng-repeat="tweet in arr_trt track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -49,17 +49,17 @@
         <!--Tweets/likes per month stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Tweets with more likes at month</h2>
+        <h2 align="center">Top Tweets that have more likes in this month</h2>
         <div ng-if="!emptytweetlikesmonth" class="col-xs-12">
             <div class="col-xs-12">
                 <canvas id="tweetlikesmonth" class="chart chart-pie"
                         chart-data="dataTlm" chart-labels="labelTlm" chart-options="optionsTlm" chart-colors="colors">
                 </canvas>
             </div>
-            <div class="col-xs-12">
-                <div class="col-xs-4" ng-repeat="tweet in arr_tlm track by $index">
-                    <h4 align="center">Numbers #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+            <div class="col-xs-12 aligned-row"">
+                <div class="col-xs-6" ng-repeat="tweet in arr_tlm track by $index">
+                    <h4 align="center">Number #{{$index + 1}}</h4>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -68,17 +68,17 @@
         <!--Tweets/likes per day stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Tweets with more likes at day</h2>
+        <h2 align="center">Top Tweets that have more likes in this day</h2>
         <div ng-if="!emptytweetlikesday" class="col-xs-12">
             <div class="col-xs-12">
                 <canvas id="tweetlikesday" class="chart chart-bar"
                         chart-data="dataTld" chart-labels="labelTld" chart-options="optionsTld" chart-colors="colors">
                 </canvas>
             </div>
-            <div class="col-xs-12">
-                <div class="col-xs-4" ng-repeat="tweet in arr_tld track by $index">
+            <div class="col-xs-12 aligned-row"">
+                <div class="col-xs-6" ng-repeat="tweet in arr_tld track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -87,7 +87,7 @@
         <!--Tweets/retweets per month stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Tweets with more retweets at month</h2>
+        <h2 align="center">Top Tweets that have more retweets in this month</h2>
         <div ng-if="!emptytweetretweetsmonth" class="col-xs-12">
             <div class="col-xs-12">
                 <canvas id="tweetretweetsmonth" class="chart chart-pie"
@@ -95,10 +95,10 @@
                         chart-colors="colors">
                 </canvas>
             </div>
-            <div class="col-xs-12">
-                <div class="col-xs-4" ng-repeat="tweet in arr_trtm track by $index">
+            <div class="col-xs-12 aligned-row"">
+                <div class="col-xs-6" ng-repeat="tweet in arr_trtm track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -107,7 +107,7 @@
         <!--Tweets/retweets per day stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Tweets with more retweets at day</h2>
+        <h2 align="center">Top Tweets that have more retweets in this day</h2>
         <div ng-if="!emptytweetretweetsday" class="col-xs-12">
             <div class="col-xs-12">
                 <canvas id="tweetretweetsday" class="chart chart-bar"
@@ -115,10 +115,10 @@
                         chart-colors="colors">
                 </canvas>
             </div>
-            <div class="col-xs-12">
-                <div class="col-xs-4" ng-repeat="tweet in arr_trtd track by $index">
+            <div class="col-xs-12 aligned-row"">
+                <div class="col-xs-6" ng-repeat="tweet in arr_trtd track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str"></twitter-widget>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
             </div>
         </div>
@@ -136,7 +136,7 @@
         <!--Top accounts stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Accounts with more followers</h2>
+        <h2 align="center">Top Accounts that have more followers</h2>
         <div class="col-xs-12">
             <div ng-if="!emptyaccFollowers" class="col-xs-6">
                 <canvas id="accFollowers" class="chart chart-doughnut"
@@ -166,7 +166,7 @@
         <!--Top Hashtags stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Hashtags more followed </h2>
+        <h2 align="center">Top most followed Hashtags</h2>
         <canvas ng-if="!emptyHashtags" id="hashtags" class="chart chart-horizontal-bar"
                 chart-data="dataHashtags" chart-labels="labelHashtags" chart-options="optionsHashtags"
                 chart-colors="colors">
@@ -176,7 +176,7 @@
         <!--Top Users stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Users more followed</h2>
+        <h2 align="center">Top most followed Users</h2>
         <canvas ng-if="!emptyFollowed" id="followed" class="chart chart-horizontal-bar"
                 chart-data="dataFollowed" chart-labels="labelFollowed" chart-options="optionsFollowed"
                 chart-colors="colors">
