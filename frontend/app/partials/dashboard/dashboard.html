@@ -260,7 +260,7 @@
                                         </div>
                                     </uib-tab>
                                     <uib-tab ng-click="tweetCtrl.webSocketFollowedUsers()"
-                                             heading="Tweets from hashtags users you follow">
+                                             heading="Tweets from users you follow">
                                         <hr>
                                         <h1 class="text-center">Tweets</h1>
                                         <div ng-repeat="tweet in tweetCtrl.followedUserTweet.slice().reverse() track by tweet.id_str">
