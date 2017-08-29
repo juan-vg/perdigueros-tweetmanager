@@ -229,7 +229,7 @@ app.controller('firstLoginCtrl', ['$scope', '$http', '$location','AlertService',
         $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/firstlogin', data
         ).then(function (response) {
                 $location.url('/');
-                console.log("Change password correct");
+                AlertService.alert('Congratulations','Password be changed successfully','Close');
             },
             //status code errors
             function (response) {
@@ -292,7 +292,6 @@ app.controller('dashboardCtrl', function ($rootScope, $location, $scope, $http, 
     };
     $http.get('config.json').
     then(function onSuccess(response) {
-        console.log(response);
         localStorage.setItem('api', response.data.api);
         localStorage.setItem('port', response.data.apiPort);
     }).
@@ -365,7 +364,6 @@ app.controller('reactivateCtrl',function($http,AlertService,$auth) {
         };
         if (data.loginType != 'local') {
             $auth.authenticate(provider).then(function(response){
-                console.log(response);
                 data.code = response.access_token;
                 $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/reactivate', data)
                     .then(function (response) {
