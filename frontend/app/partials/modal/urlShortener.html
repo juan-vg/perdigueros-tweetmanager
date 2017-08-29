@@ -1,15 +1,15 @@
 <div class="modal-header">
-    <h3 class="modal-title">Acortador de URL'S</h3>
+    <h3 class="modal-title">URL shortener</h3>
 </div>
 <div class="modal-body">
     <form ng-submit="postUrl()">
         <div class="form-group row">
             <div class="col-xs-12">
-                <label >Url a acortar</label>
+                <label >URL to short</label>
                 <input class="form-control" ng-model="urlData"/>
             </div>
             <div class="col-xs-12">
-                <button id="button" type="submit" class="form-control btn btn-primary btn-sm center-block">&nbsp;Acortar</button>
+                <button id="button" type="submit" class="form-control btn btn-primary btn-sm center-block">&nbsp;Short</button>
             </div>
         </div>
     </form>
@@ -22,7 +22,7 @@
                     </div>
                     <div clas="col-xs-2">
                         <button class="btn" ngclipboard data-clipboard-target="#foo">
-                            <i class="fa fa-clipboard fa-lg center-block" aria-hidden="true" title="Copiar al portapapeles"></i>
+                            <i class="fa fa-clipboard fa-lg center-block" aria-hidden="true" title="Copy to clipboard"></i>
                         </button>
                     </div>
                 </div>
@@ -30,5 +30,5 @@
     </tr>
 </div>
 <div class="modal-footer">
-    <button ng-click="close()" class="btn btn-primary pull-left">Cerrar</button>
+    <button ng-click="close()" class="btn btn-primary pull-left">Close</button>
 </div>

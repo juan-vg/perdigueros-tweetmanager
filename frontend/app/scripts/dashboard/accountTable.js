@@ -13,32 +13,36 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
     accountCtrl.active = false;
     $rootScope.activeAccount = accountCtrl.active;
 
-    /**
-     * GET TWITTER ACCOUNTS
-     * @type {{method: string, url: string, headers: {Content-Type: string, token}}}
-     */
-    var req = {
-        method: 'GET',
-        url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts',
-        headers: {
-            'Content-Type': 'application/json',
-            'token': localStorage.getItem('token')
-        }
-    };
-    $http(req).then(function (response) {
-        accountCtrl.accountList = response.data;
-        if(accountCtrl.accountList.length!=0){
-            accountCtrl.selectAccount(response.data[0]);
-        }
-    })
-        .catch(function (response) {
-            if (response.status == 403) {
+        /**
+         * GET TWITTER ACCOUNTS
+         * @type {{method: string, url: string, headers: {Content-Type: string, token}}}
+         */
+        var req = {
+            method: 'GET',
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts',
+            headers: {
+                'Content-Type': 'application/json',
+                'token': localStorage.getItem('token')
+            }
+        };
+        $http(req).then(function (response) {
+            accountCtrl.accountList = response.data;
+            if (accountCtrl.accountList.length != 0) {
+                if(response.data[0].activated) {
+                    accountCtrl.selectAccount(response.data[0]);
+                }
+            }
+        })
+            .catch(function (response) {
+                if (response.status == 403) {
                     localStorage.clear();
-            }
-            else if (response.status == 500) {
-                AlertService.alert('Error', 'Error obteniendo las cuentas de Twitter de la base de datos.', 'Cerrar');
-            }
-        });
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
+                }
+                else if (response.status == 500) {
+                    AlertService.alert('Error', 'Error getting Twitter accounts from database.', 'Close');
+                }
+            });
 
     /**
      * SELECTS AN ACCOUNT FROM LIST
@@ -46,11 +50,11 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
      */
     accountCtrl.selectAccount = function (account) {
         accountCtrl.active = account._id;
-        $rootScope.activeAccount = accountCtrl.active;
+        $rootScope.activeAccount = account.activated;
         localStorage.setItem('selectedAccount', account._id);
     };
 
-    accountCtrl.setClickedRow = function(index){
+    accountCtrl.setClickedRow = function (index) {
         accountCtrl.selectedRow = index;
     }
 
@@ -59,7 +63,7 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
      * SHOWS DELETE MODAL
      */
     accountCtrl.showDeleteModal = function () {
-        AlertService.alert('Eliminar cuenta ', '¿Está seguro de que desea eliminar esta cuenta?', 'Si', accountCtrl.deleteAccount, 'Cancelar');
+        AlertService.alert('Delete account', 'Are you sure you want to delete this account?', 'Yes', accountCtrl.deleteAccount, 'Cancel');
 
     };
     /**
@@ -68,33 +72,35 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
     accountCtrl.deleteAccount = function () {
         var req = {
             method: 'DELETE',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount'),
             headers: {
                 'Content-Type': 'application/json',
                 'token': localStorage.getItem('token')
             }
         };
-        $http(req).then(function (response) {
-            AlertService.alert('Cuenta borrada correctamente', "La Ley Orgánica de " +
-                "Protección de Datos nos obliga a mantener tu cuenta en nuestros servidores durante el plazo de seis meses." +
-                " Nada nos gustaría más que poder seguir tus indicaciones de borrar la cuenta, pero como no es posible a cambio " +
-                "te ofrecemos la posibilidad de recuperarla siempre que lo solicites dentro de este plazo. Atentamente, el " +
-                "equipo de Zaratech PTM", 'Cerrar');
+        $http(req).then(function () {
+            AlertService.alert('Account deleted', "The Organic Law of Data Protection obliges us to keep your account in " +
+                "our servers during the term of six months. Nothing we would like more than to follow your instructions" +
+                " to delete the account, but as it is not possible in return we offer you the possibility to recover it" +
+                " whenever you request it within this period. Sincerely, Zaratech PTM team", 'Close');
             $route.reload();
         })
             .catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'La cuenta seleccionada no es valida para realizar su eliminación.', 'Cerrar');
+                    AlertService.alert('Error', 'Selected account is not valid for delete operation.', 'Close');
                 }
+
                 else if (response.status == 403) {
-                    AlertService.alert('Error', 'No es propietario de esta cuenta de Twitter', 'Cerrar');
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
                 }
                 else if (response.status == 404) {
-                    AlertService.alert('Error', 'No se encuentra el id de la cuenta a borrar.', 'Cerrar');
+                    AlertService.alert('Error', 'Unable to find selected account.', 'Close');
                 }
                 else if (response.status == 500) {
-                    AlertService.alert('Error', 'Error borrando la cuenta de Twitter de la base de datos.', 'Cerrar');
+                    AlertService.alert('Error', 'Error getting Twitter accounts from database.', 'Close');
                 }
             });
     }
@@ -113,29 +119,31 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
     accountCtrl.reactivate = function () {
         var req = {
             method: 'PUT',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') + "/activated",
             headers: {
                 'Content-Type': 'application/json',
                 'token': localStorage.getItem('token')
             }
         };
-        $http(req).then(function (response) {
-            AlertService.alert("La cuenta se ha reactivado correctamente", "La cuenta se ha reactivado correctamente", "Cerrar");
+        $http(req).then(function () {
+            AlertService.alert("Account successfully reactivated", "The account has been successfully reactivated.", "Close");
             $route.reload();
         })
             .catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', "La cuenta seleccionada no es valida para realizar esta operación.", "Cerrar");
+                    AlertService.alert('Error', 'Selected account is not valid for reactivate operation.', 'Close');
                 }
                 else if (response.status == 403) {
-                    AlertService.alert("Error", "El usuario no es propietario de esta cuenta.", "Cerrar");
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
                 }
                 else if (response.status == 404) {
-                    AlertService.alert("Error", "El sistema no encuentra el id de la cuenta seleccionada.", "Cerrar");
+                    AlertService.alert('Error', 'Unable to find selected account.', 'Close');
                 }
                 else if (response.status == 500) {
-                    AlertService.alert('Error', "Error reactivando la cuenta de Twitter seleccionada.", "Cerrar");
+                    AlertService.alert('Error', 'Error getting Twitter accounts from database.', 'Close');
                 }
             });
     }

@@ -1,12 +1,12 @@
 <!-- Index body content, component jumbotron with welcome message -->
 <div id="welcomeHeader" class="jumbotron hidden-xs">
     <div class="container text-center">
-        <h2 class="hidden-xs">Registrate en </h2>
+        <h2 class="hidden-xs">Sign up </h2>
         <h1>Perdigueros Tweet Manager</h1>
     </div>
 </div>
 <div class="container perdiguero_signup">
-    <h1 class="text-center">Crea tu cuenta en Perdigueros Tweet Manager</h1>
+    <h1 class="text-center">Create your account at Perdigueros Tweet Manager</h1>
     <div class="container ">
         <form name="signupForm" ng-submit="postData()" class="form-horizontal signup-form" role="form" novalidate>
             <div class="row">
@@ -19,21 +19,21 @@
                 <div class="input-signup col-xs-12 col-sm-12 col-md-6">
                     <div class="form-group ">
                         <div class="col-xs-10">
-                            <input type="text" name="name" class="form-control" placeholder="Nombre" ng-model="name" required>
-                            <span class="required" ng-show="signupForm.name.$touched && signupForm.name.$invalid">El nombre es obligatorio.</span>
+                            <input type="text" name="name" class="form-control" placeholder="Name" ng-model="name" required>
+                            <span class="required" ng-show="signupForm.name.$touched && signupForm.name.$invalid">Name is required.</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-10">
-                            <input type="text" name="surname" class="form-control" placeholder="Apellido" ng-model="surname" required>
-                            <span class="required" ng-show="signupForm.surname.$touched && signupForm.surname.$invalid">El apellido es obligatorio.</span>
+                            <input type="text" name="surname" class="form-control" placeholder="Surname" ng-model="surname" required>
+                            <span class="required" ng-show="signupForm.surname.$touched && signupForm.surname.$invalid">Surname is required.</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-xs-10">
                             <input type="email" name="email" class="form-control" placeholder="E-mail" ng-model="email" required>
-                            <span ng-show="signupForm.email.$touched && signupForm.email.$invalid" class="required">El e-mail es obligatorio.</span>
-                            <span ng-show="signupForm.email.$error.email" class="mailerror"><br>Formato de e-mail incorrecto.</span>
+                            <span ng-show="signupForm.email.$touched && signupForm.email.$invalid" class="required">E-mail is required.</span>
+                            <span ng-show="signupForm.email.$error.email" class="mailerror"><br>Incorrect e-mail format.</span>
                         </div>
                     </div>
 
@@ -45,7 +45,7 @@
                     </div>
                     <div class="form-group">
                         <div class="col-xs-10">
-                            <button ng-disabled="signupForm.$invalid" type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg">Enviar</button>
+                            <button ng-disabled="signupForm.$invalid" type="submit" class="col-xs-12 btn btn-primary btn-load btn-lg">Send</button>
                         </div>
                     </div>
                 </div>
