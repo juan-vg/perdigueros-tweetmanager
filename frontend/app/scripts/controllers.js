@@ -43,7 +43,7 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
                 // Handle signin errors
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Captcha', 'Captcha is not well validated. Please, try again.', 'Close');
+                        AlertService.alert('Captcha', 'Params error or Captcha is not well validated. Please, try again.', 'Close');
                     }
                     else if (response.status == 401) {
                         AlertService.alert('Incorrect data', 'Check the data entered in the signin form.', 'Close');
@@ -148,7 +148,7 @@ app.controller('signupCtrl', ['$scope', '$http', '$location','AlertService', fun
                     }
                     //if captcha validation error
                     else if (response.status == 400) {
-                        AlertService.alert('Error','Captcha is not well validated. Please, try again.','Close');
+                        AlertService.alert('Error','Params error or Captcha is not well validated. Please, try again.','Close');
                     }
                     //db error
                     else if (response.status == 500) {
@@ -379,7 +379,7 @@ app.controller('reactivateCtrl',function($http,AlertService,$auth) {
                 })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Captcha', 'Captcha is not well validated. Please, try again.', 'Close');
+                        AlertService.alert('Captcha', 'Params error or Captcha is not well validated. Please, try again.', 'Close');
                     }
                     else if (response.status == 401) {
                         AlertService.alert('Incorrect data', 'Check the data entered in the signin form.', 'Close');
