@@ -374,7 +374,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                 $scope.dataFollowed = data;
                 $scope.optionsFollowed = {
                     scales: {
-                        yAxes: [{
+                        xAxes: [{
                             ticks: {
                                 beginAtZero: true
                             }
