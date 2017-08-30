@@ -1,5 +1,5 @@
 /**
- * Instance the angular module 'app' and all the extern modules that it uses.
+ * Instance the angular module 'app_admin' and all the extern modules that it uses.
  */
 angular.module('app_admin', ['ngRoute', 'vcRecaptcha', 'satellizer','LocalStorageModule','chart.js']);
 

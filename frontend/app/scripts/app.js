@@ -5,7 +5,7 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet','ui.bootstrap','ADM-dateTimePicker','ngclipboard','ngWebSocket']);
+angular.module('app', ['ngRoute','app_admin','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet','ui.bootstrap','ADM-dateTimePicker','ngclipboard','ngWebSocket']);
 
 //variable for manage the main module
 var app = angular.module("app");
@@ -88,15 +88,15 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
     $locationProvider.html5Mode(true);
 
     //configure auth providers
-    $authProvider.loginUrl = 'http://zaratech-ptm.ddns.net:8888/login/signin';
-    $authProvider.signupUrl = 'http://zaratech-ptm.ddns.net:8888/login/signup';
+    $authProvider.loginUrl = localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/signin';
+    $authProvider.signupUrl = localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/signup';
 
     //facebook auth provider config
     $authProvider.facebook({
         clientId : '212919395883976',
         responseType: 'token',
         name: 'facebook',
-        url: 'http://zaratech-ptm.ddns.net:8888/auth/facebook',
+        url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/auth/facebook',
         redirectUri : window.location.origin + '/auth/callback'
     });
 
@@ -105,7 +105,7 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         clientId: '60622240890-eg0kb7s2v246edt7nbpqqjst6rk8uj75.apps.googleusercontent.com',
         responseType:'token',
         name: 'google',
-        url: 'http://zaratech-ptm.ddns.net:8888/auth/google',
+        url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/auth/google',
         authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
         redirectUri : window.location.origin + '/auth/callback'
     });
@@ -119,7 +119,7 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
         requiredUrlParams: ['scope'],
         scope: ['openid','profile','email'],
         scopeDelimiter: '+',
-        authorizationEndpoint: 'http://zaratech-ptm.ddns.net:8888/auth/openid',
+        authorizationEndpoint: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/auth/openid',
     });
 
 });

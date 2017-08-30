@@ -1,17 +1,43 @@
+<!-- Navigation-->
+	<br><br>
+    <div class="container" style="background-color:#337ab7" ng-controller="adminMenuCtrl">
+        <div class="navbar-header">
+            <!-- Navbar brand-->
+            <a class="navbar-brand" href="/admin-main-panel" style="color:white">Admin Control</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right"  ng-show="isAdminActive()">
+				<!-- Users link -->
+                <li><a href="/admin-main-panel" style="color:white"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Users</a></li>
+                <!-- Accounts link -->
+                <li><a href="/admin-accounts-panel" style="color:white"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Twitter Accounts</a></li>
+                <!-- Stadistics link -->
+                <li><a href="/admin-door-panel" style="color:white"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Statistics</a></li>
+                <!-- Right list with logout button-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"  style="color:white"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-click="logout()"><a href="/admin">Sign Out&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
 <!-- Content of form with password and submit button-->
 <div class="container">
     <div class="row">
         <!-- Form with password -->
-		<h2 align="center">Bienvenido al panel de administrador</h2><br /><br />
+		<h2 align="center">Welcome to admin panel</h2><br /><br />
         <div class="col-xs-4 col-xs-offset-4">
 			   <form name="myForm" ng-submit="checkPwd()">
-       				<label for="password">Contraseña</label>
+       				<label for="password">Password</label>
        				<input type="password" id="password" name="password" ng-model="password" ng-minlength="8" ng-maxlength="20" required  />
-   					<span ng-show="!myForm.password.$error.required && (myForm.password.$error.minlength || myForm.password.$error.maxlength) && myForm.password.$dirty"><br />Contraseña minimo 8 caracteres y maximo de 20<br /></span>
+   					<span ng-show="!myForm.password.$error.required && (myForm.password.$error.minlength || myForm.password.$error.maxlength) && myForm.password.$dirty"><br />Password at least 8 characters and 20 maximum<br /></span>
 					<div id="captcha" vc-recaptcha key="'6LcU-iEUAAAAANZLuIw0e1txZeTH1VAVSIl8RPKx'" on-create="setWidgetId(widgetId)"></div>
    					<span ng-show="pwdError"><br />{{error}}<br /></span>
        				<br/>
-   					<button id="button" type="submit" class="btn btn-primary btn-lg center-block" ng-disabled="!myForm.$valid"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Entrar</button>
+   					<button id="button" type="submit" class="btn btn-primary btn-lg center-block" ng-disabled="!myForm.$valid"><i class="fa fa-sign-in" aria-hidden="true"></i>&nbsp;Enter</button>
 				</form>
         </div>
     </div>

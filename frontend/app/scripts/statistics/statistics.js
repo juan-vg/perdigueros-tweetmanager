@@ -248,7 +248,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                 var label=[];
                 var data=[];
                 for( key = 0; key < tweetsPerDayData.length; key++) {
-                    label.push("Dia: "+tweetsPerDayData[key].day);
+                    label.push("Day: "+tweetsPerDayData[key].day);
                     data.push(tweetsPerDayData[key].count);
                 }
                 // Config Chart
@@ -346,11 +346,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                                 beginAtZero:true,
                             }
                         }],
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero:this.beginzero,
-                            }
-                        }]
+                        
                     }
                 };
             }
@@ -374,7 +370,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                 $scope.dataFollowed = data;
                 $scope.optionsFollowed = {
                     scales: {
-                        yAxes: [{
+                        xAxes: [{
                             ticks: {
                                 beginAtZero: true
                             }
