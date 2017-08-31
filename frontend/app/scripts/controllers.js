@@ -258,22 +258,25 @@ app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location','AlertService
             'email': $scope.emailForgot
         };
         $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/remember', data
-        ).then(function (response) {
+        ).then(function () {
             AlertService.alert('Congratulations','New password has been generated and it has been sended to your e-mail.','Close');
                 $location.url('/');
-            },
+            }).catch(function(response){
             //status code errors
-            function (response) {
-                //incorrect validation user or non active user, or not existing email
-                if (response.status == 409) {
-                    AlertService.alert('Error','The user is already validated, disabled or there is no e-mail in the application.','Close');
-                    $location.url('/');
-                }
-                //db error
-                else if (response.status == 500) {
-                    AlertService.alert('Error','Error in database. Sorry for the inconvenience.','Close');
-                }
-            });
+            if(response.status == 400){
+                AlertService.alert('Error','Params error','Close');
+            }
+            //incorrect validation user or non active user, or not existing email
+            else if (response.status == 409) {
+                AlertService.alert('Error','The user is not validated, is disabled, is social (Facebook, Google or OpenID), or not existing e-mail in the application.','Close');
+
+            }
+            //db error
+            else if (response.status == 500) {
+                AlertService.alert('Error','Error in database. Sorry for the inconvenience.','Close');
+            }
+        });
+
     };
 }]);
 
