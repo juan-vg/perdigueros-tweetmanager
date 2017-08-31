@@ -658,7 +658,7 @@ var appRouter = function(app) {
      *       400:
      *         description: Params error
      *       409:
-     *         description: User not validated, not active, or not existing email
+     *         description: User not validated, not active, social (Facebook, Google or OpenID), or not existing email
      *       500:
      *         description: DB error
      */
@@ -686,7 +686,7 @@ var appRouter = function(app) {
                         console.log("APP-LOGIN-REMEMBER: Incorrect");
                         
                         response.writeHead(409, {"Content-Type": "text/html"});
-                        response.write("User not validated, not active, or not existing email");
+                        response.write("User not validated, not active, social (Facebook, Google or OpenID), or not existing email");
                         
                     } else {
                         console.log("APP-LOGIN-REMEMBER: Error while performing query");
