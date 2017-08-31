@@ -1,3 +1,29 @@
+<!-- Navigation-->
+	<br><br>
+    <div class="container" style="background-color:#337ab7" ng-controller="adminMenuCtrl">
+        <div class="navbar-header">
+            <!-- Navbar brand-->
+            <a class="navbar-brand" href="/admin-main-panel" style="color:white">Admin Control</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right"  ng-show="isAdminActive()">
+				<!-- Users link -->
+                <li><a href="/admin-main-panel" style="color:white"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Users</a></li>
+                <!-- Accounts link -->
+                <li><a href="/admin-accounts-panel" style="color:white"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Twitter Accounts</a></li>
+                <!-- Stadistics link -->
+                <li><a href="/admin-door-panel" style="color:white"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Statistics</a></li>
+                <!-- Right list with logout button-->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"  style="color:white"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li ng-click="logout()"><a href="/admin">Sign Out&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
 <!-- Content of form with password and submit button-->
 <div class="container">
     <div class="row">
