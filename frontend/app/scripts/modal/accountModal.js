@@ -9,7 +9,7 @@ app.controller('accountModalCtrl', function($scope,$uibModalInstance,AlertServic
     $scope.createAccount = function () {
         var req = {
             method: 'POST',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts',
+            url: localStorage.getItem('api')+'/twitter-accounts',
             headers: {
                 'Content-Type': 'application/json',
                 'token': localStorage.getItem('token')
@@ -26,25 +26,25 @@ app.controller('accountModalCtrl', function($scope,$uibModalInstance,AlertServic
         };
         $http(req).then(function (response) {
             $uibModalInstance.close();
-            AlertService.alert('Enhorabuena', 'La cuenta se ha añadido correctamente', 'Cerrar');
+            AlertService.alert('Congratulations', 'Account has beend added successfully.', 'Close');
             $route.reload();
         }).catch(function (response) {
             if (response.status == 400) {
-                AlertService.alert('Error', 'Error de parametros', 'Cerrar');
+                AlertService.alert('Error', 'Params error', 'Close');
             }
             else if (response.status == 403) {
-                AlertService.alert('Error', 'El token de usuario no se puede verificar', 'Cerrar');
                 localStorage.clear();
-                $locale.path('/');
+                AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                $location.url('/');
             }
             else if (response.status == 409) {
-                AlertService.alert('Error', 'La cuenta ya existe', 'Cerrar');
+                AlertService.alert('Error', 'Account exists into the database', 'Close');
             }
             else if (response.status == 500) {
-                AlertService.alert('Error', 'Error insertando la cuenta de Twitter en la base de datos de PTM', 'Cerrar');
+                AlertService.alert('Error', 'Error inserting the twitter account into the PTM database', 'Close');
             }
             else if (response.status == 503) {
-                AlertService.alert('Error', 'Servicio de Twitter no disponible o datos de autenticación de twitter incorrectos.', 'Cerrar');
+                AlertService.alert('Error','Twitter Internal Service error or incorrect twitter authentication data.','Close');
             }
         });
     }

@@ -13,7 +13,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/home-timeline',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,12 +26,15 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 .catch(function(response){
                     if(response.status==404){
                         tweetCtrl.homeTimeLineTweetsList = null;
-                        AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
+                        AlertService.alert('Error','Account not exists or disabled','Cerrar');
                     }
                 });
 
-            tweetCtrl.getSeguimiento();
+            tweetCtrl.getTracking();
 
+        }
+        else{
+            tweetCtrl.homeTimeLineTweetsList = null;
         }
     });
     /**
@@ -41,7 +44,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/home-timeline',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,16 +57,16 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 .catch(function (response) {
                     if(response.status==404){
                         tweetCtrl.homeTimeLineTweetsList = null;
-                        AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
+                        AlertService.alert('Error','Account not exists or it is disabled','Close');
                     }
                     else if(response.status==503){
-                        AlertService.alert('Error','Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación','Cerrar');
+                        AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                     }
                 });
         }
         else {
             tweetCtrl.homeTimeLineTweetsList = null;
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     };
     /**
@@ -73,7 +76,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/user-timeline',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,25 +87,27 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 tweetCtrl.myTweets = response.data;
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
+                    AlertService.alert('Error', 'Selected account is not valid for get my tweets operation.', 'Close');
                 }
                 else if (response.status == 403) {
-                    AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
                 }
                 else if (response.status == 404) {
-                    AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
+                    AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
                 }
                 else if (response.status == 500) {
-                    AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
+                    AlertService.alert('Error', 'Error into the database.', 'Close');
                 }
                 else if (response.status == 503) {
-                    AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
+                    AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                 }
             });
         }
         else {
             tweetCtrl.myTweets = null;
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     };
 
@@ -113,7 +118,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/scheduled',
                 headers: {
                     'Content-Type': 'application/json',
@@ -121,29 +126,30 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                 }
             }
             $http(req).then(function (response) {
-                console.log(response);
                 tweetCtrl.scheduledTweets = response.data;
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
+                    AlertService.alert('Error', 'Selected account is not valid for get scheduled tweets operation.', 'Close');
                 }
                 else if (response.status == 403) {
-                    AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
                 }
                 else if (response.status == 404) {
-                    AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
+                    AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
                 }
                 else if (response.status == 500) {
-                    AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
+                    AlertService.alert('Error', 'Error into the database.', 'Close');
                 }
                 else if (response.status == 503) {
-                    AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
+                    AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                 }
             });
         }
         else {
             tweetCtrl.scheduledTweets = null;
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
 
@@ -154,7 +160,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'POST',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/publish',
                 headers: {
                     'Content-Type': 'application/json',
@@ -166,25 +172,30 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             };
             $http(req).then(function (response) {
                 // Confirmation alert about publish a new tweet
-                AlertService.alert('Enhorabuena', 'El tweet se ha publicado correctamente.', 'Cerrar');
+                AlertService.alert('Congratulations', 'Tweet has been published successfully.', 'Close');
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros. Es posible que el tweet sea demasiado largo para ser publicado, o no reúna los requisitos de Twitter. Revíselo antes.', 'Cerrar');
+                        AlertService.alert('Error', 'Selected account is not valid for publish tweet operation.', 'Close');
                     }
                     else if (response.status == 403) {
-                        AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
+                        localStorage.clear();
+                        AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                        $location.url('/');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
+                        AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
+                    }
+                    else if (response.status == 500) {
+                        AlertService.alert('Error', 'Error into the database.', 'Close');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
+                        AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                     }
                 });
         }
         else {
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
     /**
@@ -194,7 +205,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'POST',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/schedule',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,27 +218,29 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             };
             $http(req).then(function (response) {
                 // Confirmation alert about schedule a tweet
-                AlertService.alert('Enhorabuena', 'El tweet se ha programado correctamente.', 'Cerrar');
+                AlertService.alert('Congratulations', 'Tweet has been scheduled successfully.', 'Close');
             }).catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros. Es posible que el tweet sea demasiado largo para ser publicado, o no reúna los requisitos de Twitter. Revíselo antes.', 'Cerrar');
+                    AlertService.alert('Error', 'Selected account is not valid for schedule tweet operation.', 'Close');
                 }
                 else if (response.status == 403) {
-                    AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
+                }
+                else if (response.status == 404) {
+                    AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
                 }
                 else if (response.status == 500) {
-                    AlertService.alert('Error', 'Error guardando tweet programado en la base de datos.', 'Cerrar');
+                    AlertService.alert('Error', 'Error into the database.', 'Close');
                 }
                 else if (response.status == 503) {
-                    AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
-                }
-                else if(response.status == 404){
-                    AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
+                    AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                 }
             });
         }
         else {
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
 
@@ -239,7 +252,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/mentions',
                 headers: {
                     'Content-Type': 'application/json',
@@ -251,25 +264,27 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
+                        AlertService.alert('Error', 'Selected account is not valid for get mentions operation.', 'Close');
                     }
                     else if (response.status == 403) {
-                        AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
+                        localStorage.clear();
+                        AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                        $location.url('/');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
+                        AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
                     }
                     else if (response.status == 500) {
-                        AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
+                        AlertService.alert('Error', 'Error into the database.', 'Close');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
+                        AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                     }
                 });
         }
         else {
             tweetCtrl.mentions = null;
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
 
@@ -281,7 +296,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/retweeted',
                 headers: {
                     'Content-Type': 'application/json',
@@ -293,26 +308,28 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
+                        AlertService.alert('Error', 'Selected account is not valid for get retweets operation.', 'Close');
                     }
                     else if (response.status == 403) {
-                        AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
+                        localStorage.clear();
+                        AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                        $location.url('/');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
+                        AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
                     }
                     else if (response.status == 500) {
-                        AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
+                        AlertService.alert('Error', 'Error into the database.', 'Close');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
+                        AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                     }
                 });
             ;
         }
         else {
             tweetCtrl.retweets = null;
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
 
@@ -324,7 +341,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
-                url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+                url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
                 + localStorage.getItem('selectedAccount') + '/tweets/favorited',
                 headers: {
                     'Content-Type': 'application/json',
@@ -336,26 +353,28 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             })
                 .catch(function (response) {
                     if (response.status == 400) {
-                        AlertService.alert('Error', 'La cuenta de Twitter no es válida, o hay un error en los parametros.', 'Cerrar');
+                        AlertService.alert('Error', 'Selected account is not valid for get favorites tweets operation.', 'Close');
                     }
                     else if (response.status == 403) {
-                        AlertService.alert('Error', 'El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.', 'Cerrar');
+                        localStorage.clear();
+                        AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                        $location.url('/');
                     }
                     else if (response.status == 404) {
-                        AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
+                        AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
                     }
                     else if (response.status == 500) {
-                        AlertService.alert('Error', 'Error en la base de datos', 'Cerrar');
+                        AlertService.alert('Error', 'Error into the database.', 'Close');
                     }
                     else if (response.status == 503) {
-                        AlertService.alert('Error', 'Error en el servicio externo de Twitter, espere unos momentos para reintentar la operación.', 'Cerrar');
+                        AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                     }
                 });
             ;
         }
         else {
             tweetCtrl.favorites = null;
-            AlertService.alert('Error', 'Debe seleccionar una cuenta de Twitter previamente', 'Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
 
@@ -384,7 +403,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.getAllHashtags = function () {
         var req = {
             method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') + '/hashtags',
             headers: {
                 'Content-Type': 'application/json',
@@ -396,9 +415,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         })
             .catch(function (response) {
                 if (response.status == 400) {
-                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
-                } else {
-                    AlertService.alert('Error', 'No se ha podido obtener la lista de hashtags.', 'Cerrar');
+                    AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
                 }
             });
     }
@@ -407,13 +424,13 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      *
      */
     tweetCtrl.webSocketFollowedUsers = function () {
-        var ws2 = $websocket('ws://zaratech-ptm.ddns.net:8889/twitter-accounts/' +
+        var ws2 = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtPort')+'/twitter-accounts/' +
             localStorage.getItem('selectedAccount') + '/tweets/hashtags');
         ws2.onOpen(function () {
             ws.close(true);
             ws2.send('token:' + localStorage.getItem('token'));
         });
-        ws2.onError(function (error) {
+        ws2.onError(function () {
             ws2.close(true);
         })
 
@@ -422,7 +439,6 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             ws.close(true);
             tweetCollection2.push(JSON.parse(response.data));
             tweetCtrl.followedUserTweet = tweetCollection2;
-            console.log(tweetCtrl.followedUserTweet);
         });
     }
     /**
@@ -431,7 +447,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.postHashtag = function () {
         var req = {
             method: 'POST',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') + '/hashtags',
             headers: {
                 'Content-Type': 'application/json',
@@ -442,22 +458,26 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
         };
         $http(req).then(function (response) {
-            AlertService.alert('Enhorabuena', 'El hashtag se ha añadido correctamente', 'Cerrar');
+            AlertService.alert('Congratulations', 'Hashtag has been added successfully', 'Close');
             tweetCtrl.getAllHashtags();
         })
             .catch(function (response) {
-                if(response.status==403){
-                    AlertService.alert('Error','El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.','Cerrar');
-                    $location.url('/dashboard');
+                if (response.status == 400) {
+                    AlertService.alert('Error', 'Selected account is not valid for publish tweet operation.', 'Close');
                 }
-                else if(response.status==400){
-                    AlertService.alert('Error','El campo está vacío o ha habido un problema con la información introducida.','Cerrar');
+                else if (response.status == 403) {
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
                 }
-                else if(response.status==404){
-                    AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
+                else if (response.status == 404) {
+                    AlertService.alert('Error', 'Account not exists or it is disabled.', 'Close');
                 }
-                else if(response.status==409){
-                    AlertService.alert('Error','El hashtag a seguir ya existe en la lista de hashtags seguidos.','Cerrar');
+                else if (response.status == 500) {
+                    AlertService.alert('Error', 'Error into the database.', 'Close');
+                }
+                else if (response.status == 503) {
+                    AlertService.alert('Error','Twitter Internal Service error,wait few seconds for retry the operation.','Close');
                 }
             });
 
@@ -469,7 +489,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.deleteHashtag = function (i) {
         var req = {
             method: 'DELETE',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') + '/hashtags/' +
             i.hashtag,
             headers: {
@@ -478,15 +498,31 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
         };
         $http(req).then(function (response) {
-            AlertService.alert('Enhorabuena', 'El hashtag a seguir se ha eliminado correctamente', 'Cerrar');
+            AlertService.alert('Congratulations', 'Followed hashtag has been deleted successfully.', 'Close');
             tweetCtrl.getAllHashtags();
         })
             .catch(function (response) {
-                AlertService.alert('Error', 'No se ha podido eliminar el hashtag.', 'Cerrar');
+                if(response.status==400){
+                    AlertService.alert('Error','The provided id is not valid','Close');
+                }
+                else if(response.status==403){
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
+                }
+                else if(response.status==404){
+                    AlertService.alert('Error','Hashtag not found','Close');
+                }
+                else if(response.status==409){
+                    AlertService.alert('Conflict','The hashtag does not exists for the twitter account','Close');
+                }
+                else if(response.status==500){
+                    AlertService.alert('Error','PTM database error','Close');
+                }
             });
     }
 
-    tweetCtrl.getSeguimiento= function (){
+    tweetCtrl.getTracking= function (){
         tweetCtrl.getAllHashtags();
         tweetCtrl.getAllFollowed();
     }
@@ -497,7 +533,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.getAllFollowed = function () {
         var req = {
             method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') + '/followed-users',
             headers: {
                 'Content-Type': 'application/json',
@@ -508,14 +544,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             tweetCtrl.allFollowedUsers = response.data;
         })
             .catch(function (response) {
-                if (response.status == 400) {
-                    AlertService.alert('Error', 'Debe seleccionar una cuenta de twitter antes', 'Cerrar');
-                } else {
-                    AlertService.alert('Error', 'No se ha podido obtener la lista de usuarios a seguir.', 'Cerrar');
+                if(response.status==403){
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
+                }
+                else if(response.status==404){
+                    AlertService.alert('Error','Twitter account for this operation not found','Close');
+
+                }
+                else if(response.status==500){
+                    AlertService.alert('Error','PTM database error','Close');
                 }
             });
-
-
     }
 
     /**
@@ -524,7 +565,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.postFollowed = function () {
         var req = {
             method: 'POST',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') + '/followed-users',
             headers: {
                 'Content-Type': 'application/json',
@@ -536,19 +577,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
 
         };
         $http(req).then(function (response) {
-            AlertService.alert('Enhorabuena', 'El usuario a seguir se ha añadido correctamente', 'Cerrar');
+            AlertService.alert('Congratulations', 'Followed user has been added successfully.', 'Close');
             tweetCtrl.getAllFollowed();
         })
             .catch(function (response) {
                 if(response.status==403){
-                    AlertService.alert('Error','El usuario actualmente logueado no tiene permiso sobre la cuenta de Twitter seleccionada.','Cerrar');
+                    AlertService.alert('Error','La cuenta no existe o está desactivada','Cerrar');
                     $location.url('/dashboard');
                 }
                 else if(response.status==400){
                     AlertService.alert('Error','El campo está vacío o ha habido un problema con la información introducida.','Cerrar');
                 }
                 else if(response.status==404){
-                    AlertService.alert('Error','La cuenta seleccionada no existe o está desactivada.','Cerrar');
+                    AlertService.alert('Error','La cuenta no existe o está desactivada','Cerrar');
                 }
                 else if(response.status==409){
                     AlertService.alert('Error','El usuario a seguir ya existe en la lista de usuarios seguidos.','Cerrar');
@@ -564,7 +605,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.deleteFollowed = function (i) {
         var req = {
             method: 'DELETE',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') + '/followed-users/' +
             i.user,
             headers: {
@@ -573,13 +614,28 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
         };
         $http(req).then(function (response) {
-            AlertService.alert('Enhorabuena', 'El usuario a seguir se ha eliminado correctamente', 'Cerrar');
+            AlertService.alert('Congratulations', 'Followed user has been deleted successfully.', 'Close');
             tweetCtrl.getAllFollowed();
         })
             .catch(function (response) {
-                AlertService.alert('Error', 'No se ha podido eliminar el usuario a seguir.', 'Cerrar');
+                if(response.status==400){
+                    AlertService.alert('Error','The provided id is not valid','Close');
+                }
+                else if(response.status==403){
+                    localStorage.clear();
+                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                    $location.url('/');
+                }
+                else if(response.status==404){
+                    AlertService.alert('Error','Followed user not found','Close');
+                }
+                else if(response.status==409){
+                    AlertService.alert('Conflict','The followed user does not exists for the twitter account','Close');
+                }
+                else if(response.status==500){
+                    AlertService.alert('Error','PTM database error','Close');
+                }
             });
-
     }
 
     /**
@@ -588,7 +644,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.webSocketHashtags = function () {
 
         if ($rootScope.activeAccount) {
-            var ws = $websocket('ws://zaratech-ptm.ddns.net:8889/twitter-accounts/' +
+            var ws = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
                 localStorage.getItem('selectedAccount') + '/tweets/hashtags');
 
             ws.onOpen(function () {
@@ -597,17 +653,16 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
 
             var tweetCollection = [];
             ws.onMessage(function (response) {
-                console.log(response);
                 if (response.data == "TWITTER ERROR") {
                     ws.close(true);
-                    ws = $websocket('ws://zaratech-ptm.ddns.net:8889/twitter-accounts/' +
+                    ws = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
                         localStorage.getItem('selectedAccount') + '/tweets/hashtags');
                 }
                 else if(response.data =='EMPTY LIST ERROR'){
-                    AlertService.alert('Atencion','No hay hashtags a seguir en esta cuenta','Cerrar');
+                    AlertService.alert('Atention','There are not hashtags to follow on this account.','Close');
                 }
                 else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                    AlertService.alert('Atencion','La cuenta no existe o está desactivada','Cerrar');
+                    AlertService.alert('Atention','Account not exists or it is disabled.','Close');
                 }
                 var res;
                 try {
@@ -623,7 +678,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             });
         }
         else{
-            AlertService.alert('Error','Debe seleccionar una cuenta de twitter previamente.','Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
 
@@ -632,7 +687,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      */
     tweetCtrl.webSocketFollowedUsers = function () {
         if ($rootScope.activeAccount) {
-            var ws2 = $websocket('ws://zaratech-ptm.ddns.net:8889/twitter-accounts/' +
+            var ws2 = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
                 localStorage.getItem('selectedAccount') + '/tweets/followed');
 
             var tweetCollection2 = [];
@@ -643,15 +698,15 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             ws2.onMessage(function (response) {
 
                 if (response.data == "TWITTER ERROR") {
-                    ws2 = $websocket('ws://zaratech-ptm.ddns.net:8889/twitter-accounts/' +
+                    ws2 = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
                         localStorage.getItem('selectedAccount') + '/tweets/followed');
                 }
 
                 else if(response.data =='EMPTY LIST ERROR'){
-                    AlertService.alert('Atencion','No hay usuarios a seguir en esta cuenta','Cerrar');
+                    AlertService.alert('Warning','There are not users to follow on this account.','Close');
                 }
                 else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                    AlertService.alert('Atencion','La cuenta no existe o está desactivada.','Cerrar');
+                    AlertService.alert('Warning','Account not exists or it is disabled.','Close');
                 }
                 var res;
                 try {
@@ -667,14 +722,14 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             });
         }
         else{
-            AlertService.alert('Error','Debe seleccionar una cuenta de twitter previamente.','Cerrar');
+            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
         }
     }
 
     tweetCtrl.isUserSelected = function(){
         var req = {
             method: 'GET',
-            url: 'http://zaratech-ptm.ddns.net:8888/twitter-accounts/'
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
             + localStorage.getItem('selectedAccount') ,
             headers: {
                 'Content-Type': 'application/json',
@@ -684,7 +739,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
         $http(req).then(function (response) {
         }).catch(function (response) {
             if(response.status==404){
-                AlertService.alert('Error', 'La cuenta seleccionada no existe o está desactivada.', 'Cerrar');
+                AlertService.alert('Atention','Account not exists or it is disabled.','Close');
             }
         });
     }
@@ -692,24 +747,22 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             var data = {
                 'url': tweetCtrl.url_data
             };
-            $http.post('http://zaratech-ptm.ddns.net:8888/urls', data
+            $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/urls', data
             )
             //201 status code The short URL was created successfully
                 .then(function (response) {
                         //get URL with the id of the original url
-                        tweetCtrl.url_response="Resultado: http://zaratech-ptm.ddns.net:8888/urls/"+response.data.substring(21,45);
+                        tweetCtrl.url_response="Resultado:" + localStorage.getItem('api')+":"+localStorage.getItem('port')+"/urls/"+response.data.id;
                     },
                     //status code errors
                     function (response) {
                         //if Params error
                         if (response.status == 400) {
-                            alert("Error con el acortador");
-                            console.log("Params error");
+                            AlertService.alert('Error','Shortener error','Close');
                         }
                         //DB insert error
                         else if (response.status == 500) {
-                            alert("Error con el acortador debido a la base de datos");
-                            console.log("DB error");
+                            AlertService.alert('Error','Shortener error cause of database','Close');
                         }
                     });
     }

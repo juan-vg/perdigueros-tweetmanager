@@ -507,7 +507,7 @@ a:hover {
 .ADMdtp-box footer .today {
   position: absolute;
   display: block;
-  width: 6em;
+  width: 8em;
   height: 1.7em;
   left: 0;
   right: 0;
@@ -850,3 +850,4 @@ a:hover {
   -webkit-transform:  rotateY(90deg) translateX(-10px);
   transform:  rotateY(90deg) translateX(-10px);
 }
+

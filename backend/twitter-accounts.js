@@ -24,7 +24,8 @@ exports.getAll = function(userToken, callback){
             var query;
             
             if(data == "ADMIN"){
-                query = {"activated": true};
+                // admin can retrieve all accounts
+                query = {};
             } else {
                 // users can retrieve their !activated accounts
                 query = {'email': data};

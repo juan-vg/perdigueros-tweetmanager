@@ -9,7 +9,7 @@ app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$h
     $scope.postUrl = function () {
         var req = {
             method: 'POST',
-            url: 'http://zaratech-ptm.ddns.net:8888/urls',
+            url: localStorage.getItem('api')+'/urls',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -18,25 +18,24 @@ app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$h
             }
         };
         $http(req).then(function (response) {
-            $scope.urlResponse = "http://zaratech-ptm.ddns.net:8888/urls/" + response.data.id;
-            console.log(response);
+            $scope.urlResponse = localStorage.getItem('api')+"/urls/" + response.data.id;
         }).catch(function (response) {
             if (response.status == 400) {
-                AlertService.alert('Error', 'Error de parametros', 'Cerrar');
+                AlertService.alert('Error', 'Params error', 'Close');
             }
             else if (response.status == 403) {
-                AlertService.alert('Error', 'El token de usuario no se puede verificar', 'Cerrar');
                 localStorage.clear();
-                $locale.path('/');
+                AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
+                $location.url('/');
             }
             else if (response.status == 409) {
-                AlertService.alert('Error', 'La cuenta ya existe', 'Cerrar');
+                AlertService.alert('Error', 'Account exists into the database', 'Close');
             }
             else if (response.status == 500) {
-                AlertService.alert('Error', 'Error insertando la cuenta de Twitter en la base de datos de PTM', 'Cerrar');
+                AlertService.alert('Error', 'Error inserting the url into the PTM database', 'Close');
             }
             else if (response.status == 503) {
-                AlertService.alert('Error', 'Servicio de Twitter no disponible o datos de autenticación de twitter incorrectos.', 'Cerrar');
+                AlertService.alert('Error','Twitter Internal Service error or incorrect twitter authentication data.','Close');
             }
         });
     }

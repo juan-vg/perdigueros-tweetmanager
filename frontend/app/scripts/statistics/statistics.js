@@ -1,6 +1,6 @@
 var app = angular.module('app');
 
-var api = "http://zaratech-ptm.ddns.net:8888";
+var api = localStorage.getItem('api')+':'+localStorage.getItem('port');
 // Stadistics Data Binding
 app.controller('statisticsController', function($rootScope,$http,$scope,$location,AlertService) {
     $rootScope.currentUser = localStorage.getItem('currentUserName');
@@ -248,7 +248,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                 var label=[];
                 var data=[];
                 for( key = 0; key < tweetsPerDayData.length; key++) {
-                    label.push("Dia: "+tweetsPerDayData[key].day);
+                    label.push("Day: "+tweetsPerDayData[key].day);
                     data.push(tweetsPerDayData[key].count);
                 }
                 // Config Chart
@@ -314,10 +314,10 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                     /* $http.get(api+'/twitter-accounts/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfoAcc, errorCallbackInfoAcc);*/
                     function successCallbackInfoAcc(info){
                         $scope.acc_id=points[0]._view.label;
-                        $scope.info_acc="Descripcion: " + info.data[0].description;
+                        $scope.info_acc="Description: " + info.data[0].description;
                     }
                     function errorCallbackInfoAcc(error){
-                        $scope.info_acc="Error obteniendo datos";
+                        $scope.info_acc="Error getting data";
                     }
                 };
             }
@@ -374,7 +374,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                 $scope.dataFollowed = data;
                 $scope.optionsFollowed = {
                     scales: {
-                        yAxes: [{
+                        xAxes: [{
                             ticks: {
                                 beginAtZero: true
                             }
@@ -395,7 +395,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
     .catch(function(response){
         if(response.status==403){
             localStorage.clear();
-            AlertService.alert('Error','No tienes permiso para acceder a esta zona.','Cerrar');
+            AlertService.alert('Error','Forbidden access.','Close');
             $location.url('/');
         }
     });
