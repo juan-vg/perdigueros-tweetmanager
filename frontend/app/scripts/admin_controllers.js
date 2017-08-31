@@ -179,6 +179,7 @@ app_admin.controller('AccountController', function($scope,$http,$location) {
 	function errorCallback(error){
 		console.log("Error getting user accounts");
 		if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
@@ -290,6 +291,7 @@ app_admin.controller('UserDoorController', function($scope,$http,$location,DateS
     function errorCallbackStats(error){
         console.log("Error getting stats");
         if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
@@ -348,6 +350,7 @@ app_admin.controller('AccessDataController', function($scope,$http,$location,Dat
     function errorCallbackStats(error){
         console.log("Error getting stats");
         if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
@@ -423,6 +426,7 @@ app_admin.controller('StatisticsController', function($scope,$http,$location,Dat
     function errorCallbackStats(error){
         console.log("Error getting stats");
         if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
