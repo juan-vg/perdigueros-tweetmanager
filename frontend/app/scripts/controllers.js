@@ -268,7 +268,7 @@ app.controller('forgotPasswdCtrl', ['$scope', '$http', '$location','AlertService
             }
             //incorrect validation user or non active user, or not existing email
             else if (response.status == 409) {
-                AlertService.alert('Error','The user is not validated, is disabled or not existing e-mail in the application.','Close');
+                AlertService.alert('Error','The user is not validated, is disabled, is social (Facebook, Google or OpenID), or not existing e-mail in the application.','Close');
 
             }
             //db error
