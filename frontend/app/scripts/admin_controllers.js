@@ -12,7 +12,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
     $scope.pwdError =false;
     var vm = this;
 	if (localStorage.getItem('token_admin')) {
-		localStorage.removeItem('token_admin');
+		$location.path('/admin-main-panel');
 	}
 	$scope.setWidgetId = function(widgetId) {
 		if ($scope.recaptchaId==undefined) {
@@ -98,6 +98,7 @@ app_admin.controller('UserController', function($scope,$http,$location,$window) 
 	function errorCallback(error){
 		console.log("Error getting Users list");
 		if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
@@ -178,6 +179,7 @@ app_admin.controller('AccountController', function($scope,$http,$location) {
 	function errorCallback(error){
 		console.log("Error getting user accounts");
 		if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
@@ -289,6 +291,7 @@ app_admin.controller('UserDoorController', function($scope,$http,$location,DateS
     function errorCallbackStats(error){
         console.log("Error getting stats");
         if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
@@ -347,6 +350,7 @@ app_admin.controller('AccessDataController', function($scope,$http,$location,Dat
     function errorCallbackStats(error){
         console.log("Error getting stats");
         if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
@@ -422,6 +426,7 @@ app_admin.controller('StatisticsController', function($scope,$http,$location,Dat
     function errorCallbackStats(error){
         console.log("Error getting stats");
         if (error.status == "403") {
+			localStorage.removeItem('token_admin');
 			$location.path('/admin');
 		}
 		else {
