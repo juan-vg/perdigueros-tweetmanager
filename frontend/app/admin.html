@@ -40,36 +40,11 @@
 <body >
 
 <!-- Static top navbar -->
-
-<nav class="navbar navbar-default navbar-static-top">
-    <div class="container" ng-controller="adminMenuCtrl">
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
             <!-- Navbar brand-->
-            <a class="navbar-brand" href="#">Perdigueros Tweet Manager. Admin Control</a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right"  ng-show="isAdminActive()">
-				<!-- Users link -->
-                <li><a href="/admin-main-panel"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Users</a></li>
-                <!-- Accounts link -->
-                <li><a href="/admin-accounts-panel"><i class="fa fa-twitter" aria-hidden="true"></i>&nbsp;Twitter Accounts</a></li>
-                <!-- Stadistics link -->
-                <li><a href="/admin-door-panel"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;Statistics</a></li>
-                <!-- Right list with logout button-->
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;Admin<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li ng-click="logout()"><a href=""">Sign Out&nbsp;<i class="fa fa-sign-out" aria-hidden="true"></i></a></li>
-                    </ul>
-                </li>
-            </ul>
+            <a class="navbar-brand" href="/" target="_self">Perdigueros Tweet Manager</a>
         </div>
     </div>
 </nav>

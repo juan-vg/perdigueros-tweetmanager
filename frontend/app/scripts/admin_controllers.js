@@ -12,7 +12,7 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
     $scope.pwdError =false;
     var vm = this;
 	if (localStorage.getItem('token_admin')) {
-		localStorage.removeItem('token_admin');
+		$location.path('/admin-main-panel');
 	}
 	$scope.setWidgetId = function(widgetId) {
 		if ($scope.recaptchaId==undefined) {
@@ -97,13 +97,19 @@ app_admin.controller('UserController', function($scope,$http,$location,$window) 
 	}
 	function errorCallback(error){
 		console.log("Error getting Users list");
-		var error_msg = "Error " + error.status + ": " + error.data;
-		alert(error_msg);
+		if (error.status == "403") {
+			localStorage.removeItem('token_admin');
+			$location.path('/admin');
+		}
+		else {
+			var error_msg = "Error " + error.status + ": " + error.data;
+			alert(error_msg);
+		}
 	}
 });
 
 // Accounts and Hastags Data Binding
-app_admin.controller('AccountController', function($scope,$http) {
+app_admin.controller('AccountController', function($scope,$http,$location) {
 	// Get accounts data 
 	$http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallback, errorCallback);
 	//Data Get Successfull
@@ -172,8 +178,14 @@ app_admin.controller('AccountController', function($scope,$http) {
 	}}
 	function errorCallback(error){
 		console.log("Error getting user accounts");
-		var error_msg = "Error " + error.status + ": " + error.data;
-		alert(error_msg);
+		if (error.status == "403") {
+			localStorage.removeItem('token_admin');
+			$location.path('/admin');
+		}
+		else {
+			var error_msg = "Error " + error.status + ": " + error.data;
+			alert(error_msg);
+		}
 	}
 });
 
@@ -210,7 +222,7 @@ app_admin.factory('DateService', function() {
     };
 })
 // User Iputs and Outputs from the Application Data
-app_admin.controller('UserDoorController', function($scope,$http,DateService) {
+app_admin.controller('UserDoorController', function($scope,$http,$location,DateService) {
     // Get data Statistics from the server
     $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
     function successCallbackStats(stats){
@@ -278,13 +290,20 @@ app_admin.controller('UserDoorController', function($scope,$http,DateService) {
     }
     function errorCallbackStats(error){
         console.log("Error getting stats");
-        alert("Error getting statistics data");
+        if (error.status == "403") {
+			localStorage.removeItem('token_admin');
+			$location.path('/admin');
+		}
+		else {
+			var error_msg = "Error " + error.status + ": " + error.data;
+			alert(error_msg);
+		}
     }
 });
 
 
 // User Last Connection Time Data
-app_admin.controller('AccessDataController', function($scope,$http,DateService) {
+app_admin.controller('AccessDataController', function($scope,$http,$location,DateService) {
     // Get last connection data statistics from the server
     $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
     function successCallbackStats(stats){
@@ -330,12 +349,19 @@ app_admin.controller('AccessDataController', function($scope,$http,DateService) 
     }
     function errorCallbackStats(error){
         console.log("Error getting stats");
-        alert("Error getting statistics data");
+        if (error.status == "403") {
+			localStorage.removeItem('token_admin');
+			$location.path('/admin');
+		}
+		else {
+			var error_msg = "Error " + error.status + ": " + error.data;
+			alert(error_msg);
+		}
     }
 });
 
 // Statistics Data Binding
-app_admin.controller('StatisticsController', function($scope,$http,DateService) {
+app_admin.controller('StatisticsController', function($scope,$http,$location,DateService) {
     $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/stats/app',{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackStats, errorCallbackStats);
 
     function successCallbackStats(stats){
@@ -399,7 +425,14 @@ app_admin.controller('StatisticsController', function($scope,$http,DateService) 
     }
     function errorCallbackStats(error){
         console.log("Error getting stats");
-        alert("Error getting statistics data");
+        if (error.status == "403") {
+			localStorage.removeItem('token_admin');
+			$location.path('/admin');
+		}
+		else {
+			var error_msg = "Error " + error.status + ": " + error.data;
+			alert(error_msg);
+		}
     }
     $scope.onClick = function (points, evt) {
         $http.get(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/users/'+points[0]._view.label,{headers: {'token': localStorage.getItem('token_admin')}}).then(successCallbackInfo, errorCallbackInfo);
