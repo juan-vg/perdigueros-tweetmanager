@@ -48,7 +48,6 @@
 
                             <tbody>
                             <tr ng-repeat="account in accountCtrl.accountList"
-                                ng-click="accountCtrl.selectAccount(account)"
                                 ng-class="{'selected': accountCtrl.active === account._id}"
                                 ng-show="account.activated==false"
                             >
