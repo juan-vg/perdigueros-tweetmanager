@@ -116,7 +116,11 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
     /**
      * REACTIVATES AN ACCOUNT DELETED PREVIOUSLY
      */
-    accountCtrl.reactivate = function () {
+    /**
+     * REACTIVATES AN ACCOUNT DELETED PREVIOUSLY
+     */
+    accountCtrl.reactivate = function (account) {
+        localStorage.setItem('selectedAccount', account._id);
         var req = {
             method: 'PUT',
             url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
