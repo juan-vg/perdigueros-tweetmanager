@@ -39,3 +39,10 @@
     margin-top: -40px;
     color: #60B99A;
 }
+
+.input-access {
+    display: block;
+    margin-left: 20em;
+    margin-right: auto;
+    padding-right: 3em;
+}
