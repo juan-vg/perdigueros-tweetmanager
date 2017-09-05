@@ -105,18 +105,11 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                 // Config Chart
                 $scope.labelTlm = label;
                 $scope.dataTlm = data;
-                $scope.optionsTlm = {
+                $scope.optionsTlm	= {
                     scales: {
-                        xAxes: [{
-                            display: this.scalesdisplay,
-                            ticks: {
-                                beginAtZero:this.beginzero,
-                            }
-                        }],
                         yAxes: [{
-                            display: this.scalesdisplay,
                             ticks: {
-                                beginAtZero:this.beginzero,
+                                beginAtZero: true
                             }
                         }]
                     }
@@ -181,18 +174,11 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
                 // Config Chart
                 $scope.labelTrtm = label;
                 $scope.dataTrtm = data;
-                $scope.optionsTrtm = {
+                $scope.optionsTrtm	= {
                     scales: {
-                        xAxes: [{
-                            display: this.scalesdisplay,
-                            ticks: {
-                                beginAtZero:this.beginzero,
-                            }
-                        }],
                         yAxes: [{
-                            display: this.scalesdisplay,
                             ticks: {
-                                beginAtZero:this.beginzero,
+                                beginAtZero: true
                             }
                         }]
                     }
