@@ -53,8 +53,8 @@
 		<hr><br>
         <h2 align="center">Top Tweets that have more likes in this month</h2>
         <div ng-if="!emptytweetlikesmonth" class="col-xs-12">
-            <div class="col-xs-12">
-                <canvas id="tweetlikesmonth" class="chart chart-bar"
+            <div class="col-xs-6 col-xs-offset-3 text-center" style="width: 50%; height: 50%">
+                <canvas id="tweetlikesmonth" class="chart chart-pie"
                         chart-data="dataTlm" chart-labels="labelTlm" chart-options="optionsTlm" chart-colors="colors">
                 </canvas>
             </div>
@@ -91,8 +91,8 @@
 		<hr><br>
         <h2 align="center">Top Tweets that have more retweets in this month</h2>
         <div ng-if="!emptytweetretweetsmonth" class="col-xs-12">
-            <div class="col-xs-12">
-                <canvas id="tweetretweetsmonth" class="chart chart-bar"
+            <div class="col-xs-6 col-xs-offset-3 text-center" style="width: 50%; height:50%">
+                <canvas id="tweetretweetsmonth" class="chart chart-pie"
                         chart-data="dataTrtm" chart-labels="labelTrtm" chart-options="optionsTrtm"
                         chart-colors="colors">
                 </canvas>
