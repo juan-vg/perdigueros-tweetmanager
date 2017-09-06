@@ -77,7 +77,7 @@ function start(ini){
         ini = 0;
     }
     
-    console.log("TWITTER-WORKER-START");
+    //console.log("TWITTER-WORKER-START");
 
     // get batch
     twWorkerModel.find({}, {}, { skip: ini, limit: LIMIT }, function(err, dbData){
@@ -131,7 +131,7 @@ module.exports.start = start;
 
 function twitterWorker(dbData){
     
-    console.log("TWITTER-WORKER-TW-WORKER: Num Acc: " + dbData.length);
+    //console.log("TWITTER-WORKER-TW-WORKER: Num Acc: " + dbData.length);
     
     // for each twitter account
     for (var i=0; i<dbData.length; i++){
@@ -218,7 +218,7 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                         dbData.newestTweetId = body[0].id_str;
                         progress.newestTweetId = body[0].id_str;
                         
-                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> First");
+                        //console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> First");
                     }
                 }
                 
@@ -249,7 +249,7 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                         dbData.oldestTweetId = "-1";
                         progress.oldestTweetId = "-1";
                         
-                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Start up");
+                        //console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Start up");
 
                     } else {
                         // change to ready status
@@ -257,7 +257,7 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                         progress.newestTweetId = "-1";
                         progress.oldestTweetId = "-1";
                         
-                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Finish");
+                        //console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Finish");
                     }
                     
                 } else {
@@ -272,7 +272,7 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                         dbData.oldestTweetId = body[body.length-1].id_str;
                         progress.oldestTweetId = body[body.length-1].id_str;
                         
-                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Keep down");
+                        //console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Keep down");
                         
                     } else {
                         
@@ -284,7 +284,7 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                         dbData.newestTweetId = body[0].id_str;
                         progress.newestTweetId = body[0].id_str;
                         
-                        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Keep up");
+                        //console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> Keep up");
                     }
                 }
                 
@@ -305,11 +305,11 @@ function twitterReqWorker(dbData, Twitter, favorites, retweets, query, numReq){
                 
             } else {
                 // Twitter rate limit? -> stop
-                console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> LIMIT : " + JSON.stringify(err));
+                //console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> LIMIT : " + JSON.stringify(err));
             }
         });
     } else {
-        console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> RECURSION LIMIT");
+        //console.log("TWITTER-WORKER-TW-REQ-WORKER: Acc ID: " + dbData.accId + " -> RECURSION LIMIT");
     }
 }
 
