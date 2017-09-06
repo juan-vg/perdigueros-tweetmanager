@@ -9,12 +9,12 @@ exports.sendMail = function(emailData, callback){
     var message = 'Hello '+ emailData.name +',\n\n';
     
     // body
-    if(emailData.type === "validate"){
+    if(emailData.type === "validate") {
         message += 'We are pleased to inform you that your new PTM account has been created.\n';
         message += 'Please, use the following code in order to validate your email.\n\nCode: ' + emailData.code;
         message += '\n\nYou can validate your account at ' + config.apiUrl + "/validate"
             
-    } else if(emailData.type === "first passwd")
+    } else if(emailData.type === "first passwd") {
         message += 'We have created a new password for you.\n';
         message += '\n\nPassword: ' + emailData.passwd;
         message += '\n\nYou must change it at ' + config.apiUrl + "/first-login"
