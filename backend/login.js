@@ -13,16 +13,17 @@ exports.localSignin = function (accountID, callback) {
     
     verifyCaptcha.verify(accountID.captchaData.gResponse, accountID.captchaData.rAddress, function(err, data){
         if(!err){
-            
-            var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
-    
-            // validate password and get user data (avoiding retrieval of password)
-            userAccModel.find({"email": accountID.email, "password": passwd, "activated": true, "loginType": "local"}, {"password":0},
+
+            // get user data
+            userAccModel.find({"email": accountID.email, "activated": true, "loginType": "local"},
             
                 function(err, dbData){
                     if(!err){
                         
-                        if(dbData.length > 0 && dbData[0].validated && !dbData[0].firstLogin){
+                        var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
+                        
+                        // validate password & status checks
+                        if(dbData.length > 0 && dbData[0].validated && !dbData[0].firstLogin && dbData[0].password === passwd){
                             
                             // get current date
                             var lastDate = new Date();
@@ -54,16 +55,26 @@ exports.localSignin = function (accountID, callback) {
                                 }
                             );
 
-                        } else if(dbData.length > 0 && dbData[0].validated) {
-                            // must change the passwd yet
-                            error = true;
-                            data = "MUST CHANGE PASSWD";
-                            callback(error, data);
                         } else if(dbData.length > 0) {
-                            // must validate the account yet
-                            error = true;
-                            data = "MUST VALIDATE";
-                            callback(error, data);
+                            
+                            if(dbData[0].validated && dbData[0].firstLogin) {
+                                // must change the passwd yet
+                                error = true;
+                                data = "MUST CHANGE PASSWD";
+                                callback(error, data);
+                                
+                            } else if(!dbData[0].validated) {
+                                // must validate the account yet
+                                error = true;
+                                data = "MUST VALIDATE";
+                                callback(error, data);
+                                
+                            } else { //if(dbData[0].password !== passwd)
+                                error = true;
+                                data = "INCORRECT";
+                                callback(error, data);
+                            }
+                            
                         } else {
                             error = true;
                             data = "INCORRECT";
