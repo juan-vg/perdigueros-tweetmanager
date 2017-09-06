@@ -13,3 +13,9 @@
     margin-top: 5em;
 }
 
+/* Align center a tweet */
+.twitter-tweet {
+    margin: auto;
+}
+
+
