@@ -406,7 +406,7 @@ var appRouter = function(app) {
             return response.status(400).send("Parameters error!");
         } else {
             
-            if(request.body.loginType === "local" && (!request.body.email || !request.body.passwd)){
+            if(request.body.loginType === "local" && !request.body.email){
                 return response.status(400).send("Parameters error!");
                 
             } else {
