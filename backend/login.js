@@ -20,7 +20,10 @@ exports.localSignin = function (accountID, callback) {
                 function(err, dbData){
                     if(!err){
                         
-                        var passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
+                        var passwd = "";
+                        if(accountID.passwd){
+                            passwd = crypto.createHash('sha256').update(accountID.passwd).digest('base64');
+                        }
                         
                         // validate password & status checks
                         if(dbData.length > 0 && dbData[0].validated && !dbData[0].firstLogin && dbData[0].password === passwd){
