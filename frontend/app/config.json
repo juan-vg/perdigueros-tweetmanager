@@ -1,4 +1,4 @@
-{ "api":"http://127.0.0.1",
+{ "api":"http://zaratech-ptm.ddns.net",
   "apiPort":"8888",
   "wsApi":"ws://zaratech-ptm.ddns.net",
   "rtPort":"8889"}
