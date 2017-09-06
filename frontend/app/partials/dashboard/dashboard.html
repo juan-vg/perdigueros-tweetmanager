@@ -98,7 +98,7 @@
                             <uib-tab heading="My tweets" ng-click="tweetCtrl.getMyTweets()">
                                 <hr>
                                 <div ng-repeat="tweet in tweetCtrl.myTweets track by tweet.id_str">
-                                    <twitter-widget class="tw-align-center" twitter-widget-id="tweet.id_str">
+                                    <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
                             </uib-tab>
