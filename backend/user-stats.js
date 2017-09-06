@@ -115,7 +115,7 @@ function tweetLikes(resData, email, callback){
                                 count: dbData2[i].count
                             };
                             
-                            if(entry.count >= 0){
+                            if(entry.count > 0){
                                 result.push(entry);
                             }
                         }
@@ -180,7 +180,7 @@ function tweetRetweets(resData, email, callback){
                                 count: dbData2[i].count
                             };
                             
-                            if(entry.count >= 0){
+                            if(entry.count > 0){
                                 result.push(entry);
                             }
                         }
@@ -252,7 +252,7 @@ function tweetLikesPerMonth(resData, email, callback){
                                 count: dbData2[i].count
                             };
                             
-                            if(entry.count >= 0){
+                            if(entry.count > 0){
                                 result.push(entry);
                             }
                         }
@@ -324,7 +324,7 @@ function tweetRetweetsPerMonth(resData, email, callback){
                                 count: dbData2[i].count
                             };
                             
-                            if(entry.count >= 0){
+                            if(entry.count > 0){
                                 result.push(entry);
                             }
                         }
@@ -395,7 +395,7 @@ function tweetLikesPerDay(resData, email, callback){
                                 count: dbData2[i].count
                             };
                             
-                            if(entry.count >= 0){
+                            if(entry.count > 0){
                                 result.push(entry);
                             }
                         }
@@ -466,7 +466,7 @@ function tweetRetweetsPerDay(resData, email, callback){
                                 count: dbData2[i].count
                             };
                             
-                            if(entry.count >= 0){
+                            if(entry.count > 0){
                                 result.push(entry);
                             }
                         }
