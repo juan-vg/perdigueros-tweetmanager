@@ -366,7 +366,7 @@ exports.validateUser = function (accountID, callback) {
                             if(!err){
                                 
                                 var emailData = {
-                                    "type": "passwd",
+                                    "type": "first passwd",
                                     "name": dbData[0].name,
                                     "passwd": passwd,
                                     "to": dbData[0].email
