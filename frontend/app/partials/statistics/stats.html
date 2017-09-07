@@ -20,7 +20,7 @@
                     </canvas>
                 </div>
                 <div class="col-xs-12 aligned-row">
-                    <div class="col-xs-6" ng-repeat="tweet in arr_tl track by $index">
+                    <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_tl track by $index">
                         <h4 align="center">Number #{{$index + 1}}</h4>
                         <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                     </div>
@@ -40,7 +40,7 @@
                 </canvas>
             </div>
             <div class="col-xs-12 aligned-row">
-                <div class="col-xs-6" ng-repeat="tweet in arr_trt track by $index">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_trt track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
                     <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
@@ -59,7 +59,7 @@
                 </canvas>
             </div>
             <div class="col-xs-12 aligned-row">
-                <div class="col-xs-6" ng-repeat="tweet in arr_tlm track by $index">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_tlm track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
                     <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
@@ -78,7 +78,7 @@
                 </canvas>
             </div>
             <div class="col-xs-12 aligned-row">
-                <div class="col-xs-6" ng-repeat="tweet in arr_tld track by $index">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_tld track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
                     <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
@@ -98,7 +98,7 @@
                 </canvas>
             </div>
             <div class="col-xs-12 aligned-row">
-                <div class="col-xs-6" ng-repeat="tweet in arr_trtm track by $index">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_trtm track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
                     <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
@@ -118,7 +118,7 @@
                 </canvas>
             </div>
             <div class="col-xs-12 aligned-row">
-                <div class="col-xs-6" ng-repeat="tweet in arr_trtd track by $index">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_trtd track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
                     <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
@@ -129,7 +129,7 @@
         <!--Tweets per day stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Number of tweets per day</h2>
+        <h2 align="center">Number of tweets per day (current month)</h2>
         <canvas ng-if="!emptytweetsday" id="tweetsday" class="chart chart-line"
                 chart-data="dataTd" chart-labels="labelTd" chart-options="optionsTd" chart-colors="colors">
         </canvas>

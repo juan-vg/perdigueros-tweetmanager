@@ -7,7 +7,7 @@ var app = angular.module('app');
 /**
  *  Controller for handle account table information.
  */
-app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService) {
+app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService,$location) {
 
     var accountCtrl = this;
     accountCtrl.active = false;
