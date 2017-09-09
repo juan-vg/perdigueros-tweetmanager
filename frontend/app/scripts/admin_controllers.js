@@ -9,14 +9,16 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 	catch(function onError(response) {
 		console.log("Error getting API");
 	});
+	var widgetId;
     $scope.pwdError =false;
     var vm = this;
 	if (localStorage.getItem('token_admin')) {
 		$location.path('/admin-main-panel');
 	}
-	$scope.setWidgetId = function(widgetId) {
+	$scope.setWidgetId = function(widgetId_) {
 		if ($scope.recaptchaId==undefined) {
-			$scope.recaptchaId=widgetId;
+			$scope.recaptchaId=widgetId_;
+			widgetId=widgetId_;
 		}
 	};
 	$scope.checkPwd =function() {
@@ -32,9 +34,11 @@ app_admin.controller('PasswordController', function ($scope,$http,$location,vcRe
 			$location.path('/admin-main-panel');
 		}
 		function errorCallback(error){
+			$location.path('/admin');
 			var error_msg = "Error " + error.status + ": " + error.data;
 			$scope.error = error_msg;
 			$scope.pwdError = true;
+			vcRecaptchaService.reload(widgetId)
 		}
 	};
 });
