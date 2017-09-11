@@ -653,34 +653,37 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     }
 
     /**
-     * Open websocket chanell for hashtag tweets
+     * Open websocket channel for hashtag tweets
      */
     tweetCtrl.webSocketHashtags = function () {
         tweetCtrl.hashtagSocket = hashtagSocket;
-        tweetCtrl.hashtagSocket.get();
-        tweetCtrl.hashtagTweet = hashtagSocket.tweetCollection;
-        console.log(tweetCtrl.hashtagSocket);
-    }
-
-    tweetCtrl.closeSocket = function(s){
-        console.log('Socket into close');
-        if(s=="hashtag"){
-            tweetCtrl.hashtagSocket.close();
-        }
-        else if(s=="followed"){
-            tweetCtrl.followedSocket.close();
-        }
+        tweetCtrl.hashtagSocket.start(function(collection){
+            tweetCtrl.hashtagTweet = collection;
+        });
+        //console.log(tweetCtrl.hashtagSocket);
     }
 
     /**
-     *
+     * Open websocket channel for followed tweets
      */
     tweetCtrl.webSocketFollowedUsers = function () {
         tweetCtrl.followedSocket = followedSocket;
-        tweetCtrl.followedSocket.get();
-        tweetCtrl.followedTweet = followedSocket.tweetCollection;
-        console.log(followedSocket);
+        tweetCtrl.followedSocket.start(function(collection){
+            tweetCtrl.followedTweet = collection;
+        });
+        //console.log(followedSocket);
     }
+    
+    // NOT USED?
+    tweetCtrl.deleteSocketTweets = function(){
+        // TO-DO: CLOSE SOCKETS BEFORE
+        // tweetCtrl.hashtagSocket.close()
+        // tweetCtrl.followedSocket.close()
+        
+        tweetCtrl.followedTweet = null;
+        tweetCtrl.hashtagTweet = null;
+    }
+    
 
     tweetCtrl.isUserSelected = function(){
         var req = {
@@ -721,9 +724,5 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                             AlertService.alert('Error','Shortener error cause of database','Close');
                         }
                     });
-    }
-    tweetCtrl.deleteSocketTweets = function(){
-        tweetCtrl.followedTweet = null;
-        tweetCtrl.hashtagTweet = null;
     }
 });
