@@ -5,7 +5,8 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute','app_admin','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet','ui.bootstrap','ADM-dateTimePicker','ngclipboard','ngWebSocket']);
+angular.module('app', ['ngRoute','app_admin','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet',
+    'ui.bootstrap','ngclipboard','ngWebSocket','ae-datetimepicker','ngLoader']);
 
 //variable for manage the main module
 var app = angular.module("app");
@@ -124,5 +125,134 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
 
 });
 
+app.factory('hashtagSocket',function($websocket){
+
+    var hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+        localStorage.getItem('selectedAccount') + '/tweets/hashtags');
+
+    var tweetCollection = [];
+    var noTw = "";
+
+    hashtagSocket.onError(function(response){
+        if (response.data == "TWITTER ERROR") {
+            hashtagSocket.close();
+            hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+                localStorage.getItem('selectedAccount') + '/tweets/hashtags');
+        }
+        else if(response.data =='EMPTY LIST ERROR'){
+            noTw = "No tweets yet";
+            hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+                localStorage.getItem('selectedAccount') + '/tweets/hashtags');
+        }
+        else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
+            console.log(response.data);
+        }
+    });
+    hashtagSocket.onMessage(function (response) {
+        console.log(tweetCollection.length);
+        if (response.data == "TWITTER ERROR") {
+            hashtagSocket.close();
+            hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+                localStorage.getItem('selectedAccount') + '/tweets/hashtags');
+        }
+        else if(response.data =='EMPTY LIST ERROR'){
+            noTw = "No tweets yet";
+            hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+                localStorage.getItem('selectedAccount') + '/tweets/hashtags');
+        }
+        else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
+            console.log(response.data);
+        }
+        else {
+            var res;
+            try {
+                res = JSON.parse(response.data);
+            }
+            catch (e) {
+                res = {'id_str': response.data};
+            }
+            // LIMIT LENGTH OF TWEET ARRAY TO 20
+            if (tweetCollection.length == 20) {
+                tweetCollection.splice(1, 1);
+            }
+            tweetCollection.push({
+                'id_str': res.id_str
+            });
+        }
+    });
+
+    hashtagSocket.onClose(function(response){
+        hashtagSocket.tweetCollection = null;
+        hashtagSocket = hashtagSocket;
+    });
+
+    var methods = {
+        tweetCollection : tweetCollection,
+        noTw : noTw,
+        get: function() {
+            hashtagSocket.send('token:' + localStorage.getItem('token'));
+        },
+        close : function(){
+            hashtagSocket.close();
+        }
+    };
+
+    return methods;
+});
+
+app.factory('followedSocket',function($websocket,$rootScope){
+    var followedSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+        localStorage.getItem('selectedAccount') + '/tweets/followed');
+
+    var tweetCollection = [];
+    var noTw = "";
+
+
+
+    followedSocket.onMessage(function (response) {
+        console.log(tweetCollection.length);
+        if (response.data == "TWITTER ERROR") {
+            console.log(response.data);
+            followedSocket.close();
+            followedSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+                localStorage.getItem('selectedAccount') + '/tweets/followed');
+        }
+        else if(response.data =='EMPTY LIST ERROR'){
+            noTw = "No tweets yet";
+        }
+        else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
+            console.log(response.data);
+        }
+        else {
+            var res;
+            try {
+                res = JSON.parse(response.data);
+            }
+            catch (e) {
+                res = {'id_str': response.data};
+            }
+            // LIMIT LENGTH OF TWEET ARRAY TO 20
+            if (tweetCollection.length == 20) {
+                tweetCollection.splice(1, 1);
+            }
+            tweetCollection.push({
+                'id_str': res.id_str
+            });
+        }
+    });
+
+    var methods = {
+        tweetCollection : tweetCollection,
+        noTw : noTw,
+        get: function() {
+            followedSocket.send('token:' + localStorage.getItem('token'));
+        },
+        close : function(){
+            followedSocket.close();
+        }
+    };
+
+    return methods;
+});
 
 

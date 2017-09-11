@@ -9,8 +9,8 @@ var app = angular.module('app');
  * Controller that manage the signin view,that is the main view of the application.
  * Uses services $auth for satellizer, $location for routes, $scope for the scope and $http for internet services.
  */
-app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
-    function ($location, $http, $auth, AlertService) {
+app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService','vcRecaptchaService',
+    function ($location, $http, $auth, AlertService,vcRecaptchaService) {
         var vm = this;
 
         $http.get('config.json').
@@ -44,9 +44,11 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
                 .catch(function (response) {
                     if (response.status == 400) {
                         AlertService.alert('Input error', 'Params error or Captcha is not well validated. Please, try again.', 'Close');
+                        vcRecaptchaService.reload();
                     }
                     else if (response.status == 401) {
                         AlertService.alert('Incorrect data', 'Check the data entered in the signin form.', 'Close');
+                        vcRecaptchaService.reload();
                     }
                     else if (response.status == 409) {
                         AlertService.alert('Validate account', 'Account is pending validation. Please validate it.', 'Close');
@@ -62,9 +64,11 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
                     }
                     else if (response.status == 500) {
                         AlertService.alert('DB error', 'Error in database. Sorry for the inconvenience', 'Close');
+                        vcRecaptchaService.reload();
                     }
                     else if (response.status == 503) {
                         AlertService.alert('External error', 'Error signin by external causes (Facebook, Google or OpenID)', 'Close');
+                        vcRecaptchaService.reload();
                     }
                 });
         }
@@ -127,7 +131,8 @@ app.controller('signinCtrl', ['$location', '$http', '$auth', 'AlertService',
  * Otherwise, treat posibble errors.
  */
 
-app.controller('signupCtrl', ['$scope', '$http', '$location','AlertService', function ($scope, $http, $location,AlertService) {
+app.controller('signupCtrl', ['$scope', '$http', '$location','AlertService','vcRecaptchaService',
+    function ($scope, $http, $location,AlertService,vcRecaptchaService) {
     $scope.postData = function () {
         var data = {
             'name': $scope.name,
@@ -138,23 +143,25 @@ app.controller('signupCtrl', ['$scope', '$http', '$location','AlertService', fun
         $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/signup', data
         )
         //200 status code(valid,user not exists and not have other problems)
-            .then(function (response) {
+            .then(function () {
+                    AlertService.alert('Congratulations','First step was completed. Now validate your account','Close');
                     //redirection to /validate view
                     $location.url('/validate');
-                },
-                //status code errors
-                function (response) {
+                }).catch ( function(response) {
                     //if email address already in use
                     if (response.status == 409) {
                         AlertService.alert('Email Error','Email has been used in this application.','Close');
+                        vcRecaptchaService.reload();
                     }
                     //if captcha validation error
                     else if (response.status == 400) {
                         AlertService.alert('Input error','Params error or Captcha is not well validated. Please, try again.','Close');
+                        vcRecaptchaService.reload();
                     }
                     //db error
                     else if (response.status == 500) {
                         AlertService.alert('DB Error','Error in database. Sorry for the inconvenience','Close');
+                        vcRecaptchaService.reload();
                     }
                 });
     };
@@ -164,18 +171,18 @@ app.controller('signupCtrl', ['$scope', '$http', '$location','AlertService', fun
  * Create the validateCtrl, verify the e-mail and the code and redirect to 'first-login' page
  */
 app.controller('validateCtrl', ['$scope', '$http', '$location','AlertService', function ($scope, $http, $location,AlertService) {
-    var mail = "";
     $scope.validate = function () {
         var data = {
             'email': $scope.email,
             'code': $scope.code
         };
         $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'/login/validate', data
-        ).then(function (response) {
+        ).then(function () {
+                AlertService.alert('Congratulations','Review your mail and change your default password','Close');
                 $location.url('/first-login');
-            },
-            //status code errors
-            function (response) {
+            })
+            // status code errors
+            .catch(function (response) {
                 //incorrect validation code
                 if (response.status == 401) {
                     AlertService.alert('Error','You have entered an incorrect validation code. Check it out or request a new one','Close');
@@ -199,8 +206,9 @@ app.controller('validateCtrl', ['$scope', '$http', '$location','AlertService', f
         $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+'validate/resend', data
         ).then(function (response) {
                 $location.url('/validate');
-            },
+            })
             //status code errors
+            .catch(
             function (response) {
                 //already validated, not active or not existing mail for user
                 if (response.status == 409) {
@@ -232,7 +240,7 @@ app.controller('firstLoginCtrl', ['$scope', '$http', '$location','AlertService',
         ).then(function (response) {
                 $location.url('/');
                 AlertService.alert('Congratulations','Password has been changed successfully','Close');
-            },
+            }).catch(
             //status code errors
             function (response) {
                 //incorrect validation user or non active user, or not existing email

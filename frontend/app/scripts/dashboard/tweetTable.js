@@ -4,12 +4,18 @@ var app = angular.module('app');
 /**
  * Controller for tweet table information
  */
-app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal, $websocket,$location) {
+app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uibModal,$location,$websocket,hashtagSocket,followedSocket,$scope) {
     var tweetCtrl = this;
+    tweetCtrl.message = 'Loading tweets ...';
+    tweetCtrl.limitTweets = 20;
+
     /*
     *  Load home timeline at init of controller
     * */
     $rootScope.$watch("activeAccount",function(){
+        tweetCtrl.homeTimeLineTweetsList = null;
+        tweetCtrl.working = true;
+        tweetCtrl.message = 'Loading tweets ...';
         if($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
@@ -22,6 +28,8 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
             $http(req).then(function (response) {
                 tweetCtrl.homeTimeLineTweetsList = response.data;
+            })['finally'](function() {
+                tweetCtrl.working = false;
             })
                 .catch(function(response){
                     if(response.status==404){
@@ -41,6 +49,8 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      * GET HOME TIMELINE
      */
     tweetCtrl.getHomeTimeline = function () {
+        tweetCtrl.homeTimeLineTweetsList = null;
+        tweetCtrl.working = true;
         if ($rootScope.activeAccount) {
             var req = {
                 method: 'GET',
@@ -53,6 +63,9 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
             $http(req).then(function (response) {
                 tweetCtrl.homeTimeLineTweetsList = response.data;
+            })
+                ['finally'](function() {
+                tweetCtrl.working = false;
             })
                 .catch(function (response) {
                     if(response.status==404){
@@ -73,7 +86,9 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      * GET MY TWEETS
      */
     tweetCtrl.getMyTweets = function () {
+        tweetCtrl.working = true;
         if ($rootScope.activeAccount) {
+            tweetCtrl.myTweets = null;
             var req = {
                 method: 'GET',
                 url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
@@ -85,7 +100,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
             $http(req).then(function (response) {
                 tweetCtrl.myTweets = response.data;
-            }).catch(function (response) {
+            })                ['finally'](function() {
+                tweetCtrl.working = false;
+            })
+                .catch(function (response) {
                 if (response.status == 400) {
                     AlertService.alert('Error', 'Selected account is not valid for get my tweets operation.', 'Close');
                 }
@@ -116,6 +134,8 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      */
     tweetCtrl.getScheduledTweets = function () {
         if ($rootScope.activeAccount) {
+            tweetCtrl.working = true;
+            tweetCtrl.scheduledTweets = null;
             var req = {
                 method: 'GET',
                 url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
@@ -127,6 +147,9 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
             $http(req).then(function (response) {
                 tweetCtrl.scheduledTweets = response.data;
+            })
+                ['finally'](function() {
+                tweetCtrl.working = false;
             }).catch(function (response) {
                 if (response.status == 400) {
                     AlertService.alert('Error', 'Selected account is not valid for get scheduled tweets operation.', 'Close');
@@ -250,6 +273,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.getMentions = function () {
         // if an account is selected
         if ($rootScope.activeAccount) {
+            tweetCtrl.working = true;
             var req = {
                 method: 'GET',
                 url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
@@ -261,6 +285,9 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
             $http(req).then(function (response) {
                 tweetCtrl.mentions = response.data;
+            })
+                ['finally'](function() {
+                tweetCtrl.working = false;
             })
                 .catch(function (response) {
                     if (response.status == 400) {
@@ -294,6 +321,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.getRetweets = function () {
         // if an account is selected
         if ($rootScope.activeAccount) {
+            tweetCtrl.working = true;
             var req = {
                 method: 'GET',
                 url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
@@ -305,6 +333,9 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
             $http(req).then(function (response) {
                 tweetCtrl.retweets = response.data;
+            })
+                ['finally'](function() {
+                tweetCtrl.working = false;
             })
                 .catch(function (response) {
                     if (response.status == 400) {
@@ -339,6 +370,7 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     tweetCtrl.getFavorites = function () {
         // if an account is selected
         if ($rootScope.activeAccount) {
+            tweetCtrl.working = true;
             var req = {
                 method: 'GET',
                 url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
@@ -350,6 +382,9 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             }
             $http(req).then(function (response) {
                 tweetCtrl.favorites = response.data;
+            })
+                ['finally'](function() {
+                tweetCtrl.working = false;
             })
                 .catch(function (response) {
                     if (response.status == 400) {
@@ -420,27 +455,6 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
             });
     }
 
-    /**
-     *
-     */
-    tweetCtrl.webSocketFollowedUsers = function () {
-        var ws2 = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtPort')+'/twitter-accounts/' +
-            localStorage.getItem('selectedAccount') + '/tweets/hashtags');
-        ws2.onOpen(function () {
-            ws.close(true);
-            ws2.send('token:' + localStorage.getItem('token'));
-        });
-        ws2.onError(function () {
-            ws2.close(true);
-        })
-
-        var tweetCollection2 = [];
-        ws2.onMessage(function (response) {
-            ws.close(true);
-            tweetCollection2.push(JSON.parse(response.data));
-            tweetCtrl.followedUserTweet = tweetCollection2;
-        });
-    }
     /**
      * Add a new hashtag to the list
      */
@@ -642,43 +656,19 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      * Open websocket chanell for hashtag tweets
      */
     tweetCtrl.webSocketHashtags = function () {
+        tweetCtrl.hashtagSocket = hashtagSocket;
+        tweetCtrl.hashtagSocket.get();
+        tweetCtrl.hashtagTweet = hashtagSocket.tweetCollection;
+        console.log(tweetCtrl.hashtagSocket);
+    }
 
-        if ($rootScope.activeAccount) {
-            var ws = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
-                localStorage.getItem('selectedAccount') + '/tweets/hashtags');
-
-            ws.onOpen(function () {
-                ws.send('token:' + localStorage.getItem('token'));
-            });
-
-            var tweetCollection = [];
-            ws.onMessage(function (response) {
-                if (response.data == "TWITTER ERROR") {
-                    ws.close(true);
-                    ws = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
-                        localStorage.getItem('selectedAccount') + '/tweets/hashtags');
-                }
-                else if(response.data =='EMPTY LIST ERROR'){
-                    AlertService.alert('Atention','There are not hashtags to follow on this account.','Close');
-                }
-                else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                    AlertService.alert('Atention','Account not exists or it is disabled.','Close');
-                }
-                var res;
-                try {
-                    res = JSON.parse(response.data);
-                }
-                catch (e) {
-                    res = {'id_str': response.data};
-                }
-                tweetCollection.push({
-                    'id_str': res.id_str
-                });
-                tweetCtrl.hashtagTweet = tweetCollection;
-            });
+    tweetCtrl.closeSocket = function(s){
+        console.log('Socket into close');
+        if(s=="hashtag"){
+            tweetCtrl.hashtagSocket.close();
         }
-        else{
-            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
+        else if(s=="followed"){
+            tweetCtrl.followedSocket.close();
         }
     }
 
@@ -686,44 +676,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      *
      */
     tweetCtrl.webSocketFollowedUsers = function () {
-        if ($rootScope.activeAccount) {
-            var ws2 = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
-                localStorage.getItem('selectedAccount') + '/tweets/followed');
-
-            var tweetCollection2 = [];
-            ws2.onOpen(function () {
-                ws2.send('token:' + localStorage.getItem('token'));
-            });
-
-            ws2.onMessage(function (response) {
-
-                if (response.data == "TWITTER ERROR") {
-                    ws2 = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
-                        localStorage.getItem('selectedAccount') + '/tweets/followed');
-                }
-
-                else if(response.data =='EMPTY LIST ERROR'){
-                    AlertService.alert('Warning','There are not users to follow on this account.','Close');
-                }
-                else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                    AlertService.alert('Warning','Account not exists or it is disabled.','Close');
-                }
-                var res;
-                try {
-                    res = JSON.parse(response.data);
-                }
-                catch (e) {
-                    res = {'id_str': response.data};
-                }
-                tweetCollection2.push({
-                    'id_str': res.id_str
-                });
-                tweetCtrl.followedUserTweet = tweetCollection2;
-            });
-        }
-        else{
-            AlertService.alert('Error', 'Twitter account must be selected previously.', 'Close');
-        }
+        tweetCtrl.followedSocket = followedSocket;
+        tweetCtrl.followedSocket.get();
+        tweetCtrl.followedTweet = followedSocket.tweetCollection;
+        console.log(followedSocket);
     }
 
     tweetCtrl.isUserSelected = function(){
@@ -765,5 +721,9 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
                             AlertService.alert('Error','Shortener error cause of database','Close');
                         }
                     });
+    }
+    tweetCtrl.deleteSocketTweets = function(){
+        tweetCtrl.followedTweet = null;
+        tweetCtrl.hashtagTweet = null;
     }
 });

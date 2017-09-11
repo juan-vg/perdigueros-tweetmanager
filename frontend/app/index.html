@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="app">
+<html ng-app="app" ng-init="working = true;">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,14 +10,19 @@
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
   <!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
   <script src="bower_components/jquery/dist/jquery.js"></script>
-
-
+  <!--Moment-->
+  <script src="bower_components/moment/min/moment.min.js"></script>
+  <script src="bower_components/moment/locale/en-au.js"></script>
   <!-- Bootstrap Framework load -->
+  <script src="js/bootstrap.min.js"></script>
+  <script src="bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
   <link href="css/bootstrap.min.css" rel="stylesheet">
-
+  <link href="bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/angular-bootstrap-datetimepicker-directive/angular-bootstrap-datetimepicker-directive.min.js"></script>
+  <script src="bower_components/angular-eonasdan-datetimepicker/dist/angular-eonasdan-datetimepicker.min.js"></script>
   <link href="css/footer.css" rel="stylesheet">
   <link href="css/common-styles.css" rel="stylesheet">
   <link href="css/login.css" rel="stylesheet">
@@ -27,14 +32,12 @@
   <link href="css/dashboard.css" rel="stylesheet">
   <link href="css/scheduleForm.css" rel="stylesheet"/>
   <link href="css/equal-height-columns.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="bower_components/ng-loaders/ngLoader.min.css">
   
   <!-- Font Awesome library load -->
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <!-- ADM bb Styles -->
-  <link rel="stylesheet" href="css/ADM-dateTimePicker.css"/>
 
-  <!-- ngStore module for localStorage and sessionStorage -->
-  <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/angular-route/angular-route.js"></script>
   <script src="bower_components/satellizer/dist/satellizer.min.js"></script>
   <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
@@ -64,10 +67,10 @@
   <script src="https://cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js"></script>
   <script src="https://www.google.com/jsapi"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chartkick/2.2.4/chartkick.js"></script>
+  <script src="bower_components/ng-loaders/ngLoader.min.js"></script>
 	
   <script src="bower_components/c3/c3.js"></script>
   <script src="bower_components/d3/d3.js"></script>
-  <script src="bower_components/adm-dtp/dist/ADM-dateTimePicker.js"></script>
   <script src="scripts/app_admin.js"></script>
   <script src="scripts/admin_controllers.js"></script>
 </head>
@@ -126,17 +129,10 @@
 </div>
 
 <footer class="footer" >
-  <div class="container text-center">
-    <p class=text-muted">@Copyright PTM</p>
+  <div class="text-center">
+    <p >@Copyright PTM</p>
   </div>
 </footer>
-
-
-<!-- jQuery(necessary for Bootstrap's JavaScript Plugin) -->
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<!-- Bootstrap js library required -->
-<script src="js/bootstrap.min.js"></script>
 
 </body>
 </html>
