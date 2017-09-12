@@ -242,7 +242,7 @@ app.controller('statisticsController', function($rootScope,$http,$scope,$locatio
             }
             // Number Tweets per Day
             var tweetsPerDayData= stats.data.tweetsPerDay;
-            if (tweetsPerDayData.length != 0) {
+            if (tweetsPerDayData.length > 1) {
                 // Exist Data
                 $scope.emptytweetsday=false;
                 var label=[];
