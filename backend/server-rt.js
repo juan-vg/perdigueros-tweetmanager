@@ -6,14 +6,17 @@ var follUsModel = require("./models/followed-users");
 var accVerificator = require("./account-verifications.js");
 var dbVerificator = require("./db-verifications.js");
 var mongoose = require("mongoose");
+
+// Fix for: "DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) is deprecated ..."
+mongoose.Promise = global.Promise;
+
 var objectID = require('mongodb').ObjectID;
 var HashMap = require('hashmap');
+var config = require('./config');
 
-const SERVER_PORT = 8889;
-
-const wss = new WebSocketServer.Server({ port: SERVER_PORT }, function(err){
+const wss = new WebSocketServer.Server({ port: config.wsPort }, function(err){
     if(!err){
-        console.log("Backend RT server listening on port %s...", SERVER_PORT);
+        console.log("Backend RT server listening on port %s...", config.wsPort);
     }
 });
 

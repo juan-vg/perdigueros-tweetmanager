@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart": "npm install",
-    "start": "parallelshell 'node --harmony_tailcalls server.js' 'node tweet-rt.js'"
+    "start": "parallelshell 'node --harmony_tailcalls server.js' 'node server-rt.js'"
   },
   "author": "",
   "license": "ISC",

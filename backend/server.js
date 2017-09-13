@@ -4,8 +4,14 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var swaggerJSDoc = require('swagger-jsdoc');
 var mongoose = require("mongoose");
+
+// Fix for: "DeprecationWarning: Mongoose: mpromise (mongoose's default promise library) is deprecated ..."
+mongoose.Promise = global.Promise;
+
 var cors = require('cors');
 var xmlparser = require('express-xml-bodyparser');
+var config = require('./config');
+var init = require('./init');
 var router = express.Router();
 var app = express();
 
@@ -22,12 +28,12 @@ var swaggerDefinition = {
         version: '1.0.1',
         description: 'Zaratech PTM Backend Project API'
     },
-    host: 'zaratech-ptm.ddns.net:8888',
+    host: config.domain + ':' + config.apiPort,
     basePath: ''
 };
 
 if(local){
-    swaggerDefinition.host = 'localhost:8888';
+    swaggerDefinition.host = 'localhost:' + config.apiPort;
 }
 
 // options for the swagger docs
@@ -78,6 +84,10 @@ app.use(express.static('./public'));
 // disables the 'X-Powered-By: Express' message
 app.disable('x-powered-by');
 
-var server = app.listen(8888, function () {
+// launch server
+var server = app.listen(config.apiPort, function () {
     console.log("Backend API server listening on port %s...", server.address().port);
 });
+
+// check if app init is needed
+init.checkInit();
