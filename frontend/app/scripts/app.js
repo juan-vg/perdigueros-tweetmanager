@@ -5,7 +5,8 @@
 /**
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
-angular.module('app', ['ngRoute','app_admin','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet','ui.bootstrap','ADM-dateTimePicker','ngclipboard','ngWebSocket']);
+angular.module('app', ['ngRoute','app_admin','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet',
+    'ui.bootstrap','ngclipboard','ngWebSocket','ae-datetimepicker','ngLoader','alexjoffroy.angular-loaders']);
 
 //variable for manage the main module
 var app = angular.module("app");
@@ -124,5 +125,197 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
 
 });
 
+app.run(function($http){
+    $http.get('config.json').
+    then(function onSuccess(response) {
+        localStorage.setItem('api', response.data.api);
+        localStorage.setItem('port', response.data.apiPort);
+        localStorage.setItem('rtport', response.data.rtPort);
+        localStorage.setItem('wsApi',response.data.wsApi);
+    }).
+    catch(function onError(response) {
+        console.log("Error obteniendo API");
+    });
+});
+
+app.factory('hashtagSocket',function($websocket,AlertService){
+    var hashtagSocket;
+
+    var tweetCollection = [];
+    var lastId = 0;
+    var workingSocket = false;
+
+    var start = function(callback){
+        hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+        localStorage.getItem('selectedAccount') + '/tweets/hashtags');
+        tweetCollection = [];
+        workingSocket = true;
+        try {
+            callback(tweetCollection, workingSocket);
+        }
+        catch(e){
+
+        };
+
+        hashtagSocket.onMessage(function (response) {
+            workingSocket = true;
+            //console.log(tweetCollection.length);
+            if (response.data == "TWITTER ERROR") {
+                hashtagSocket.close();
+                start();
+            }
+            else if(response.data =='EMPTY LIST ERROR'){
+                workingSocket = false;
+                callback(tweetCollection,workingSocket);
+                AlertService.alert('Atention','There are not hashtags to follow in this account','Close');
+            }
+            else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
+                workingSocket = false;
+                callback(tweetCollection,workingSocket);
+                AlertService.alert('Error','Socket validation error: account not found','Close');
+            }
+            else {
+                var res;
+                try {
+                    res = JSON.parse(response.data);
+                }
+                catch (e) {
+                    res = {'id_str': response.data};
+                }
+                var present = false;
+                // if last id inserted is not equal that the next id will be inserted
+                for(var i=0;i<tweetCollection.lenght;i++){
+                    if(tweetCollection[i].id_str === res.id_str){
+                        present = true;
+                    }
+                }
+                if(!present){
+                    if(tweetCollection.length==20){
+                        // LIMIT LENGTH OF TWEET ARRAY TO 20
+                        if (tweetCollection.length == 20) {
+                            tweetCollection.splice(1, 1);
+                        }
+                    }
+                    tweetCollection.push({
+                        'id_str': res.id_str
+                    });
+                }
+                /*
+                if(lastId!=res.id_str){
+                    tweetCollection.push({
+                        'id_str': res.id_str
+                    });
+                    callback(tweetCollection,workingSocket);
+                }
+                lastId = res.id_str;
+                */
+            }
+
+        });
+        hashtagSocket.onClose(function(){
+            hashtagSocket.hashtagTweet = null;
+        });
+
+        hashtagSocket.send('token:' + localStorage.getItem('token'));
+    }
+
+    var methods = {
+        tweetCollection : tweetCollection,
+        workingSocket : workingSocket,
+        start : start,
+        close : function(){
+            if(hashtagSocket){
+                hashtagSocket.close();
+            }
+        }
+    };
+
+    return methods;
+});
+
+app.factory('followedSocket',function($websocket,AlertService){
+    var followedSocket;
+    var tweetCollection = [];
+    var lastId = 0;
+    var workingSocket = false;
+
+    var start = function(callback){
+        followedSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
+        localStorage.getItem('selectedAccount') + '/tweets/followed');
+
+        tweetCollection = [];
+
+        try {
+            callback(tweetCollection, workingSocket);
+        }
+        catch(e){
+
+        };
+        followedSocket.onMessage(function (response) {
+            workingSocket = true;
+            //console.log(tweetCollection.length);
+            if (response.data == "TWITTER ERROR") {
+                followedSocket.close();
+                start();
+            }
+            else if(response.data =='EMPTY LIST ERROR'){
+                workingSocket = false;
+                callback(tweetCollection, workingSocket);
+                AlertService.alert('Atention','There are not users to follow in this account','Close');
+            }
+            else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
+                workingSocket = false;
+                callback(tweetCollection, workingSocket);
+                AlertService.alert('Error','Socket validation error: account not found','Close');
+            }
+            else {
+                var res;
+                try {
+                    res = JSON.parse(response.data);
+                }
+                catch (e) {
+                    res = {'id_str': response.data};
+                }
+                var present = false;
+                // if last id inserted is not equal that the next id will be inserted
+                for(var i=0;i<tweetCollection.lenght;i++){
+                    if(tweetCollection[i].id_str === res.id_str){
+                        present = true;
+                    }
+                }
+                if(!present){
+                    if(tweetCollection.length==20){
+                        // LIMIT LENGTH OF TWEET ARRAY TO 20
+                        if (tweetCollection.length == 20) {
+                            tweetCollection.splice(1, 1);
+                        }
+                    }
+                    tweetCollection.push({
+                        'id_str': res.id_str
+                    });
+                }
+            }
+        });
+
+        followedSocket.onClose(function(){
+            followedSocket.followedTweet = null;
+        });
+
+        followedSocket.send('token:' + localStorage.getItem('token'));
+    }
+
+    var methods = {
+        tweetCollection : tweetCollection,
+        workingSocket : workingSocket,
+        start : start,
+        close : function(){
+            if(followedSocket){
+                followedSocket.close();
+            }
+        }
+    };
+
+    return methods;
+});
 
 

@@ -7,7 +7,7 @@ var app = angular.module('app');
 /**
  *  Controller for handle account table information.
  */
-app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService) {
+app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $route, AlertService,$location) {
 
     var accountCtrl = this;
     accountCtrl.active = false;
@@ -36,7 +36,6 @@ app.controller('accountTableCtrl', function ($http, $rootScope, $uibModal, $rout
             .catch(function (response) {
                 if (response.status == 403) {
                     localStorage.clear();
-                    AlertService.alert('Inactivity time', 'Due to inactivity, the session has been closed for security reasons.', 'Close');
                     $location.url('/');
                 }
                 else if (response.status == 500) {

@@ -176,3 +176,7 @@ body {
 #userIcon{
     color:white;
 }
+
+.ballLoader{
+    background-color: #337ab7;
+}

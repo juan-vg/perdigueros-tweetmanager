@@ -1,6 +1,5 @@
 <!-- Content of home logged user view-->
 <div class="container">
-
     <div class="row">
         <!-- Account panel -->
         <div ng-controller="accountTableCtrl as accountCtrl" id="account-panel" class="col-md-5">
@@ -88,22 +87,44 @@
                     <uib-tab-body>
                         <hr>
                         <uib-tabset type="pills" class="center-pills">
+                            <loader
+                                    working="tweetCtrl.working"
+                                    disable-background="disable"
+                                    message="tweetCtrl.message"
+                                    template="7">
+                            </loader>
                             <uib-tab heading="Home tweets" ng-click="tweetCtrl.getHomeTimeline()">
                                 <hr>
+                                <div class="text-center" ng-if="tweetCtrl.homeTimeLineTweetsList.length == 0">
+                                    <h2>No tweets yet</h2>
+                                </div>
                                 <div ng-repeat="tweet in tweetCtrl.homeTimeLineTweetsList track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
+
                             </uib-tab>
                             <uib-tab heading="My tweets" ng-click="tweetCtrl.getMyTweets()">
                                 <hr>
+                                <loader
+                                        working="tweetCtrl.working"
+                                        disable-background="disable"
+                                        message="tweetCtrl.message"
+                                        template="7">
+                                </loader>
                                 <div ng-repeat="tweet in tweetCtrl.myTweets track by tweet.id_str">
+                                    <div class="text-center" ng-if="tweetCtrl.myTweets.length == 0">
+                                        <h2>No tweets yet</h2>
+                                    </div>
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
                             </uib-tab>
                             <uib-tab heading="Scheduled tweets" ng-click="tweetCtrl.getScheduledTweets()">
                                 <hr>
+                                <div class="text-center" ng-if="tweetCtrl.scheduledTweets.length ==0">
+                                    <h2>No scheduled tweets yet</h2>
+                                </div>
                                 <div ng-repeat="tweet in tweetCtrl.scheduledTweets track by tweet.id_str">
                                     <hr>
                                     <h3>Tweets awaiting publication</h3>
@@ -125,6 +146,15 @@
                             </uib-tab>
                             <uib-tab heading="Mentions" ng-click="tweetCtrl.getMentions()">
                                 <hr>
+                                <div class="text-center" ng-if="tweetCtrl.mentions.length == 0">
+                                    <h2>No tweets yet</h2>
+                                </div>
+                                <loader
+                                        working="tweetCtrl.working"
+                                        disable-background="disable"
+                                        message="tweetCtrl.message"
+                                        template="7">
+                                </loader>
                                 <div ng-repeat="tweet in tweetCtrl.mentions track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
@@ -132,6 +162,15 @@
                             </uib-tab>
                             <uib-tab heading="I have been retwitted" ng-click="tweetCtrl.getRetweets()">
                                 <hr>
+                                <div class="text-center" ng-if="tweetCtrl.retweets.length ==0">
+                                    <h2>No tweets yet</h2>
+                                </div>
+                                <loader
+                                        working="tweetCtrl.working"
+                                        disable-background="disable"
+                                        message="tweetCtrl.message"
+                                        template="7">
+                                </loader>
                                 <div ng-repeat="tweet in tweetCtrl.retweets track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
@@ -139,13 +178,24 @@
                             </uib-tab>
                             <uib-tab heading="My favorites" ng-click="tweetCtrl.getFavorites()">
                                 <hr>
+                                <div class="text-center" ng-if="tweetCtrl.favorites.length ==0">
+                                    <h2>No tweets yet</h2>
+                                </div>
+
+                                <loader
+                                        working="tweetCtrl.working"
+                                        disable-background="disable"
+                                        message="tweetCtrl.message"
+                                        template="7">
+                                </loader>
+
                                 <div ng-repeat="tweet in tweetCtrl.favorites track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
                                 </div>
                             </uib-tab>
 
-                            <uib-tab ng-click="tweetCtrl.isUserSelected()" heading="Real time tracking">
+                            <uib-tab ng-click="tweetCtrl.isUserSelected()" deselect="tweetCtrl.closeSocketIfOpen()" heading="Real time tracking">
                                 <hr>
                                 <uib-tabset type="pills" class="center-pills">
                                     <uib-tab elem-ready="tweetCtrl.getTracking()" heading="Manage tracking">
@@ -171,7 +221,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr ng-if="toggle[$index]">
-                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete it?</h5>
+                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete
+                                                        it?</h5>
                                                         <div class="text-center">
                                                             <div class="btn-group">
                                                                 <button class="btn btn-danger"
@@ -222,7 +273,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr ng-if="toggle[$index]">
-                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete it?</h5>
+                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete
+                                                        it?</h5>
                                                         <div class="text-center">
                                                             <div class="btn-group">
                                                                 <button class="btn btn-danger"
@@ -250,19 +302,26 @@
                                             </form>
                                         </div>
                                     </uib-tab>
-                                    <uib-tab ng-click="tweetCtrl.webSocketHashtags()" heading="Follow hashtags">
+                                    <uib-tab select="tweetCtrl.webSocketHashtags()"
+                                             deselect="tweetCtrl.hashtagSocket.close()"
+                                             heading="Follow hashtags">
                                         <hr>
                                         <h1 class="text-center">Tweets</h1>
-                                        <div ng-repeat="tweet in tweetCtrl.hashtagTweet.slice().reverse() track by tweet.id_str ">
+                                        <div ng-show="tweetCtrl.workingSocket"  class="loader text-center ballLoader" loader-css="ball-pulse"></div>
+                                        <hr>
+                                        <div ng-repeat="tweet in tweetCtrl.hashtagTweet.slice().reverse()  track by tweet.id_str">
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
                                         </div>
                                     </uib-tab>
-                                    <uib-tab ng-click="tweetCtrl.webSocketFollowedUsers()"
+                                    <uib-tab select="tweetCtrl.webSocketFollowedUsers()"
+                                             deselect="tweetCtrl.followedSocket.close()"
                                              heading="Tweets from users you follow">
                                         <hr>
                                         <h1 class="text-center">Tweets</h1>
-                                        <div ng-repeat="tweet in tweetCtrl.followedUserTweet.slice().reverse() track by tweet.id_str">
+                                        <div ng-show="tweetCtrl.workingSocket"  class="loader text-center ballLoader" loader-css="ball-pulse"></div>
+                                        <hr>
+                                        <div ng-repeat="tweet in tweetCtrl.followedTweet.slice().reverse() track by tweet.id_str">
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
                                         </div>
@@ -327,13 +386,12 @@
                                       ng-model="tweetCtrl.sTweet"></textarea>
                             <hr>
                             <label>Select date and time:</label>
-                            <adm-dtp ng-model='tweetCtrl.sDate' options='{autoClose:true, calType: "gregorian",
-                            default:"today",gregorianStartDay: 1,    gregorianDic: {
-        title: "Grégorien",
-                            monthsNames: ["January", "February", "March", "April", "May", "June", "July", "August",
-                            "September", "October", "November", "December"], daysNames: ["S", "M", "T", "W", "Th", "F", "S"],
-                            todayBtn: "Current month"
-                            }}'></adm-dtp>
+                            <div class="input-group" datetimepicker ng-model="tweetCtrl.sDate">
+                                <input class="form-control"/>
+                                <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                             </span>
+                            </div>
                             <br>
                             <button type="submit" class="btn btn-default">Schedule tweet <i
                                     class="fa fa-plus-circle fa-lg blueIcon"></i>

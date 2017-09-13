@@ -13,17 +13,13 @@ You need to install git too :
 
 https://git-scm.org/downloads
 
-Furthermore, you need bower and you can install with the next command :
-
-```
-$ npm install -g bower
-```
 
 
 ### Install the dependencies and run the frontend application
 
 Only execute `npm start` because we have configured npm for install the bower and npm dependencies.
-This command runs the application in 8000 port too.
+
+The `npm start`command runs the application in 8000 port too.
 
 There is a file [/app/config.json] to configure the route API and ports of the application.
 

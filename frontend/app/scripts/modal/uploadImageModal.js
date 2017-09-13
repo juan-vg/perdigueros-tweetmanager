@@ -52,6 +52,8 @@ app.service('upload', function ($http, $q)
             {
                 deferred.reject(msg);
             })
+            
+        // NOT REACHABLE (Previous return)
         return deferred.promise;
     }
 });
