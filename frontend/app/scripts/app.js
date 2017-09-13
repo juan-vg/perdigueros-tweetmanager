@@ -149,8 +149,14 @@ app.factory('hashtagSocket',function($websocket,AlertService){
         hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
         localStorage.getItem('selectedAccount') + '/tweets/hashtags');
         tweetCollection = [];
-        workingSocket = false;
-        callback(tweetCollection,workingSocket);
+        workingSocket = true;
+        try {
+            callback(tweetCollection, workingSocket);
+        }
+        catch(e){
+
+        };
+
         hashtagSocket.onMessage(function (response) {
             workingSocket = true;
             //console.log(tweetCollection.length);
@@ -176,11 +182,25 @@ app.factory('hashtagSocket',function($websocket,AlertService){
                 catch (e) {
                     res = {'id_str': response.data};
                 }
-                // LIMIT LENGTH OF TWEET ARRAY TO 20
-                if (tweetCollection.length == 20) {
-                    tweetCollection.splice(1, 1);
-                }
+                var present = false;
                 // if last id inserted is not equal that the next id will be inserted
+                for(var i=0;i<tweetCollection.lenght;i++){
+                    if(tweetCollection[i].id_str === res.id_str){
+                        present = true;
+                    }
+                }
+                if(!present){
+                    if(tweetCollection.length==20){
+                        // LIMIT LENGTH OF TWEET ARRAY TO 20
+                        if (tweetCollection.length == 20) {
+                            tweetCollection.splice(1, 1);
+                        }
+                    }
+                    tweetCollection.push({
+                        'id_str': res.id_str
+                    });
+                }
+                /*
                 if(lastId!=res.id_str){
                     tweetCollection.push({
                         'id_str': res.id_str
@@ -188,6 +208,7 @@ app.factory('hashtagSocket',function($websocket,AlertService){
                     callback(tweetCollection,workingSocket);
                 }
                 lastId = res.id_str;
+                */
             }
 
         });
@@ -223,7 +244,13 @@ app.factory('followedSocket',function($websocket,AlertService){
         localStorage.getItem('selectedAccount') + '/tweets/followed');
 
         tweetCollection = [];
-        workingSocket = false;
+
+        try {
+            callback(tweetCollection, workingSocket);
+        }
+        catch(e){
+
+        };
         followedSocket.onMessage(function (response) {
             workingSocket = true;
             //console.log(tweetCollection.length);
@@ -249,18 +276,24 @@ app.factory('followedSocket',function($websocket,AlertService){
                 catch (e) {
                     res = {'id_str': response.data};
                 }
-                // LIMIT LENGTH OF TWEET ARRAY TO 20
-                if (tweetCollection.length == 20) {
-                    tweetCollection.splice(1, 1);
-                }
+                var present = false;
                 // if last id inserted is not equal that the next id will be inserted
-                if(lastId!=res.id_str ){
+                for(var i=0;i<tweetCollection.lenght;i++){
+                    if(tweetCollection[i].id_str === res.id_str){
+                        present = true;
+                    }
+                }
+                if(!present){
+                    if(tweetCollection.length==20){
+                        // LIMIT LENGTH OF TWEET ARRAY TO 20
+                        if (tweetCollection.length == 20) {
+                            tweetCollection.splice(1, 1);
+                        }
+                    }
                     tweetCollection.push({
                         'id_str': res.id_str
                     });
-                    callback(tweetCollection,workingSocket);
                 }
-                lastId = res.id_str;
             }
         });
 
