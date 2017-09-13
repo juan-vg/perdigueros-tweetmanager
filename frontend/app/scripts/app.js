@@ -125,6 +125,19 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
 
 });
 
+app.run(function($http){
+    $http.get('config.json').
+    then(function onSuccess(response) {
+        localStorage.setItem('api', response.data.api);
+        localStorage.setItem('port', response.data.apiPort);
+        localStorage.setItem('rtport', response.data.rtPort);
+        localStorage.setItem('wsApi',response.data.wsApi);
+    }).
+    catch(function onError(response) {
+        console.log("Error obteniendo API");
+    });
+});
+
 app.factory('hashtagSocket',function($websocket,AlertService){
     var hashtagSocket;
 
