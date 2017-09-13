@@ -6,7 +6,7 @@
  * Instance the angular module 'app' and all the extern modules that it uses.
  */
 angular.module('app', ['ngRoute','app_admin','vcRecaptcha', 'satellizer','LocalStorageModule','chart.js','ngtweet',
-    'ui.bootstrap','ngclipboard','ngWebSocket','ae-datetimepicker','ngLoader']);
+    'ui.bootstrap','ngclipboard','ngWebSocket','ae-datetimepicker','ngLoader','alexjoffroy.angular-loaders']);
 
 //variable for manage the main module
 var app = angular.module("app");
@@ -125,52 +125,40 @@ app.config(function ($routeProvider, $locationProvider, $authProvider) {
 
 });
 
-app.factory('hashtagSocket',function($websocket){
-
+app.factory('hashtagSocket',function($websocket,AlertService){
     var hashtagSocket;
 
     var tweetCollection = [];
-    var noTw = "";
-    
+    var lastId = 0;
+    var workingSocket = true;
+
     var start = function(callback){
-        
+
         hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
         localStorage.getItem('selectedAccount') + '/tweets/hashtags');
-        
+
         tweetCollection = [];
-        noTw = "";
-        
-        callback(tweetCollection);
-        
-        hashtagSocket.onError(function(response){
-            if (response.data == "TWITTER ERROR") {
-                console.log(response.data);
-                hashtagSocket.close();
-                start();
-            }
-            else if(response.data =='EMPTY LIST ERROR'){
-                noTw = "You have no followed hashtags on your list";
-                //TO-DO??? -> callback???
-            }
-            else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                // TO-DO: user feedback
-                console.log(response.data);
-            }
-        });
+        if(callback) {
+            callback(tweetCollection, workingSocket);
+        }
+
         hashtagSocket.onMessage(function (response) {
             //console.log(tweetCollection.length);
             if (response.data == "TWITTER ERROR") {
-                console.log(response.data);
-                hashtagSocket.close();
+                if(hashtagSocket) {
+                    hashtagSocket.close();
+                }
                 start();
             }
             else if(response.data =='EMPTY LIST ERROR'){
-                noTw = "You have no followed hashtags on your list";
-                //TO-DO??? -> callback???
+                workingSocket = false;
+                callback(tweetCollection,workingSocket);
+                AlertService.alert('Atention','There are not hashtags to follow in this account','Close');
             }
             else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                // TO-DO: user feedback
-                console.log(response.data);
+                workingSocket = false;
+                callback(tweetCollection,workingSocket);
+                AlertService.alert('Error','Socket validation error: account not found','Close');
             }
             else {
                 var res;
@@ -184,23 +172,25 @@ app.factory('hashtagSocket',function($websocket){
                 if (tweetCollection.length == 20) {
                     tweetCollection.splice(1, 1);
                 }
-                tweetCollection.push({
-                    'id_str': res.id_str
-                });
+                // if last id inserted is not equal that the next id will be inserted
+                if(lastId!=res.id_str){
+                    tweetCollection.push({
+                        'id_str': res.id_str
+                    });
+                }
+                lastId = res.id_str;
             }
         });
-
-        hashtagSocket.onClose(function(response){
-            hashtagSocket.tweetCollection = null;
-            hashtagSocket = null;
+        hashtagSocket.onClose(function(){
+            hashtagSocket.hashtagTweet = null;
         });
-        
+
         hashtagSocket.send('token:' + localStorage.getItem('token'));
     }
 
     var methods = {
         tweetCollection : tweetCollection,
-        noTw : noTw,
+        workingSocket : workingSocket,
         start : start,
         close : function(){
             if(hashtagSocket){
@@ -212,52 +202,37 @@ app.factory('hashtagSocket',function($websocket){
     return methods;
 });
 
-app.factory('followedSocket',function($websocket,$rootScope){
+app.factory('followedSocket',function($websocket,AlertService){
     var followedSocket;
-
     var tweetCollection = [];
-    var noTw = "";
-    
+    var lastId = 0;
+    var workingSocket = true;
+
     var start = function(callback){
-        
         followedSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
         localStorage.getItem('selectedAccount') + '/tweets/followed');
-        
+
         tweetCollection = [];
-        noTw = "";
-        
-        callback(tweetCollection);
-        
-        followedSocket.onError(function(response){
-            if (response.data == "TWITTER ERROR") {
-                console.log(response.data);
-                followedSocket.close();
-                start();
-            }
-            else if(response.data =='EMPTY LIST ERROR'){
-                noTw = "You have no followed users on your list";
-                //TO-DO??? -> callback???
-            }
-            else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                // TO-DO: user feedback
-                console.log(response.data);
-            }
-        });
-        
+        workingSocket = true;
+
         followedSocket.onMessage(function (response) {
+            callback(tweetCollection,workingSocket);
             //console.log(tweetCollection.length);
             if (response.data == "TWITTER ERROR") {
-                console.log(response.data);
-                followedSocket.close();
+                if(followedSocket) {
+                    followedSocket.close();
+                }
                 start();
             }
             else if(response.data =='EMPTY LIST ERROR'){
-                noTw = "You have no followed users on your list";
-                //TO-DO??? -> callback???
+                workingSocket = false;
+                callback(tweetCollection, workingSocket);
+                AlertService.alert('Atention','There are not users to follow in this account','Close');
             }
             else if(response.data=='VALIDATION-ERROR: ACCOUNT NOT FOUND'){
-                // TO-DO: user feedback
-                console.log(response.data);
+                workingSocket = false;
+                callback(tweetCollection, workingSocket);
+                AlertService.alert('Error','Socket validation error: account not found','Close');
             }
             else {
                 var res;
@@ -271,23 +246,26 @@ app.factory('followedSocket',function($websocket,$rootScope){
                 if (tweetCollection.length == 20) {
                     tweetCollection.splice(1, 1);
                 }
-                tweetCollection.push({
-                    'id_str': res.id_str
-                });
+                // if last id inserted is not equal that the next id will be inserted
+                if(lastId!=res.id_str ){
+                    tweetCollection.push({
+                        'id_str': res.id_str
+                    });
+                }
+                lastId = res.id_str;
             }
         });
-        
-        followedSocket.onClose(function(response){
-            followedSocket.tweetCollection = null;
-            followedSocket = null;
+
+        followedSocket.onClose(function(){
+            followedSocket.followedTweet = null;
         });
-        
+
         followedSocket.send('token:' + localStorage.getItem('token'));
     }
 
     var methods = {
         tweetCollection : tweetCollection,
-        noTw : noTw,
+        workingSocket : workingSocket,
         start : start,
         close : function(){
             if(followedSocket){

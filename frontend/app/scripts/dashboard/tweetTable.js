@@ -657,10 +657,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      */
     tweetCtrl.webSocketHashtags = function () {
         tweetCtrl.hashtagSocket = hashtagSocket;
-        tweetCtrl.hashtagSocket.start(function(collection){
+        tweetCtrl.hashtagSocket.start(function(collection,workingSocket){
             tweetCtrl.hashtagTweet = collection;
+            tweetCtrl.workingSocket = workingSocket;
         });
-        //console.log(tweetCtrl.hashtagSocket);
     }
 
     /**
@@ -668,21 +668,12 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      */
     tweetCtrl.webSocketFollowedUsers = function () {
         tweetCtrl.followedSocket = followedSocket;
-        tweetCtrl.followedSocket.start(function(collection){
+        tweetCtrl.followedSocket.start(function(collection,workingSocket){
             tweetCtrl.followedTweet = collection;
+            tweetCtrl.workingSocket = workingSocket;
         });
-        //console.log(followedSocket);
     }
-    
-    // NOT USED?
-    tweetCtrl.deleteSocketTweets = function(){
-        // TO-DO: CLOSE SOCKETS BEFORE
-        // tweetCtrl.hashtagSocket.close()
-        // tweetCtrl.followedSocket.close()
-        
-        tweetCtrl.followedTweet = null;
-        tweetCtrl.hashtagTweet = null;
-    }
+
     
 
     tweetCtrl.isUserSelected = function(){

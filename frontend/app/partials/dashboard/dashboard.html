@@ -1,6 +1,5 @@
 <!-- Content of home logged user view-->
 <div class="container">
-
     <div class="row">
         <!-- Account panel -->
         <div ng-controller="accountTableCtrl as accountCtrl" id="account-panel" class="col-md-5">
@@ -88,17 +87,17 @@
                     <uib-tab-body>
                         <hr>
                         <uib-tabset type="pills" class="center-pills">
-                            <uib-tab  heading="Home tweets" ng-click="tweetCtrl.getHomeTimeline()">
+                            <loader
+                                    working="tweetCtrl.working"
+                                    disable-background="disable"
+                                    message="tweetCtrl.message"
+                                    template="7">
+                            </loader>
+                            <uib-tab heading="Home tweets" ng-click="tweetCtrl.getHomeTimeline()">
                                 <hr>
                                 <div class="text-center" ng-if="tweetCtrl.homeTimeLineTweetsList.length == 0">
                                     <h2>No tweets yet</h2>
                                 </div>
-                                <loader
-                                        working="tweetCtrl.working"
-                                        disable-background="disable"
-                                        message="tweetCtrl.message"
-                                        template="7">
-                                </loader>
                                 <div ng-repeat="tweet in tweetCtrl.homeTimeLineTweetsList track by tweet.id_str">
                                     <twitter-widget twitter-widget-id="tweet.id_str">
                                     </twitter-widget>
@@ -113,7 +112,7 @@
                                         message="tweetCtrl.message"
                                         template="7">
                                 </loader>
-                                <div  ng-repeat="tweet in tweetCtrl.myTweets track by tweet.id_str">
+                                <div ng-repeat="tweet in tweetCtrl.myTweets track by tweet.id_str">
                                     <div class="text-center" ng-if="tweetCtrl.myTweets.length == 0">
                                         <h2>No tweets yet</h2>
                                     </div>
@@ -196,7 +195,7 @@
                                 </div>
                             </uib-tab>
 
-                            <uib-tab ng-click="tweetCtrl.isUserSelected()" heading="Real time tracking">
+                            <uib-tab ng-click="tweetCtrl.isUserSelected()" deselect="tweetCtrl.closeSocketIfOpen()" heading="Real time tracking">
                                 <hr>
                                 <uib-tabset type="pills" class="center-pills">
                                     <uib-tab elem-ready="tweetCtrl.getTracking()" heading="Manage tracking">
@@ -222,7 +221,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr ng-if="toggle[$index]">
-                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete it?</h5>
+                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete
+                                                        it?</h5>
                                                         <div class="text-center">
                                                             <div class="btn-group">
                                                                 <button class="btn btn-danger"
@@ -273,7 +273,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr ng-if="toggle[$index]">
-                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete it?</h5>
+                                                    <td colspan="4"><h5 align="center">Are you sure you want to delete
+                                                        it?</h5>
                                                         <div class="text-center">
                                                             <div class="btn-group">
                                                                 <button class="btn btn-danger"
@@ -301,34 +302,25 @@
                                             </form>
                                         </div>
                                     </uib-tab>
-                                    <uib-tab  select="tweetCtrl.webSocketHashtags()" deselect="tweetCtrl.hashtagSocket.close()"
-                                              heading="Follow hashtags">
+                                    <uib-tab select="tweetCtrl.webSocketHashtags()"
+                                             deselect="tweetCtrl.hashtagSocket.close()"
+                                             heading="Follow hashtags">
                                         <hr>
                                         <h1 class="text-center">Tweets</h1>
+                                        <div ng-show="tweetCtrl.workingSocket"  class="loader text-center ballLoader" loader-css="ball-pulse"></div>
                                         <hr>
-                                        <h3 class="text-center">{{tweetCtrl.noTw}}</h3>
                                         <div ng-repeat="tweet in tweetCtrl.hashtagTweet.slice().reverse()  track by tweet.id_str">
-                                            <loader
-                                                    working="tweetCtrl.working"
-                                                    disable-background="disable"
-                                                    message="tweetCtrl.message"
-                                                    template="7">
-                                            </loader>
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
                                         </div>
                                     </uib-tab>
-                                    <uib-tab select="tweetCtrl.webSocketFollowedUsers()" deselect="tweetCtrl.followedSocket.close()"
+                                    <uib-tab select="tweetCtrl.webSocketFollowedUsers()"
+                                             deselect="tweetCtrl.followedSocket.close()"
                                              heading="Tweets from users you follow">
                                         <hr>
                                         <h1 class="text-center">Tweets</h1>
+                                        <div ng-show="tweetCtrl.workingSocket"  class="loader text-center ballLoader" loader-css="ball-pulse"></div>
                                         <hr>
-                                        <div class="btn-group">
-                                            <button class="btn-default">Start stream</button>
-                                            <button class="btn-danger">Stop stream</button>
-                                            <button class="btn-warning">Delete tweets</button>
-                                        </div>
-                                        <h3 class="text-center">{{tweetCtrl.noTw}}</h3>
                                         <div ng-repeat="tweet in tweetCtrl.followedTweet.slice().reverse() track by tweet.id_str">
                                             <twitter-widget twitter-widget-id="tweet.id_str">
                                             </twitter-widget>
