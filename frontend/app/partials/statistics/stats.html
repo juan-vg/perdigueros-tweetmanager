@@ -28,25 +28,24 @@
             </div>
             <h3 align="center" ng-if="emptytweetlikes">No data yet</h3>
         </div>
-        <!--Tweets/retweets stat-->
+		<!--Tweets/likes per day stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Tweets that have more retweets</h2>
-
-        <div ng-if="!emptytweetretweets" class="col-xs-12">
+        <h2 align="center">Top Tweets that have more likes in this day</h2>
+        <div ng-if="!emptytweetlikesday" class="col-xs-12">
             <div class="col-xs-12">
-                <canvas id="tweetretweets" class="chart chart-bar"
-                        chart-data="dataTrt" chart-labels="labelTrt" chart-options="optionsTrt" chart-colors="colors">
+                <canvas id="tweetlikesday" class="chart chart-bar"
+                        chart-data="dataTld" chart-labels="labelTld" chart-options="optionsTld" chart-colors="colors">
                 </canvas>
             </div>
             <div class="col-xs-12 aligned-row">
-                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_trt track by $index">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_tld track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
                     <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
             </div>
         </div>
-        <h3 align="center" ng-if="emptytweetretweets">No data yet</h3>
+        <h3 align="center" ng-if="emptytweetlikesday">No data yet</h3>
 		</div>
         <!--Tweets/likes per month stat-->
 		<div class="col-xs-12">
@@ -67,24 +66,45 @@
         </div>
         <h3 align="center" ng-if="emptytweetlikesmonth">No data yet</h3>
 		</div>
-        <!--Tweets/likes per day stat-->
+		<!--Tweets/retweets stat-->
 		<div class="col-xs-12">
 		<hr><br>
-        <h2 align="center">Top Tweets that have more likes in this day</h2>
-        <div ng-if="!emptytweetlikesday" class="col-xs-12">
+        <h2 align="center">Top Tweets that have more retweets</h2>
+
+        <div ng-if="!emptytweetretweets" class="col-xs-12">
             <div class="col-xs-12">
-                <canvas id="tweetlikesday" class="chart chart-bar"
-                        chart-data="dataTld" chart-labels="labelTld" chart-options="optionsTld" chart-colors="colors">
+                <canvas id="tweetretweets" class="chart chart-bar"
+                        chart-data="dataTrt" chart-labels="labelTrt" chart-options="optionsTrt" chart-colors="colors">
                 </canvas>
             </div>
             <div class="col-xs-12 aligned-row">
-                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_tld track by $index">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_trt track by $index">
                     <h4 align="center">Number #{{$index + 1}}</h4>
                     <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
                 </div>
             </div>
         </div>
-        <h3 align="center" ng-if="emptytweetlikesday">No data yet</h3>
+        <h3 align="center" ng-if="emptytweetretweets">No data yet</h3>
+		</div>
+		<!--Tweets/retweets per day stat-->
+		<div class="col-xs-12">
+		<hr><br>
+        <h2 align="center">Top Tweets that have more retweets in this day</h2>
+        <div ng-if="!emptytweetretweetsday" class="col-xs-12">
+            <div class="col-xs-12">
+                <canvas id="tweetretweetsday" class="chart chart-bar"
+                        chart-data="dataTrtd" chart-labels="labelTrtd" chart-options="optionsTrtd"
+                        chart-colors="colors">
+                </canvas>
+            </div>
+            <div class="col-xs-12 aligned-row">
+                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_trtd track by $index">
+                    <h4 align="center">Number #{{$index + 1}}</h4>
+                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
+                </div>
+            </div>
+        </div>
+        <h3 align="center" ng-if="emptytweetretweetsday">No data yet</h3>
 		</div>
         <!--Tweets/retweets per month stat-->
 		<div class="col-xs-12">
@@ -105,26 +125,6 @@
             </div>
         </div>
         <h3 align="center" ng-if="emptytweetretweetsmonth">No data yet</h3>
-		</div>
-        <!--Tweets/retweets per day stat-->
-		<div class="col-xs-12">
-		<hr><br>
-        <h2 align="center">Top Tweets that have more retweets in this day</h2>
-        <div ng-if="!emptytweetretweetsday" class="col-xs-12">
-            <div class="col-xs-12">
-                <canvas id="tweetretweetsday" class="chart chart-bar"
-                        chart-data="dataTrtd" chart-labels="labelTrtd" chart-options="optionsTrtd"
-                        chart-colors="colors">
-                </canvas>
-            </div>
-            <div class="col-xs-12 aligned-row">
-                <div class="col-xs-12 col-md-6" ng-repeat="tweet in arr_trtd track by $index">
-                    <h4 align="center">Number #{{$index + 1}}</h4>
-                    <twitter-widget twitter-widget-id="tweet.id_str" twitter-widget-options="{'cards': 'hidden','conversation': 'none'}"></twitter-widget>
-                </div>
-            </div>
-        </div>
-        <h3 align="center" ng-if="emptytweetretweetsday">No data yet</h3>
 		</div>
         <!--Tweets per day stat-->
 		<div class="col-xs-12">
