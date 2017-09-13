@@ -1,16 +1,20 @@
 # `Perdigueros Tweet Manager Backend` 
 
 
-### Prerequisites
+## Prerequisites
 
 - Node.JS 6.x
 - MongoDB >2.x
 
-### Configuration
+## Configuration
 
 There is a [config file](config.js) that enables you to configure the PTM URL and other options.
 
-### Install the dependencies and run the backend application
+### Localhost
+
+You must change the var local to true on [server.js](server.js) in order to configurate Swagger 
+
+## Install the dependencies and run the backend application
 
 Just run the following command from the backend directory:
 

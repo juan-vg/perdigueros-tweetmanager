@@ -3,27 +3,24 @@
 Here are the instructions for Perdigueros Tweet Manager Frontend deployment:
 
 
-### Prerequisites
+## Prerequisites
 
-You need npm and bower. Npm is distributed with Node.js- which means that when you download Node.js, you automatically get npm installed on your computer :
+- Node.JS 6.x (https://nodejs.org/en/)
 
-https://nodejs.org/en/
+## Configuration
 
-You need to install git too :
+There is a file [config file](app/config.json) that enables you to configure the domain name (and ports) used by the API (Backend).
 
-https://git-scm.org/downloads
+In order to configure the frontend application ***port*** you will have to edit the file [package.json](package.json).
 
+## Install the dependencies and run the frontend application
 
+Just run the following command from the frontend directory:
 
-### Install the dependencies and run the frontend application
+    npm start
 
-Only execute `npm start` because we have configured npm for install the bower and npm dependencies.
-
-The `npm start`command runs the application in 8000 port too.
-
-There is a file [/app/config.json] to configure the route API and ports of the application.
-
+The `npm start` command runs the application in the port 8000 (by default).
 
 ## Contact
 
-For more information or issues contact us in : zaratech.ptm@gmail.com
+For more information or issues contact us at : zaratech.ptm@gmail.com
