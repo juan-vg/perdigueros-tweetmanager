@@ -130,24 +130,19 @@ app.factory('hashtagSocket',function($websocket,AlertService){
 
     var tweetCollection = [];
     var lastId = 0;
-    var workingSocket = true;
+    var workingSocket = false;
 
     var start = function(callback){
-
         hashtagSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
         localStorage.getItem('selectedAccount') + '/tweets/hashtags');
-
         tweetCollection = [];
-        if(callback) {
-            callback(tweetCollection, workingSocket);
-        }
-
+        workingSocket = false;
+        callback(tweetCollection,workingSocket);
         hashtagSocket.onMessage(function (response) {
+            workingSocket = true;
             //console.log(tweetCollection.length);
             if (response.data == "TWITTER ERROR") {
-                if(hashtagSocket) {
-                    hashtagSocket.close();
-                }
+                hashtagSocket.close();
                 start();
             }
             else if(response.data =='EMPTY LIST ERROR'){
@@ -177,9 +172,11 @@ app.factory('hashtagSocket',function($websocket,AlertService){
                     tweetCollection.push({
                         'id_str': res.id_str
                     });
+                    callback(tweetCollection,workingSocket);
                 }
                 lastId = res.id_str;
             }
+
         });
         hashtagSocket.onClose(function(){
             hashtagSocket.hashtagTweet = null;
@@ -206,22 +203,19 @@ app.factory('followedSocket',function($websocket,AlertService){
     var followedSocket;
     var tweetCollection = [];
     var lastId = 0;
-    var workingSocket = true;
+    var workingSocket = false;
 
     var start = function(callback){
         followedSocket = $websocket(localStorage.getItem('wsApi')+':'+localStorage.getItem('rtport')+'/twitter-accounts/' +
         localStorage.getItem('selectedAccount') + '/tweets/followed');
 
         tweetCollection = [];
-        workingSocket = true;
-
+        workingSocket = false;
         followedSocket.onMessage(function (response) {
-            callback(tweetCollection,workingSocket);
+            workingSocket = true;
             //console.log(tweetCollection.length);
             if (response.data == "TWITTER ERROR") {
-                if(followedSocket) {
-                    followedSocket.close();
-                }
+                followedSocket.close();
                 start();
             }
             else if(response.data =='EMPTY LIST ERROR'){
@@ -251,6 +245,7 @@ app.factory('followedSocket',function($websocket,AlertService){
                     tweetCollection.push({
                         'id_str': res.id_str
                     });
+                    callback(tweetCollection,workingSocket);
                 }
                 lastId = res.id_str;
             }
