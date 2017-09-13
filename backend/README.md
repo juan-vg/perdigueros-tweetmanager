@@ -12,7 +12,7 @@ There is a [config file](config.js) that enables you to configure the PTM URL an
 
 ### Install the dependencies and run the backend application
 
-Just run the following command from the backend direcory:
+Just run the following command from the backend directory:
 
     npm start
 
