@@ -14,9 +14,10 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
     * */
     $rootScope.$watch("activeAccount",function(){
         tweetCtrl.homeTimeLineTweetsList = null;
-        tweetCtrl.working = true;
+        tweetCtrl.working = false;
         tweetCtrl.message = 'Loading tweets ...';
         if($rootScope.activeAccount) {
+            tweetCtrl.working = true;
             var req = {
                 method: 'GET',
                 url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
@@ -50,8 +51,8 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      */
     tweetCtrl.getHomeTimeline = function () {
         tweetCtrl.homeTimeLineTweetsList = null;
-        tweetCtrl.working = true;
         if ($rootScope.activeAccount) {
+            tweetCtrl.working = true;
             var req = {
                 method: 'GET',
                 url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/twitter-accounts/'
@@ -86,8 +87,8 @@ app.controller('tweetTableCtrl', function ($rootScope, $http, AlertService, $uib
      * GET MY TWEETS
      */
     tweetCtrl.getMyTweets = function () {
-        tweetCtrl.working = true;
         if ($rootScope.activeAccount) {
+            tweetCtrl.working = true;
             tweetCtrl.myTweets = null;
             var req = {
                 method: 'GET',
