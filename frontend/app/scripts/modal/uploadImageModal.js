@@ -12,7 +12,7 @@ app.controller('uploadImageCtrl', function ($scope, upload,$uibModalInstance)
 		
 		upload.uploadFile(file).then(function(res)
 		{
-			$scope.imageUrlResponse = localStorage.getItem('api')+'/images/' + res.data.id;
+			$scope.imageUrlResponse = localStorage.getItem('api')+":"+localStorage.getItem('port')+ '/images/' + res.data.id;
 		})
 	}
 
@@ -38,7 +38,7 @@ app.service('upload', function ($http, $q)
         var deferred = $q.defer();
         var formData = new FormData();
         formData.append("file", file);
-        return $http.post(localStorage.getItem('api')+"/images/", formData, {
+        return $http.post(localStorage.getItem('api')+":"+localStorage.getItem('port')+ "/images/", formData, {
             headers: {
                 "Content-type": undefined
             },
@@ -52,6 +52,8 @@ app.service('upload', function ($http, $q)
             {
                 deferred.reject(msg);
             })
+            
+        // NOT REACHABLE (Previous return)
         return deferred.promise;
     }
 });
