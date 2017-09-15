@@ -18,7 +18,6 @@ app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$h
             }
         };
         $http(req).then(function (response) {
-            console.log(response);
             $scope.urlResponse = localStorage.getItem('api')+":"+localStorage.getItem('port')+"/urls/" + response.data.id;
         }).catch(function (response) {
             if (response.status == 400) {
