@@ -9,7 +9,7 @@ app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$h
     $scope.postUrl = function () {
         var req = {
             method: 'POST',
-            url: localStorage.getItem('api')+'/urls',
+            url: localStorage.getItem('api')+":"+localStorage.getItem('port')+'/urls',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -18,7 +18,7 @@ app.controller('urlModalCtrl', function($scope,$uibModalInstance,AlertService,$h
             }
         };
         $http(req).then(function (response) {
-            $scope.urlResponse = localStorage.getItem('api')+"/urls/" + response.data.id;
+            $scope.urlResponse = localStorage.getItem('api')+":"+localStorage.getItem('port')+"/urls/" + response.data.id;
         }).catch(function (response) {
             if (response.status == 400) {
                 AlertService.alert('Error', 'Params error', 'Close');
