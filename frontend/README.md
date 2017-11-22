@@ -23,4 +23,4 @@ The `npm start` command runs the application in the port 8000 (by default).
 
 ## Contact
 
-For more information or issues contact us at : zaratech.ptm@gmail.com
+For more information or issues contact us at : zaratech.ptm@gmail.com (Email address no longer available, use Issues section instead)
